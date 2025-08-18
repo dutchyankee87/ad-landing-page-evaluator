@@ -7,8 +7,16 @@ import ComponentScores from '../components/results/ComponentScores';
 import Suggestions from '../components/results/Suggestions';
 import AdSummary from '../components/results/AdSummary';
 
+const PLATFORM_NAMES = {
+  meta: 'Meta (Facebook/Instagram)',
+  tiktok: 'TikTok',
+  linkedin: 'LinkedIn',
+  google: 'Google Ads',
+  reddit: 'Reddit'
+} as const;
+
 const Results: React.FC = () => {
-  const { results, hasEvaluated } = useAdEvaluation();
+  const { results, hasEvaluated, adData } = useAdEvaluation();
   const navigate = useNavigate();
 
   // Redirect if results aren't available
@@ -45,9 +53,13 @@ const Results: React.FC = () => {
         
         <div className="bg-white rounded-xl shadow-md overflow-hidden mb-8">
           <div className="bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-8 text-white">
-            <h1 className="text-3xl font-bold mb-2">Ad Evaluation Results</h1>
+            <h1 className="text-3xl font-bold mb-2">
+              {adData.platform ? `${PLATFORM_NAMES[adData.platform as keyof typeof PLATFORM_NAMES]} ` : ''}
+              Ad Evaluation Results
+            </h1>
             <p className="opacity-90">
               Here's how well your ad, landing page, and audience align
+              {adData.platform ? ` for ${PLATFORM_NAMES[adData.platform as keyof typeof PLATFORM_NAMES]} advertising` : ''}
             </p>
           </div>
           

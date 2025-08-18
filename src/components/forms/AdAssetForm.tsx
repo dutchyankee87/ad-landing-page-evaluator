@@ -1,6 +1,14 @@
 import React, { useState, useRef } from 'react';
-import { Image, Upload, X } from 'lucide-react';
+import { Image, Upload, X, Info } from 'lucide-react';
 import { useAdEvaluation } from '../../context/AdEvaluationContext';
+
+const SUPPORTED_PLATFORMS = [
+  { id: 'meta', name: 'Meta (Facebook/Instagram)', guidance: 'Screenshot your ad from Facebook Ads Manager or Instagram promotion. Include the full ad creative and any text overlay.' },
+  { id: 'tiktok', name: 'TikTok', guidance: 'Capture your ad preview from TikTok Ads Manager. For video ads, take a screenshot of a representative frame.' },
+  { id: 'linkedin', name: 'LinkedIn', guidance: 'Screenshot from LinkedIn Campaign Manager. Include the full sponsored content or ad format.' },
+  { id: 'google', name: 'Google Ads', guidance: 'Capture from Google Ads interface. Include display ads, search ads, or YouTube ad thumbnails.' },
+  { id: 'reddit', name: 'Reddit', guidance: 'Screenshot your promoted post or ad from Reddit Ads. Include the full post format and any media.' }
+];
 
 const AdAssetForm: React.FC = () => {
   const { adData, updateAdData } = useAdEvaluation();
@@ -50,24 +58,55 @@ const AdAssetForm: React.FC = () => {
     updateAdData({ imageUrl: null });
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     updateAdData({ [name]: value });
   };
+
+  const selectedPlatform = SUPPORTED_PLATFORMS.find(p => p.id === adData.platform);
 
   return (
     <div className="space-y-6">
       <div>
         <h2 className="text-xl font-semibold mb-1">Ad Assets</h2>
         <p className="text-gray-600 mb-6">
-          Upload your ad creative and enter the headline and description
+          Select your platform and upload a screenshot of your complete ad
         </p>
+      </div>
+
+      {/* Platform Selection */}
+      <div className="space-y-2">
+        <label htmlFor="platform" className="block text-sm font-medium text-gray-700">
+          Advertising Platform <span className="text-red-500">*</span>
+        </label>
+        <select
+          id="platform"
+          name="platform"
+          value={adData.platform || ''}
+          onChange={handleInputChange}
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+        >
+          <option value="">Select a platform...</option>
+          {SUPPORTED_PLATFORMS.map(platform => (
+            <option key={platform.id} value={platform.id}>
+              {platform.name}
+            </option>
+          ))}
+        </select>
+        {selectedPlatform && (
+          <div className="flex items-start gap-2 p-3 bg-blue-50 rounded-lg border border-blue-200">
+            <Info className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+            <p className="text-sm text-blue-800">
+              <strong>Screenshot Tip:</strong> {selectedPlatform.guidance}
+            </p>
+          </div>
+        )}
       </div>
       
       {/* Image Upload */}
       <div className="space-y-2">
         <label className="block text-sm font-medium text-gray-700">
-          Ad Image <span className="text-red-500">*</span>
+          Ad Screenshot <span className="text-red-500">*</span>
         </label>
         
         {!adData.imageUrl ? (
@@ -86,7 +125,7 @@ const AdAssetForm: React.FC = () => {
                 Drag and drop or click to upload
               </p>
               <p className="text-xs text-gray-500">
-                PNG, JPG, GIF up to 5MB
+                PNG, JPG, GIF up to 5MB • Complete ad screenshot including all text and visuals
               </p>
             </div>
             <input
@@ -113,46 +152,6 @@ const AdAssetForm: React.FC = () => {
             </button>
           </div>
         )}
-      </div>
-      
-      {/* Headline */}
-      <div className="space-y-2">
-        <label htmlFor="headline" className="block text-sm font-medium text-gray-700">
-          Headline <span className="text-red-500">*</span>
-        </label>
-        <input
-          type="text"
-          id="headline"
-          name="headline"
-          value={adData.headline || ''}
-          onChange={handleInputChange}
-          placeholder="Enter your ad headline"
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-          maxLength={40}
-        />
-        <p className="text-xs text-gray-500">
-          Max 40 characters. {adData.headline ? 40 - adData.headline.length : 40} characters remaining.
-        </p>
-      </div>
-      
-      {/* Description */}
-      <div className="space-y-2">
-        <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-          Description <span className="text-red-500">*</span>
-        </label>
-        <textarea
-          id="description"
-          name="description"
-          value={adData.description || ''}
-          onChange={handleInputChange}
-          placeholder="Enter your ad description"
-          rows={4}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none"
-          maxLength={125}
-        />
-        <p className="text-xs text-gray-500">
-          Max 125 characters. {adData.description ? 125 - adData.description.length : 125} characters remaining.
-        </p>
       </div>
     </div>
   );

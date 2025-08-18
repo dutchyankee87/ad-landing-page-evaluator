@@ -2,6 +2,14 @@ import React from 'react';
 import { useAdEvaluation } from '../../context/AdEvaluationContext';
 import { ExternalLink } from 'lucide-react';
 
+const PLATFORM_NAMES = {
+  meta: 'Meta (Facebook/Instagram)',
+  tiktok: 'TikTok',
+  linkedin: 'LinkedIn',
+  google: 'Google Ads',
+  reddit: 'Reddit'
+} as const;
+
 const AdSummary: React.FC = () => {
   const { adData, landingPageData } = useAdEvaluation();
   
@@ -12,28 +20,30 @@ const AdSummary: React.FC = () => {
       <div className="grid md:grid-cols-2 gap-6">
         {/* Ad Content */}
         <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4">
-          <h3 className="text-lg font-medium mb-4">Ad Content</h3>
+          <h3 className="text-lg font-medium mb-4">Ad Screenshot</h3>
           
           {adData.imageUrl && (
             <div className="mb-4">
               <img
                 src={adData.imageUrl}
-                alt="Ad creative"
+                alt="Complete ad screenshot"
                 className="w-full h-48 object-cover rounded-lg border border-gray-200"
               />
             </div>
           )}
           
           <div className="space-y-3">
-            <div>
-              <h4 className="text-sm font-medium text-gray-500">Headline</h4>
-              <p className="text-gray-800">{adData.headline}</p>
-            </div>
+            {adData.platform && (
+              <div>
+                <h4 className="text-sm font-medium text-gray-500">Platform</h4>
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    {PLATFORM_NAMES[adData.platform as keyof typeof PLATFORM_NAMES] || adData.platform}
+                  </span>
+                </div>
+              </div>
+            )}
             
-            <div>
-              <h4 className="text-sm font-medium text-gray-500">Description</h4>
-              <p className="text-gray-800">{adData.description}</p>
-            </div>
           </div>
         </div>
         

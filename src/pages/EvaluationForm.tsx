@@ -4,6 +4,7 @@ import { Image, Link, Upload, AlertCircle } from 'lucide-react';
 import { useAdEvaluation } from '../context/AdEvaluationContext';
 import AdAssetForm from '../components/forms/AdAssetForm';
 import LandingPageForm from '../components/forms/LandingPageForm';
+import UsageBanner from '../components/UsageBanner';
 
 type Step = 'adAssets' | 'landingPage' | 'review';
 
@@ -16,8 +17,8 @@ const EvaluationForm: React.FC = () => {
 
   const handleNext = () => {
     if (currentStep === 'adAssets') {
-      if (!adData.headline || !adData.description || !adData.imageUrl) {
-        setError('Please complete all required fields before proceeding.');
+      if (!adData.platform || !adData.imageUrl) {
+        setError('Please select a platform and upload an ad screenshot before proceeding.');
         return;
       }
       setCurrentStep('landingPage');
@@ -112,12 +113,14 @@ const EvaluationForm: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-3xl mx-auto">
-        <h1 className="text-3xl font-bold text-center mb-2">Meta Ad Evaluation</h1>
+        <h1 className="text-3xl font-bold text-center mb-2">Ad Landing Page Evaluation</h1>
         <p className="text-gray-600 text-center mb-8">
-          Complete all steps to receive a comprehensive ad evaluation
+          Complete all steps to receive a comprehensive evaluation of your ad and landing page alignment
         </p>
         
         {renderStepIndicator()}
+        
+        <UsageBanner />
         
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg mb-6 flex items-center gap-2">
@@ -136,21 +139,25 @@ const EvaluationForm: React.FC = () => {
               
               <div className="border border-gray-200 rounded-lg p-4">
                 <h3 className="text-sm font-medium text-gray-500 mb-2">Ad Assets</h3>
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm font-medium text-gray-700">Headline</p>
-                    <p className="text-sm text-gray-600">{adData.headline}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-700">Description</p>
-                    <p className="text-sm text-gray-600">{adData.description}</p>
-                  </div>
+                <div className="space-y-4">
+                  {adData.platform && (
+                    <div>
+                      <p className="text-sm font-medium text-gray-700">Platform</p>
+                      <p className="text-sm text-gray-600">
+                        {adData.platform === 'meta' && 'Meta (Facebook/Instagram)'}
+                        {adData.platform === 'tiktok' && 'TikTok'}
+                        {adData.platform === 'linkedin' && 'LinkedIn'}
+                        {adData.platform === 'google' && 'Google Ads'}
+                        {adData.platform === 'reddit' && 'Reddit'}
+                      </p>
+                    </div>
+                  )}
                   {adData.imageUrl && (
-                    <div className="md:col-span-2">
-                      <p className="text-sm font-medium text-gray-700 mb-2">Ad Image</p>
+                    <div>
+                      <p className="text-sm font-medium text-gray-700 mb-2">Ad Screenshot</p>
                       <img 
                         src={adData.imageUrl} 
-                        alt="Ad preview" 
+                        alt="Complete ad screenshot" 
                         className="h-40 object-cover rounded-lg border border-gray-200" 
                       />
                     </div>

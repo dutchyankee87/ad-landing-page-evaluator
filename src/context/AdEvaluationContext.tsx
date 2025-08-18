@@ -2,8 +2,6 @@ import React, { createContext, useState, useContext, ReactNode } from 'react';
 
 // Types
 interface AdData {
-  headline: string | null;
-  description: string | null;
   imageUrl: string | null;
   platform: string | null;
 }
@@ -60,8 +58,6 @@ const AdEvaluationContext = createContext<AdEvaluationContextType | undefined>(u
 // Provider component
 export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [adData, setAdData] = useState<AdData>({
-    headline: null,
-    description: null,
     imageUrl: null,
     platform: null
   });
@@ -130,6 +126,98 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
     await mockEvaluateAd();
   };
   
+  const getPlatformSpecificSuggestions = (platform: string) => {
+    const platformSuggestions = {
+      meta: {
+        visual: [
+          "Optimize images for mobile viewing as most Meta users browse on mobile devices",
+          "Use bright, eye-catching visuals that stand out in social feeds",
+          "Ensure your brand colors match your landing page for consistent recognition"
+        ],
+        contextual: [
+          "Include social proof elements like testimonials that appear on your landing page",
+          "Match the emotional tone of your ad with your landing page's value proposition",
+          "Ensure your CTA button language is consistent between ad and landing page"
+        ],
+        tone: [
+          "Maintain a conversational, social media-friendly tone across touchpoints",
+          "Use engaging, scroll-stopping language that matches your landing page personality",
+          "Consider the casual browsing context of social media users"
+        ]
+      },
+      tiktok: {
+        visual: [
+          "Use dynamic, trend-aware visuals that feel native to TikTok",
+          "Ensure high contrast and bold text for mobile viewing",
+          "Match the energetic visual style with your landing page design"
+        ],
+        contextual: [
+          "Align trending hashtags and concepts with your landing page content",
+          "Ensure your value proposition resonates with a younger demographic",
+          "Create authentic content that doesn't feel overly promotional"
+        ],
+        tone: [
+          "Use casual, authentic language that feels genuine to TikTok users",
+          "Match the creative, playful energy across ad and landing page",
+          "Avoid corporate jargon in favor of conversational, relatable messaging"
+        ]
+      },
+      linkedin: {
+        visual: [
+          "Use professional, clean visuals that convey credibility",
+          "Ensure consistent branding with corporate color schemes",
+          "Focus on quality imagery that reflects business professionalism"
+        ],
+        contextual: [
+          "Highlight business benefits and ROI in both ad and landing page",
+          "Include industry-specific language and pain points",
+          "Ensure B2B value propositions are consistently presented"
+        ],
+        tone: [
+          "Maintain professional, authoritative tone across all touchpoints",
+          "Use industry expertise and thought leadership language",
+          "Focus on business outcomes and professional credibility"
+        ]
+      },
+      google: {
+        visual: [
+          "Optimize for quick scanning as users often browse search results rapidly",
+          "Use clear, high-quality images that support search intent",
+          "Ensure visual hierarchy guides users from ad to landing page seamlessly"
+        ],
+        contextual: [
+          "Match ad keywords with prominent landing page content",
+          "Ensure search intent aligns with landing page offerings",
+          "Create clear conversion paths from ad click to landing page action"
+        ],
+        tone: [
+          "Use direct, solution-focused language that addresses search queries",
+          "Maintain consistency in problem-solving approach",
+          "Focus on immediate value and clear next steps"
+        ]
+      },
+      reddit: {
+        visual: [
+          "Use authentic, non-promotional visuals that fit Reddit's community culture",
+          "Avoid overly polished imagery in favor of genuine, relatable content",
+          "Ensure visuals support community-focused messaging"
+        ],
+        contextual: [
+          "Lead with value and genuine helpfulness rather than direct promotion",
+          "Ensure landing page provides real value mentioned in the ad",
+          "Focus on community benefit and authentic problem-solving"
+        ],
+        tone: [
+          "Use genuine, community-first language that avoids sales speak",
+          "Maintain authentic, helpful tone that respects Reddit culture",
+          "Focus on contributing value rather than extracting it"
+        ]
+      }
+    };
+
+    return platformSuggestions[platform as keyof typeof platformSuggestions] || platformSuggestions.meta;
+  };
+
   const mockEvaluateAd = async () => {
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 2000));
@@ -141,6 +229,8 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
     
     const overallScore = Math.round((visualScore + contextualScore + toneScore) / 3 * 10) / 10;
     
+    const platformSuggestions = getPlatformSpecificSuggestions(adData.platform || 'meta');
+    
     const mockResults: EvaluationResults = {
       overallScore,
       componentScores: {
@@ -148,23 +238,7 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
         contextualMatch: contextualScore,
         toneAlignment: toneScore
       },
-      suggestions: {
-        visual: [
-          "Consider using colors that better match your landing page's color scheme",
-          "Ensure your ad image style is consistent with your website's visual identity",
-          "Test different image compositions to improve visual flow"
-        ],
-        contextual: [
-          "Align your ad headline more closely with your landing page's main value proposition",
-          "Ensure the benefits mentioned in your ad are prominently featured on the landing page",
-          "Consider adding social proof elements that match between ad and page"
-        ],
-        tone: [
-          "Maintain consistent voice and personality across ad copy and landing page content",
-          "Ensure the urgency level in your ad matches the tone on your landing page",
-          "Consider adjusting the formality level to be consistent across touchpoints"
-        ]
-      }
+      suggestions: platformSuggestions
     };
     
     setResults(mockResults);
@@ -173,8 +247,6 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
   
   const resetEvaluation = () => {
     setAdData({
-      headline: null,
-      description: null,
       imageUrl: null,
       platform: null
     });
