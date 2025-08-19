@@ -1,4 +1,6 @@
 import OpenAI from 'npm:openai@4.28.0';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
+import { canUserEvaluate, TIER_LIMITS } from './db-schema.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -196,7 +198,42 @@ Deno.serve(async (req) => {
 
   try {
     console.log('🚀 Edge Function called!');
-    const { adData, landingPageData, audienceData } = await req.json();
+    const { adData, landingPageData, audienceData, userEmail } = await req.json();
+    
+    // Initialize Supabase client for usage tracking
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+    
+    let userId = null;
+    
+    // If user email provided, check usage limits
+    if (userEmail) {
+      const { data: user } = await supabaseClient
+        .from('users')
+        .select('*')
+        .eq('email', userEmail)
+        .single();
+        
+      if (user && !canUserEvaluate(user)) {
+        return new Response(
+          JSON.stringify({ 
+            error: `Monthly evaluation limit reached (${user.monthlyEvaluations}/${TIER_LIMITS[user.tier]}). Please upgrade your plan.`,
+            errorCode: 'USAGE_LIMIT_EXCEEDED'
+          }),
+          {
+            status: 429,
+            headers: {
+              ...corsHeaders,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+      }
+      
+      userId = user?.id;
+    }
     
     const openai = new OpenAI({
       apiKey: Deno.env.get('OPENAI_API_KEY'),
@@ -310,6 +347,38 @@ Format your response as a JSON object with this structure:
     };
 
     console.log('📊 Analysis complete:', { overallScore, usedGPT: !!analysis.scores });
+
+    // Increment usage count for tracked users
+    if (userId) {
+      try {
+        await supabaseClient
+          .from('users')
+          .update({ 
+            monthlyEvaluations: supabaseClient.raw('monthly_evaluations + 1') 
+          })
+          .eq('id', userId);
+        
+        // Log the evaluation
+        await supabaseClient
+          .from('evaluations')
+          .insert({
+            user_id: userId,
+            platform: adData.platform,
+            ad_screenshot_url: adData.imageUrl,
+            landing_page_url: landingPageData.url,
+            overall_score: overallScore,
+            visual_score: analysis.scores.visualMatch,
+            contextual_score: analysis.scores.contextualMatch,
+            tone_score: analysis.scores.toneAlignment,
+            used_ai: !!analysis.scores
+          });
+          
+        console.log('✅ Usage tracking updated');
+      } catch (dbError) {
+        console.warn('⚠️ Database logging failed:', dbError);
+        // Don't fail the evaluation if logging fails
+      }
+    }
 
     return new Response(
       JSON.stringify(response),

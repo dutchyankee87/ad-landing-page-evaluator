@@ -13,13 +13,11 @@ export default defineConfig({
         // Exclude server-side packages from client build
         return id.includes('postgres') || 
                id.includes('pg') || 
-               id.includes('drizzle-orm/postgres-js') ||
-               id === './src/lib/db/index.ts' ||
-               id === './src/lib/db/queries.ts';
+               id.includes('drizzle-orm/postgres-js');
       },
     },
   },
   optimizeDeps: {
-    exclude: ['lucide-react', 'postgres', 'pg', 'drizzle-orm/postgres-js'],
+    exclude: ['lucide-react'],
   },
 });
