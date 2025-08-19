@@ -291,6 +291,7 @@ Format your response as a JSON object with this structure:
     
     // Try GPT-4 Vision first
     try {
+      console.log('🤖 Using GPT-4o Vision for analysis...');
       const completion = await openai.chat.completions.create({
         messages: [{
           role: "user",
@@ -320,10 +321,13 @@ Format your response as a JSON object with this structure:
         throw new Error('Invalid response format from GPT-4 Vision');
       }
       
+      console.log('✅ GPT-4o analysis successful!');
+      
     } catch (visionError) {
-      console.error('GPT-4 Vision failed:', visionError);
+      console.error('❌ GPT-4o failed:', visionError);
       
       // Fallback to text-only analysis with mock data
+      console.log('🔄 Using fallback mock analysis...');
       const fallbackAnalysis = generateFallbackAnalysis(adData.platform || 'meta');
       analysis = fallbackAnalysis;
     }
