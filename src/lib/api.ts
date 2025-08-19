@@ -46,16 +46,21 @@ export interface UsageInfo {
 // Evaluate ad using Supabase Edge Function
 export async function evaluateAd(request: EvaluationRequest): Promise<EvaluationResponse> {
   try {
+    console.log('🚀 Attempting to call Supabase Edge Function...');
+    console.log('Supabase URL:', import.meta.env.VITE_SUPABASE_URL);
+    console.log('Has Anon Key:', !!import.meta.env.VITE_SUPABASE_ANON_KEY);
+    
     // Try Supabase Edge Function first
     const { data, error } = await supabase.functions.invoke('evaluate-ad', {
       body: request
     });
 
     if (error) {
-      console.warn('Supabase Edge Function failed:', error);
+      console.warn('❌ Supabase Edge Function failed:', error);
       throw error;
     }
 
+    console.log('✅ Edge Function successful!');
     return data;
   } catch (error) {
     console.warn('API evaluation failed, using fallback:', error);
