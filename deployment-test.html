@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Deployment Test</title>
+</head>
+<body>
+    <h1>Deployment Test</h1>
+    <p>If you can see this, the basic deployment is working.</p>
+    <p>Environment Variables Test:</p>
+    <ul>
+        <li>VITE_SUPABASE_URL: <span id="supabase-url"></span></li>
+        <li>VITE_SUPABASE_ANON_KEY: <span id="supabase-key"></span></li>
+    </ul>
+    
+    <script>
+        // Test if environment variables are loaded
+        document.getElementById('supabase-url').textContent = 
+            import.meta.env.VITE_SUPABASE_URL || 'NOT SET';
+        document.getElementById('supabase-key').textContent = 
+            import.meta.env.VITE_SUPABASE_ANON_KEY ? 'SET' : 'NOT SET';
+    </script>
+</body>
+</html>
