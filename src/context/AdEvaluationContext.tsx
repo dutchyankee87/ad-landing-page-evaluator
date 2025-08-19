@@ -90,40 +90,30 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
   };
   
   const evaluateAd = async () => {
-    // Check if Supabase is configured
-    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-    const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-    
-    if (supabaseUrl && supabaseKey) {
-      try {
-        const response = await fetch(`${supabaseUrl}/functions/v1/evaluate-ad`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${supabaseKey}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            adData,
-            landingPageData,
-            audienceData,
-          }),
-        });
+    try {
+      // Use the client-safe API
+      const { evaluateAd: apiEvaluateAd } = await import('../lib/api');
+      
+      const response = await apiEvaluateAd({
+        adData,
+        landingPageData,
+        audienceData,
+        // TODO: Add user email when auth is implemented
+        userEmail: undefined
+      });
 
-        if (!response.ok) {
-          throw new Error(`API request failed: ${response.status}`);
-        }
-
-        const data = await response.json();
-        setResults(data);
-        setHasEvaluated(true);
-        return;
-      } catch (error) {
-        console.warn('API evaluation failed, falling back to demo mode:', error);
-      }
+      setResults({
+        overallScore: response.overallScore,
+        componentScores: response.componentScores,
+        suggestions: response.suggestions
+      });
+      setHasEvaluated(true);
+      
+    } catch (error) {
+      console.warn('Evaluation failed, using fallback:', error);
+      // Fallback to mock evaluation
+      await mockEvaluateAd();
     }
-    
-    // Fallback to mock evaluation for demo purposes
-    await mockEvaluateAd();
   };
   
   const getPlatformSpecificSuggestions = (platform: string) => {
