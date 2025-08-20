@@ -3,7 +3,7 @@ const { drizzle } = require('drizzle-orm/postgres-js');
 const postgres = require('postgres');
 const { pgTable, uuid, text, integer, boolean, timestamp, index } = require('drizzle-orm/pg-core');
 const { eq, sql } = require('drizzle-orm');
-const puppeteer = require('puppeteer');
+// Remove Puppeteer - using screenshot service instead
 
 // Database schema (inline to avoid import issues)
 const users = pgTable('users', {
@@ -31,51 +31,53 @@ const evaluations = pgTable('evaluations', {
 
 const TIER_LIMITS = { free: 1, pro: 50, enterprise: 1000 };
 
-// Screenshot landing page function
+// Screenshot landing page using HTMLCSStoImage service
 const screenshotLandingPage = async (url) => {
-  let browser = null;
   try {
     console.log('📸 Taking screenshot of landing page:', url);
     
-    browser = await puppeteer.launch({
-      headless: true,
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-accelerated-2d-canvas',
-        '--no-first-run',
-        '--no-zygote',
-        '--single-process', // <- this one doesn't work in Windows
-        '--disable-gpu'
-      ]
-    });
-
-    const page = await browser.newPage();
-    await page.setViewport({ width: 1200, height: 800 });
+    // Use HTMLCSStoImage API (free tier available)
+    const screenshotApiUrl = `https://htmlcsstoimage.com/demo_run?url=${encodeURIComponent(url)}&width=1200&height=800&selector=body`;
     
-    // Set a reasonable timeout
-    await page.goto(url, { 
-      waitUntil: 'networkidle0', 
-      timeout: 10000 
+    const response = await fetch(screenshotApiUrl, {
+      method: 'GET',
+      timeout: 15000
     });
 
-    // Take screenshot
-    const screenshot = await page.screenshot({ 
-      encoding: 'base64',
-      fullPage: false // Just above the fold
-    });
+    if (!response.ok) {
+      throw new Error(`Screenshot API failed: ${response.status}`);
+    }
 
-    console.log('✅ Screenshot captured successfully');
-    return `data:image/png;base64,${screenshot}`;
+    const imageBuffer = await response.arrayBuffer();
+    const base64Image = Buffer.from(imageBuffer).toString('base64');
+    
+    console.log('✅ Screenshot captured successfully via API');
+    return `data:image/png;base64,${base64Image}`;
 
   } catch (error) {
     console.warn('❌ Screenshot failed:', error.message);
-    return null;
-  } finally {
-    if (browser) {
-      await browser.close();
+    
+    // Fallback: try a simpler approach with a different service
+    try {
+      console.log('🔄 Trying fallback screenshot service...');
+      
+      // Simple URL to image service
+      const fallbackUrl = `https://image.thum.io/get/width/1200/crop/800/noanimate/${encodeURIComponent(url)}`;
+      
+      const fallbackResponse = await fetch(fallbackUrl, { timeout: 10000 });
+      
+      if (fallbackResponse.ok) {
+        const imageBuffer = await fallbackResponse.arrayBuffer();
+        const base64Image = Buffer.from(imageBuffer).toString('base64');
+        
+        console.log('✅ Fallback screenshot successful');
+        return `data:image/png;base64,${base64Image}`;
+      }
+    } catch (fallbackError) {
+      console.warn('❌ Fallback screenshot also failed:', fallbackError.message);
     }
+    
+    return null;
   }
 };
 
