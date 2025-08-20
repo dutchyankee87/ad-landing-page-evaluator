@@ -1,12 +1,12 @@
 {
-  "version": "7",
-  "dialect": "postgresql",
+  "version": "5",
+  "dialect": "pg",
   "entries": [
     {
       "idx": 0,
-      "version": "7",
-      "when": 1755589704320,
-      "tag": "0000_opposite_princess_powerful",
+      "version": "5",
+      "when": 1692744840000,
+      "tag": "0000_initial",
       "breakpoints": true
     }
   ]

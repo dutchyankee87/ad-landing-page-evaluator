@@ -1,5 +1,6 @@
 import OpenAI from 'openai';
-import { createClient } from '@supabase/supabase-js';
+import { getUserByEmail, canUserEvaluate, incrementUserEvaluations, createEvaluation } from '../src/lib/db/queries';
+import { TIER_LIMITS } from '../src/lib/db/schema';
 
 // Types
 interface AdData {
@@ -61,29 +62,18 @@ export default async function handler(req: any, res: any) {
       apiKey: process.env.OPENAI_API_KEY,
     });
 
-    // Initialize Supabase for database operations
-    const supabase = createClient(
-      process.env.SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
-
     let userId = null;
 
     // Check user usage limits if email provided
     if (userEmail) {
-      const { data: user } = await supabase
-        .from('users')
-        .select('id, tier, monthly_evaluations')
-        .eq('email', userEmail)
-        .single();
+      const user = await getUserByEmail(userEmail);
 
       if (user) {
-        const limits = { free: 1, pro: 50, enterprise: 1000 };
-        const limit = limits[user.tier as keyof typeof limits] || 1;
+        const limit = TIER_LIMITS[user.tier];
         
-        if (user.monthly_evaluations >= limit) {
+        if (user.monthlyEvaluations >= limit) {
           return res.status(429).json({
-            error: `Monthly limit reached (${user.monthly_evaluations}/${limit}). Please upgrade your plan.`,
+            error: `Monthly limit reached (${user.monthlyEvaluations}/${limit}). Please upgrade your plan.`,
             errorCode: 'USAGE_LIMIT_EXCEEDED'
           });
         }
@@ -167,22 +157,20 @@ Return ONLY valid JSON:
     if (userId) {
       try {
         // Increment user usage
-        await supabase.rpc('increment_user_evaluation', { user_id_param: userId });
+        await incrementUserEvaluations(userId);
         
         // Store evaluation
-        await supabase
-          .from('evaluations')
-          .insert({
-            user_id: userId,
-            platform: adData.platform,
-            ad_screenshot_url: adData.imageUrl,
-            landing_page_url: landingPageData.url,
-            overall_score: overallScore,
-            visual_score: analysis.scores.visualMatch,
-            contextual_score: analysis.scores.contextualMatch,
-            tone_score: analysis.scores.toneAlignment,
-            used_ai: true
-          });
+        await createEvaluation({
+          userId: userId,
+          platform: adData.platform,
+          adScreenshotUrl: adData.imageUrl,
+          landingPageUrl: landingPageData.url,
+          overallScore: overallScore,
+          visualScore: analysis.scores.visualMatch,
+          contextualScore: analysis.scores.contextualMatch,
+          toneScore: analysis.scores.toneAlignment,
+          usedAi: true
+        });
 
         console.log('✅ Evaluation stored in database');
       } catch (dbError) {
