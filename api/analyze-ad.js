@@ -1,6 +1,34 @@
-import OpenAI from 'openai';
-import { getUserByEmail, canUserEvaluate, incrementUserEvaluations, createEvaluation } from '../src/lib/db/queries';
-import { TIER_LIMITS } from '../src/lib/db/schema';
+const OpenAI = require('openai').default || require('openai');
+const { drizzle } = require('drizzle-orm/postgres-js');
+const postgres = require('postgres');
+const { pgTable, uuid, text, integer, boolean, timestamp, index } = require('drizzle-orm/pg-core');
+const { eq, sql } = require('drizzle-orm');
+
+// Database schema (inline to avoid import issues)
+const users = pgTable('users', {
+  id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
+  email: text('email').unique().notNull(),
+  tier: text('tier', { enum: ['free', 'pro', 'enterprise'] }).default('free').notNull(),
+  monthlyEvaluations: integer('monthly_evaluations').default(0).notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).default(sql`NOW()`).notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).default(sql`NOW()`).notNull(),
+});
+
+const evaluations = pgTable('evaluations', {
+  id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
+  userId: uuid('user_id').references(() => users.id),
+  platform: text('platform').default('meta').notNull(),
+  adScreenshotUrl: text('ad_screenshot_url').notNull(),
+  landingPageUrl: text('landing_page_url').notNull(),
+  overallScore: integer('overall_score').notNull(),
+  visualScore: integer('visual_score').notNull(),
+  contextualScore: integer('contextual_score').notNull(),
+  toneScore: integer('tone_score').notNull(),
+  usedAi: boolean('used_ai').default(true).notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).default(sql`NOW()`).notNull(),
+});
+
+const TIER_LIMITS = { free: 1, pro: 50, enterprise: 1000 } as const;
 
 // Types
 interface AdData {
@@ -30,10 +58,10 @@ const getPlatformPrompt = (platform: string) => {
     google: 'Google Ads - focus on search intent alignment and conversion optimization',
     reddit: 'Reddit - focus on community authenticity and non-promotional tone'
   };
-  return prompts[platform as keyof typeof prompts] || prompts.meta;
+  return prompts[platform] || prompts.meta;
 };
 
-export default async function handler(req: any, res: any) {
+module.exports = async function handler(req, res) {
   // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -48,14 +76,19 @@ export default async function handler(req: any, res: any) {
   }
 
   try {
-    const { adData, landingPageData, audienceData, userEmail }: {
-      adData: AdData;
-      landingPageData: LandingPageData;
-      audienceData: AudienceData;
-      userEmail?: string;
-    } = req.body;
+    const { adData, landingPageData, audienceData, userEmail } = req.body;
 
     console.log('🚀 Vercel Function called for platform:', adData.platform);
+
+    // Initialize database connection
+    let db = null;
+    if (process.env.DATABASE_URL) {
+      const client = postgres(process.env.DATABASE_URL, { prepare: false });
+      db = drizzle(client);
+      console.log('✅ Database connected');
+    } else {
+      console.log('⚠️ No database connection - proceeding without user tracking');
+    }
 
     // Initialize OpenAI
     const openai = new OpenAI({
@@ -64,21 +97,27 @@ export default async function handler(req: any, res: any) {
 
     let userId = null;
 
-    // Check user usage limits if email provided
-    if (userEmail) {
-      const user = await getUserByEmail(userEmail);
+    // Check user usage limits if email provided and database available
+    if (userEmail && db) {
+      try {
+        const userResult = await db.select().from(users).where(eq(users.email, userEmail)).limit(1);
+        const user = userResult[0];
 
-      if (user) {
-        const limit = TIER_LIMITS[user.tier];
-        
-        if (user.monthlyEvaluations >= limit) {
-          return res.status(429).json({
-            error: `Monthly limit reached (${user.monthlyEvaluations}/${limit}). Please upgrade your plan.`,
-            errorCode: 'USAGE_LIMIT_EXCEEDED'
-          });
+        if (user) {
+          const limit = TIER_LIMITS[user.tier];
+          
+          if (user.monthlyEvaluations >= limit) {
+            return res.status(429).json({
+              error: `Monthly limit reached (${user.monthlyEvaluations}/${limit}). Please upgrade your plan.`,
+              errorCode: 'USAGE_LIMIT_EXCEEDED'
+            });
+          }
+          
+          userId = user.id;
         }
-        
-        userId = user.id;
+      } catch (dbError) {
+        console.warn('⚠️ Database query failed:', dbError);
+        // Continue without user tracking
       }
     }
 
@@ -154,13 +193,19 @@ Return ONLY valid JSON:
     };
 
     // Store evaluation in database
-    if (userId) {
+    if (userId && db) {
       try {
         // Increment user usage
-        await incrementUserEvaluations(userId);
+        await db
+          .update(users)
+          .set({ 
+            monthlyEvaluations: sql`monthly_evaluations + 1`,
+            updatedAt: new Date()
+          })
+          .where(eq(users.id, userId));
         
         // Store evaluation
-        await createEvaluation({
+        await db.insert(evaluations).values({
           userId: userId,
           platform: adData.platform,
           adScreenshotUrl: adData.imageUrl,
@@ -214,4 +259,4 @@ Return ONLY valid JSON:
 
     return res.status(200).json(fallbackResponse);
   }
-}
+};
