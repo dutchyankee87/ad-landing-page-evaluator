@@ -28,29 +28,11 @@ const evaluations = pgTable('evaluations', {
   createdAt: timestamp('created_at', { withTimezone: true }).default(sql`NOW()`).notNull(),
 });
 
-const TIER_LIMITS = { free: 1, pro: 50, enterprise: 1000 } as const;
+const TIER_LIMITS = { free: 1, pro: 50, enterprise: 1000 };
 
-// Types
-interface AdData {
-  imageUrl: string;
-  platform: string;
-}
+// Helper function for platform-specific prompts
 
-interface LandingPageData {
-  url: string;
-  title?: string;
-  mainContent?: string;
-  ctaText?: string;
-}
-
-interface AudienceData {
-  ageRange: string;
-  gender: string;
-  location?: string;
-  interests: string;
-}
-
-const getPlatformPrompt = (platform: string) => {
+const getPlatformPrompt = (platform) => {
   const prompts = {
     meta: 'Meta (Facebook & Instagram) - focus on social engagement and mobile optimization',
     tiktok: 'TikTok - focus on visual energy, trends, and authentic content',
