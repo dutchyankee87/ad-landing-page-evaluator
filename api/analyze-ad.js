@@ -31,50 +31,74 @@ const evaluations = pgTable('evaluations', {
 
 const TIER_LIMITS = { free: 1, pro: 50, enterprise: 1000 };
 
-// Screenshot landing page using HTMLCSStoImage service
+// Screenshot landing page using ScreenshotAPI.net (paid service)
 const screenshotLandingPage = async (url) => {
+  const screenshotApiToken = process.env.SCREENSHOT_API_TOKEN;
+  
+  if (!screenshotApiToken) {
+    console.warn('⚠️ No SCREENSHOT_API_TOKEN found - skipping screenshot');
+    return null;
+  }
+
   try {
     console.log('📸 Taking screenshot of landing page:', url);
     
-    // Use HTMLCSStoImage API (free tier available)
-    const screenshotApiUrl = `https://htmlcsstoimage.com/demo_run?url=${encodeURIComponent(url)}&width=1200&height=800&selector=body`;
+    // Use ScreenshotAPI.net - reliable paid service
+    const screenshotApiUrl = `https://shot.screenshotapi.net/screenshot`;
     
     const response = await fetch(screenshotApiUrl, {
-      method: 'GET',
-      timeout: 15000
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        token: screenshotApiToken,
+        url: url,
+        width: 1200,
+        height: 800,
+        output: 'json',
+        file_type: 'png',
+        wait_for_event: 'load'
+      }),
+      timeout: 20000
     });
 
     if (!response.ok) {
-      throw new Error(`Screenshot API failed: ${response.status}`);
+      throw new Error(`Screenshot API failed: ${response.status} - ${await response.text()}`);
     }
 
-    const imageBuffer = await response.arrayBuffer();
-    const base64Image = Buffer.from(imageBuffer).toString('base64');
+    const result = await response.json();
     
-    console.log('✅ Screenshot captured successfully via API');
-    return `data:image/png;base64,${base64Image}`;
+    if (result.screenshot) {
+      console.log('✅ Screenshot captured successfully via ScreenshotAPI');
+      return result.screenshot; // Already a data URL
+    } else {
+      throw new Error('No screenshot in API response');
+    }
 
   } catch (error) {
-    console.warn('❌ Screenshot failed:', error.message);
+    console.warn('❌ ScreenshotAPI failed:', error.message);
     
-    // Fallback: try a simpler approach with a different service
-    try {
-      console.log('🔄 Trying fallback screenshot service...');
-      
-      // Simple URL to image service
-      const fallbackUrl = `https://image.thum.io/get/width/1200/crop/800/noanimate/${encodeURIComponent(url)}`;
-      
-      const fallbackResponse = await fetch(fallbackUrl, { timeout: 10000 });
-      
-      if (fallbackResponse.ok) {
-        const imageBuffer = await fallbackResponse.arrayBuffer();
-        const base64Image = Buffer.from(imageBuffer).toString('base64');
+    // Fallback to URLBox.io if available
+    const urlboxKey = process.env.URLBOX_API_KEY;
+    if (urlboxKey) {
+      try {
+        console.log('🔄 Trying URLBox fallback...');
         
-        console.log('✅ Fallback screenshot successful');
-        return `data:image/png;base64,${base64Image}`;
+        const fallbackUrl = `https://api.urlbox.io/v1/${urlboxKey}/png?url=${encodeURIComponent(url)}&width=1200&height=800&delay=2000`;
+        
+        const fallbackResponse = await fetch(fallbackUrl, { timeout: 15000 });
+        
+        if (fallbackResponse.ok) {
+          const imageBuffer = await fallbackResponse.arrayBuffer();
+          const base64Image = Buffer.from(imageBuffer).toString('base64');
+          
+          console.log('✅ URLBox fallback successful');
+          return `data:image/png;base64,${base64Image}`;
+        }
+      } catch (fallbackError) {
+        console.warn('❌ URLBox fallback also failed:', fallbackError.message);
       }
-    } catch (fallbackError) {
-      console.warn('❌ Fallback screenshot also failed:', fallbackError.message);
     }
     
     return null;
