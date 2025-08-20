@@ -10,9 +10,9 @@ const Header: React.FC = () => {
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
-            <BarChart3 className="h-6 w-6 text-blue-600" />
-            <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Meta Ad Evaluator
+            <BarChart3 className="h-6 w-6 text-orange-500" />
+            <span className="text-xl font-bold bg-gradient-to-r from-orange-500 to-black bg-clip-text text-transparent">
+              AdAlign
             </span>
           </Link>
           
@@ -21,8 +21,8 @@ const Header: React.FC = () => {
               to="/" 
               className={`flex items-center gap-1 text-sm font-medium ${
                 location.pathname === '/' 
-                  ? 'text-blue-600' 
-                  : 'text-gray-600 hover:text-blue-600 transition-colors'
+                  ? 'text-black' 
+                  : 'text-gray-600 hover:text-black transition-colors'
               }`}
             >
               <Home className="h-4 w-4" />
@@ -33,8 +33,8 @@ const Header: React.FC = () => {
               to="/evaluate" 
               className={`px-4 py-2 rounded-full text-sm font-medium ${
                 location.pathname === '/evaluate' 
-                  ? 'bg-blue-600 text-white' 
-                  : 'bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors'
+                  ? 'bg-black text-white' 
+                  : 'bg-gray-50 text-black hover:bg-gray-100 transition-colors'
               }`}
             >
               Start Evaluation
