@@ -3,6 +3,7 @@ const { drizzle } = require('drizzle-orm/postgres-js');
 const postgres = require('postgres');
 const { pgTable, uuid, text, integer, boolean, timestamp, index } = require('drizzle-orm/pg-core');
 const { eq, sql } = require('drizzle-orm');
+const puppeteer = require('puppeteer');
 
 // Database schema (inline to avoid import issues)
 const users = pgTable('users', {
@@ -30,8 +31,55 @@ const evaluations = pgTable('evaluations', {
 
 const TIER_LIMITS = { free: 1, pro: 50, enterprise: 1000 };
 
-// Helper function for platform-specific prompts
+// Screenshot landing page function
+const screenshotLandingPage = async (url) => {
+  let browser = null;
+  try {
+    console.log('📸 Taking screenshot of landing page:', url);
+    
+    browser = await puppeteer.launch({
+      headless: true,
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-accelerated-2d-canvas',
+        '--no-first-run',
+        '--no-zygote',
+        '--single-process', // <- this one doesn't work in Windows
+        '--disable-gpu'
+      ]
+    });
 
+    const page = await browser.newPage();
+    await page.setViewport({ width: 1200, height: 800 });
+    
+    // Set a reasonable timeout
+    await page.goto(url, { 
+      waitUntil: 'networkidle0', 
+      timeout: 10000 
+    });
+
+    // Take screenshot
+    const screenshot = await page.screenshot({ 
+      encoding: 'base64',
+      fullPage: false // Just above the fold
+    });
+
+    console.log('✅ Screenshot captured successfully');
+    return `data:image/png;base64,${screenshot}`;
+
+  } catch (error) {
+    console.warn('❌ Screenshot failed:', error.message);
+    return null;
+  } finally {
+    if (browser) {
+      await browser.close();
+    }
+  }
+};
+
+// Helper function for platform-specific prompts
 const getPlatformPrompt = (platform) => {
   const prompts = {
     meta: 'Meta (Facebook & Instagram) - focus on social engagement and mobile optimization',
@@ -103,18 +151,39 @@ module.exports = async function handler(req, res) {
       }
     }
 
+    // Capture landing page screenshot
+    const landingPageScreenshot = await screenshotLandingPage(landingPageData.url);
+
     const platformInfo = getPlatformPrompt(adData.platform);
     
-    const prompt = `You are an expert ${platformInfo} ads analyst. Analyze this ad screenshot and landing page:
+    const prompt = `You are an expert ${platformInfo} ads analyst. 
 
-Ad Platform: ${adData.platform}
-Landing Page: ${landingPageData.url}
+You will analyze TWO images:
+1. AD SCREENSHOT: The user's uploaded ad creative
+2. LANDING PAGE SCREENSHOT: The destination page (${landingPageData.url})
+
+Compare these images for congruence and effectiveness:
+
 Target Audience: ${audienceData.ageRange}, ${audienceData.gender}, interests: ${audienceData.interests}
 
-Evaluate and provide scores (1-10) for:
-1. Visual Match: Ad visual design alignment with landing page
-2. Contextual Match: Ad message alignment with landing page content
-3. Tone Alignment: Voice and messaging consistency
+Analyze both images and evaluate (1-10 scores):
+
+1. **Visual Match**: 
+   - Color schemes, fonts, imagery style consistency
+   - Brand visual identity alignment
+   - Design aesthetic coherence
+
+2. **Contextual Match**: 
+   - Message/offer consistency between ad and landing page
+   - Value proposition alignment
+   - Call-to-action consistency
+
+3. **Tone Alignment**: 
+   - Voice and personality consistency
+   - Messaging style coherence
+   - Brand tone matching
+
+Provide specific observations about what you see in each image and how they compare.
 
 Return ONLY valid JSON:
 {
@@ -124,32 +193,49 @@ Return ONLY valid JSON:
     "toneAlignment": 9
   },
   "suggestions": {
-    "visual": ["suggestion 1", "suggestion 2", "suggestion 3"],
-    "contextual": ["suggestion 1", "suggestion 2", "suggestion 3"],
-    "tone": ["suggestion 1", "suggestion 2", "suggestion 3"]
+    "visual": ["specific visual improvement based on what you see", "color/design suggestion", "layout recommendation"],
+    "contextual": ["message alignment suggestion", "content consistency tip", "offer matching advice"],
+    "tone": ["voice consistency suggestion", "messaging tone advice", "brand personality tip"]
   }
 }`;
 
     console.log('🤖 Calling GPT-4o Vision...');
 
-    // Call GPT-4o Vision
+    // Prepare content array with both images
+    const content = [
+      { type: "text", text: prompt },
+      { 
+        type: "image_url", 
+        image_url: { 
+          url: adData.imageUrl,
+          detail: "high" 
+        } 
+      }
+    ];
+
+    // Add landing page screenshot if available
+    if (landingPageScreenshot) {
+      content.push({
+        type: "image_url", 
+        image_url: { 
+          url: landingPageScreenshot,
+          detail: "high" 
+        } 
+      });
+      console.log('📸 Both ad and landing page images sent to GPT-4o');
+    } else {
+      console.log('⚠️ Only ad image sent - landing page screenshot failed');
+    }
+
+    // Call GPT-4o Vision with both images
     const completion = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [{
         role: "user",
-        content: [
-          { type: "text", text: prompt },
-          { 
-            type: "image_url", 
-            image_url: { 
-              url: adData.imageUrl,
-              detail: "high" 
-            } 
-          }
-        ]
+        content: content
       }],
       response_format: { type: "json_object" },
-      max_tokens: 1500,
+      max_tokens: 2000, // Increased for more detailed analysis
       temperature: 0.7
     });
 
