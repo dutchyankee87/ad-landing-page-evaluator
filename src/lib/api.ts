@@ -43,40 +43,28 @@ export interface UsageInfo {
   canEvaluate: boolean;
 }
 
-// Evaluate ad using direct HTTP call to Supabase Edge Function
+// Evaluate ad using Vercel Function
 export async function evaluateAd(request: EvaluationRequest): Promise<EvaluationResponse> {
   try {
-    console.log('🚀 Calling Edge Function directly via HTTP...');
+    console.log('🚀 Calling Vercel Function...');
     
-    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-    const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-    
-    if (!supabaseUrl || !supabaseAnonKey) {
-      console.warn('❌ Missing Supabase environment variables');
-      throw new Error('Supabase configuration missing');
-    }
-    
-    console.log('✅ Environment variables found');
-    
-    // Direct HTTP call to Edge Function
-    const response = await fetch(`${supabaseUrl}/functions/v1/evaluate-ad`, {
+    // Call Vercel Function (deployed at /api/analyze-ad)
+    const response = await fetch('/api/analyze-ad', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${supabaseAnonKey}`,
-        'apikey': supabaseAnonKey
       },
       body: JSON.stringify(request)
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.warn('❌ Edge Function HTTP error:', response.status, errorText);
+      console.warn('❌ Vercel Function error:', response.status, errorText);
       throw new Error(`HTTP ${response.status}: ${errorText}`);
     }
 
     const data = await response.json();
-    console.log('✅ Edge Function successful!');
+    console.log('✅ Vercel Function successful!');
     return data;
     
   } catch (error) {
