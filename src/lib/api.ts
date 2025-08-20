@@ -1,5 +1,5 @@
 // Client-side API wrapper that works in both development and production
-import { supabase } from './supabase';
+// Using direct HTTP calls to avoid Supabase client import issues
 
 // Types for API responses
 export interface EvaluationRequest {
@@ -43,27 +43,44 @@ export interface UsageInfo {
   canEvaluate: boolean;
 }
 
-// Evaluate ad using Supabase Edge Function
+// Evaluate ad using direct HTTP call to Supabase Edge Function
 export async function evaluateAd(request: EvaluationRequest): Promise<EvaluationResponse> {
   try {
-    console.log('🚀 Attempting to call Supabase Edge Function...');
-    console.log('Supabase URL:', import.meta.env.VITE_SUPABASE_URL);
-    console.log('Has Anon Key:', !!import.meta.env.VITE_SUPABASE_ANON_KEY);
+    console.log('🚀 Calling Edge Function directly via HTTP...');
     
-    // Try Supabase Edge Function first
-    const { data, error } = await supabase.functions.invoke('evaluate-ad', {
-      body: request
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+    
+    if (!supabaseUrl || !supabaseAnonKey) {
+      console.warn('❌ Missing Supabase environment variables');
+      throw new Error('Supabase configuration missing');
+    }
+    
+    console.log('✅ Environment variables found');
+    
+    // Direct HTTP call to Edge Function
+    const response = await fetch(`${supabaseUrl}/functions/v1/evaluate-ad`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${supabaseAnonKey}`,
+        'apikey': supabaseAnonKey
+      },
+      body: JSON.stringify(request)
     });
 
-    if (error) {
-      console.warn('❌ Supabase Edge Function failed:', error);
-      throw error;
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.warn('❌ Edge Function HTTP error:', response.status, errorText);
+      throw new Error(`HTTP ${response.status}: ${errorText}`);
     }
 
+    const data = await response.json();
     console.log('✅ Edge Function successful!');
     return data;
+    
   } catch (error) {
-    console.warn('API evaluation failed, using fallback:', error);
+    console.warn('🔄 API call failed, using fallback:', error);
     
     // Fallback to mock evaluation for demo/development
     return generateFallbackEvaluation(request.adData.platform);
