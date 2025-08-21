@@ -17,7 +17,7 @@ const NotFound: React.FC = () => {
           className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl hover:from-orange-600 hover:to-red-600 transition-all font-semibold shadow-lg transform hover:-translate-y-0.5"
         >
           <Home className="h-5 w-5" />
-          Back to AdAlign
+          Back to adalign.io
         </Link>
       </div>
     </div>

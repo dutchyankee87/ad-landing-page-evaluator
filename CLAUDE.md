@@ -1,4 +1,4 @@
-# Ad Landing Page Evaluator - Claude Development Guide
+# adalign.io - Claude Development Guide
 
 ## Project Overview
 A React-based web application that evaluates the congruence between paid media (meta, tiktok, linkedin, reddit, google) ads and their corresponding landing pages. The tool analyzes visual match, contextual alignment, and tone consistency to provide actionable recommendations for improving ad performance.
@@ -68,7 +68,7 @@ Once you are done with your work, append a review to the same file. The review s
 If I ask you to start working on a new task during our session, then create a separate claude/tasks/TASK_NAME.md file for the new task and repeat the process.
 
 ## Project Memory
-- We are working on a Meta Ad Landing Page Evaluator that helps marketers optimize ad-to-page congruence
+- We are working on adalign.io that helps marketers optimize ad-to-page congruence
 - The application uses a multi-step form to collect ad assets, landing page URLs, and audience data
 - AI analysis is performed via OpenAI GPT-4 through Supabase Edge Functions
 - The app provides visual, contextual, and tone alignment scores with actionable suggestions

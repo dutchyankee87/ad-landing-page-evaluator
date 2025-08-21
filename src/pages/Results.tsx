@@ -55,7 +55,7 @@ const Results: React.FC = () => {
         <div className="bg-white rounded-xl shadow-md overflow-hidden mb-8">
           <div className="bg-gradient-to-r from-orange-500 to-black px-6 py-8 text-white">
             <h1 className="text-3xl md:text-4xl font-bold mb-2">
-              🎯 Your AdAlign Report
+              🎯 Your adalign.io Report
             </h1>
             <p className="opacity-90 text-lg">
               Here's exactly what's killing (or boosting) your conversions
