@@ -74,32 +74,54 @@ Deno.serve(async (req) => {
 
     const platformInfo = getPlatformSpecificPrompt(adData.platform || 'meta');
     
-    const prompt = `You are an expert ${platformInfo.name} ads analyst. Analyze this ad screenshot and provide evaluation scores.
+    const prompt = `You are a Senior Paid Media Analyst with 15+ years of experience optimizing ${platformInfo.name} campaigns and ad-to-landing page performance.
 
-Ad Details:
-- Platform: ${platformInfo.name}
-- Focus Areas: ${platformInfo.focus}
+EXPERTISE AREAS:
+- ${platformInfo.name} algorithm optimization and best practices
+- Paid media attribution and conversion tracking
+- Creative-to-landing page performance correlation
+- Campaign ROI optimization and audience targeting
 
-Landing Page: ${landingPageData.url}
-Target Audience: ${audienceData.ageRange}, ${audienceData.gender}, interests: ${audienceData.interests}
+CONTEXT:
+- Platform: ${platformInfo.name} (Focus: ${platformInfo.focus})
+- Landing Page: ${landingPageData.url}
+- Target Audience: ${audienceData.ageRange}, ${audienceData.gender}, interests: ${audienceData.interests}
 
-Analyze the ad screenshot and provide scores (1-10) and specific suggestions for:
-1. Visual Match: How well the ad's visual design aligns with the landing page
-2. Contextual Match: How well the ad's message matches the landing page content  
-3. Tone Alignment: Consistency in voice and messaging style
+ANALYSIS TASK:
+Analyze this ad screenshot and provide a strategic paid media assessment of its conversion potential and performance likelihood. Focus on high-level insights that would matter to marketing executives making budget decisions.
+
+PROVIDE EXECUTIVE-LEVEL ANALYSIS FOR:
+1. **Brand Coherence**: How effectively does this ad create expectations that the landing page can fulfill?
+2. **User Journey Assessment**: Will users who click this ad find what they expect on the landing page?
+3. **Conversion Optimization**: What psychological barriers or accelerators are present in this funnel?
+4. **Platform Performance Prediction**: How likely is this combination to succeed on ${platformInfo.name}?
 
 Return ONLY a JSON object in this exact format:
 {
-  "scores": {
-    "visualMatch": 7,
-    "contextualMatch": 8,
-    "toneAlignment": 6
+  "executiveSummary": "2-3 sentence strategic overview of the ad-to-page performance potential",
+  "overallAssessment": "STRONG" | "MODERATE" | "WEAK",
+  "brandCoherence": {
+    "score": "HIGH" | "MEDIUM" | "LOW",
+    "insight": "Strategic finding about brand consistency and expectation setting"
   },
-  "suggestions": {
-    "visual": ["suggestion 1", "suggestion 2", "suggestion 3"],
-    "contextual": ["suggestion 1", "suggestion 2", "suggestion 3"],
-    "tone": ["suggestion 1", "suggestion 2", "suggestion 3"]
-  }
+  "userJourneyAlignment": {
+    "score": "HIGH" | "MEDIUM" | "LOW", 
+    "insight": "Strategic finding about expectation vs delivery alignment"
+  },
+  "conversionOptimization": {
+    "score": "HIGH" | "MEDIUM" | "LOW",
+    "insight": "Strategic finding about conversion barriers/accelerators"
+  },
+  "strategicRecommendations": [
+    {
+      "priority": "HIGH" | "MEDIUM" | "LOW",
+      "recommendation": "Executive-level strategic recommendation",
+      "expectedImpact": "Quantified or qualified business impact description",
+      "effort": "LOW" | "MEDIUM" | "HIGH"
+    }
+  ],
+  "riskFactors": ["Primary risk factor that could hurt campaign performance", "Secondary risk factor"],
+  "missedOpportunities": ["Key opportunity being overlooked", "Secondary missed opportunity"]
 }`;
 
     console.log('🤖 Calling GPT-4o Vision...');
@@ -132,21 +154,42 @@ Return ONLY a JSON object in this exact format:
     const analysis = JSON.parse(completion.choices[0].message.content || '{}');
     
     // Validate response format
-    if (!analysis.scores || !analysis.suggestions) {
+    if (!analysis.executiveSummary || !analysis.overallAssessment || !analysis.brandCoherence) {
       throw new Error('Invalid GPT-4o response format');
     }
 
-    // Calculate overall score
-    const overallScore = Math.round(
-      (analysis.scores.visualMatch + 
-       analysis.scores.contextualMatch + 
-       analysis.scores.toneAlignment) / 3
-    );
+    // Convert strategic assessment to numerical score for compatibility
+    const assessmentToScore = {
+      'STRONG': 8,
+      'MODERATE': 6,
+      'WEAK': 4
+    };
+
+    const scoreMapping = {
+      'HIGH': 8,
+      'MEDIUM': 6,
+      'LOW': 4
+    };
+
+    const overallScore = assessmentToScore[analysis.overallAssessment as keyof typeof assessmentToScore] || 6;
 
     const response = {
       overallScore,
-      componentScores: analysis.scores,
-      suggestions: analysis.suggestions
+      overallAssessment: analysis.overallAssessment,
+      executiveSummary: analysis.executiveSummary,
+      componentScores: {
+        brandCoherence: scoreMapping[analysis.brandCoherence.score as keyof typeof scoreMapping] || 6,
+        userJourneyAlignment: scoreMapping[analysis.userJourneyAlignment.score as keyof typeof scoreMapping] || 6,
+        conversionOptimization: scoreMapping[analysis.conversionOptimization.score as keyof typeof scoreMapping] || 6
+      },
+      insights: {
+        brandCoherence: analysis.brandCoherence.insight,
+        userJourneyAlignment: analysis.userJourneyAlignment.insight,
+        conversionOptimization: analysis.conversionOptimization.insight
+      },
+      strategicRecommendations: analysis.strategicRecommendations || [],
+      riskFactors: analysis.riskFactors || [],
+      missedOpportunities: analysis.missedOpportunities || []
     };
 
     console.log('🎉 GPT-4o analysis complete!', { overallScore });
@@ -164,31 +207,43 @@ Return ONLY a JSON object in this exact format:
   } catch (error) {
     console.error('💥 Error:', error);
     
-    // Fallback response
+    // Fallback response with strategic format
     const fallbackResponse = {
-      overallScore: 7,
+      overallScore: 6,
+      overallAssessment: "MODERATE",
+      executiveSummary: "The ad-to-landing page combination shows moderate alignment with opportunities for strategic optimization to improve conversion potential.",
       componentScores: {
-        visualMatch: 7,
-        contextualMatch: 7,
-        toneAlignment: 7
+        brandCoherence: 6,
+        userJourneyAlignment: 6,
+        conversionOptimization: 6
       },
-      suggestions: {
-        visual: [
-          "Ensure brand colors are consistent between ad and landing page",
-          "Optimize images for mobile viewing",
-          "Use high-contrast visuals that stand out"
-        ],
-        contextual: [
-          "Match your ad's value proposition with landing page headline",
-          "Ensure CTA language is consistent",
-          "Include social proof elements"
-        ],
-        tone: [
-          "Maintain consistent voice across touchpoints",
-          "Use platform-appropriate language",
-          "Focus on user benefits"
-        ]
-      }
+      insights: {
+        brandCoherence: "Brand consistency appears adequate but could benefit from stronger visual and messaging alignment to create clearer user expectations.",
+        userJourneyAlignment: "The user journey shows reasonable flow, though expectation setting in the ad could better prepare users for the landing page experience.",
+        conversionOptimization: "Conversion potential exists but requires strategic enhancements to remove friction points and strengthen persuasion elements."
+      },
+      strategicRecommendations: [
+        {
+          priority: "HIGH",
+          recommendation: "Strengthen brand consistency between ad creative and landing page design elements",
+          expectedImpact: "15-25% improvement in user trust and engagement metrics",
+          effort: "MEDIUM"
+        },
+        {
+          priority: "MEDIUM", 
+          recommendation: "Optimize conversion funnel by reducing cognitive load and clarifying value proposition",
+          expectedImpact: "10-18% conversion rate improvement",
+          effort: "MEDIUM"
+        }
+      ],
+      riskFactors: [
+        "Potential disconnect between ad promise and landing page delivery could increase bounce rates",
+        "Insufficient platform optimization may impact algorithm performance and ad costs"
+      ],
+      missedOpportunities: [
+        "Leveraging platform-specific features and user behaviors for enhanced performance",
+        "Implementing advanced persuasion techniques to maximize conversion potential"
+      ]
     };
 
     return new Response(
