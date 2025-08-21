@@ -96,6 +96,12 @@ PROVIDE EXECUTIVE-LEVEL ANALYSIS FOR:
 3. **Conversion Optimization**: What psychological barriers or accelerators are present in this funnel?
 4. **Platform Performance Prediction**: How likely is this combination to succeed on ${platformInfo.name}?
 
+ADDITIONALLY, identify 3-5 specific areas on the landing page that need optimization. For each area, provide:
+- Location description (header, hero-section, navigation, cta-button, footer, etc.)
+- Severity level (HIGH/MEDIUM/LOW)
+- Specific improvement recommendation
+- Expected conversion impact
+
 Return ONLY a JSON object in this exact format:
 {
   "executiveSummary": "2-3 sentence strategic overview of the ad-to-page performance potential",
@@ -121,7 +127,17 @@ Return ONLY a JSON object in this exact format:
     }
   ],
   "riskFactors": ["Primary risk factor that could hurt campaign performance", "Secondary risk factor"],
-  "missedOpportunities": ["Key opportunity being overlooked", "Secondary missed opportunity"]
+  "missedOpportunities": ["Key opportunity being overlooked", "Secondary missed opportunity"],
+  "heatmapZones": [
+    {
+      "location": "hero-section" | "header" | "navigation" | "cta-button" | "content" | "footer",
+      "description": "Brief description of the page area",
+      "severity": "HIGH" | "MEDIUM" | "LOW",
+      "issue": "Specific problem identified in this area", 
+      "suggestion": "Actionable improvement recommendation",
+      "expectedImpact": "Quantified conversion impact estimate"
+    }
+  ]
 }`;
 
     console.log('🤖 Calling GPT-4o Vision...');
@@ -189,7 +205,8 @@ Return ONLY a JSON object in this exact format:
       },
       strategicRecommendations: analysis.strategicRecommendations || [],
       riskFactors: analysis.riskFactors || [],
-      missedOpportunities: analysis.missedOpportunities || []
+      missedOpportunities: analysis.missedOpportunities || [],
+      heatmapZones: analysis.heatmapZones || []
     };
 
     console.log('🎉 GPT-4o analysis complete!', { overallScore });
@@ -243,6 +260,32 @@ Return ONLY a JSON object in this exact format:
       missedOpportunities: [
         "Leveraging platform-specific features and user behaviors for enhanced performance",
         "Implementing advanced persuasion techniques to maximize conversion potential"
+      ],
+      heatmapZones: [
+        {
+          location: "hero-section",
+          description: "Main headline and primary call-to-action area",
+          severity: "HIGH",
+          issue: "Value proposition may not be immediately clear to visitors",
+          suggestion: "Strengthen headline clarity and CTA prominence for better conversion",
+          expectedImpact: "15-25% improvement in engagement and click-through rates"
+        },
+        {
+          location: "header",
+          description: "Navigation and brand identity area",
+          severity: "MEDIUM", 
+          issue: "Navigation structure could be more intuitive",
+          suggestion: "Simplify navigation to reduce cognitive load and improve user flow",
+          expectedImpact: "8-15% reduction in bounce rate"
+        },
+        {
+          location: "cta-button",
+          description: "Primary conversion action button",
+          severity: "HIGH",
+          issue: "Call-to-action button may lack visual prominence",
+          suggestion: "Increase button size and contrast to draw attention and improve conversions",
+          expectedImpact: "12-20% conversion rate improvement"
+        }
       ]
     };
 

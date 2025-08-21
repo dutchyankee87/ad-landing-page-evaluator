@@ -22,21 +22,53 @@ interface AudienceData {
 }
 
 interface ComponentScores {
-  visualMatch: number;
-  contextualMatch: number;
-  toneAlignment: number;
+  visualMatch?: number; // Legacy support
+  contextualMatch?: number; // Legacy support  
+  toneAlignment?: number; // Legacy support
+  brandCoherence?: number;
+  userJourneyAlignment?: number;
+  conversionOptimization?: number;
 }
 
 interface Suggestions {
-  visual: string[];
-  contextual: string[];
-  tone: string[];
+  visual?: string[]; // Legacy support
+  contextual?: string[]; // Legacy support
+  tone?: string[]; // Legacy support
+}
+
+interface StrategicRecommendation {
+  priority: 'HIGH' | 'MEDIUM' | 'LOW';
+  recommendation: string;
+  expectedImpact: string;
+  effort: 'LOW' | 'MEDIUM' | 'HIGH';
+}
+
+interface HeatmapZone {
+  location: string;
+  description: string;
+  severity: 'HIGH' | 'MEDIUM' | 'LOW';
+  issue: string;
+  suggestion: string;
+  expectedImpact: string;
+}
+
+interface Insights {
+  brandCoherence?: string;
+  userJourneyAlignment?: string;
+  conversionOptimization?: string;
 }
 
 interface EvaluationResults {
   overallScore: number;
+  overallAssessment?: 'STRONG' | 'MODERATE' | 'WEAK';
+  executiveSummary?: string;
   componentScores: ComponentScores;
-  suggestions: Suggestions;
+  suggestions?: Suggestions; // Legacy support
+  insights?: Insights;
+  strategicRecommendations?: StrategicRecommendation[];
+  riskFactors?: string[];
+  missedOpportunities?: string[];
+  heatmapZones?: HeatmapZone[];
 }
 
 interface AdEvaluationContextType {

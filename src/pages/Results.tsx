@@ -6,6 +6,7 @@ import ScoreGauge from '../components/results/ScoreGauge';
 import ComponentScores from '../components/results/ComponentScores';
 import Suggestions from '../components/results/Suggestions';
 import AdSummary from '../components/results/AdSummary';
+import { HeatmapOverlay } from '../components/heatmap/HeatmapOverlay';
 
 const PLATFORM_NAMES = {
   meta: 'Meta (Facebook/Instagram)',
@@ -91,6 +92,24 @@ const Results: React.FC = () => {
             
             {/* Ad Summary */}
             <AdSummary />
+            
+            {/* Landing Page Heatmap */}
+            {results.heatmapZones && results.heatmapZones.length > 0 && (
+              <section className="mb-12">
+                <h2 className="text-2xl font-bold mb-4">🔍 Landing Page Optimization Zones</h2>
+                <p className="text-gray-600 mb-6">
+                  Click on the colored zones below to see specific recommendations for each area of your landing page.
+                  Red = High Priority, Yellow = Medium Priority, Blue = Low Priority.
+                </p>
+                <div className="bg-gray-50 p-6 rounded-lg">
+                  <HeatmapOverlay 
+                    imageUrl="/api/placeholder/800/1200" // This should be the actual landing page screenshot
+                    zones={results.heatmapZones}
+                    className="max-w-2xl mx-auto"
+                  />
+                </div>
+              </section>
+            )}
             
             {/* Improvement Suggestions */}
             <Suggestions suggestions={results.suggestions} />
