@@ -8,7 +8,7 @@ const ScoreGauge: React.FC<ScoreGaugeProps> = ({ score }) => {
   // Helper function to get color based on score
   const getScoreColor = (score: number): string => {
     if (score >= 7.5) return '#22C55E'; // Green
-    if (score >= 5) return '#F59E0B';   // Amber
+    if (score >= 5) return '#F97316';   // Orange
     return '#EF4444';                   // Red
   };
 
@@ -44,9 +44,9 @@ const ScoreGauge: React.FC<ScoreGaugeProps> = ({ score }) => {
 
           {/* Labels */}
           <div className="flex justify-between mt-2 px-1">
-            <span className="text-red-500 text-sm font-medium">Poor</span>
-            <span className="text-amber-500 text-sm font-medium">Average</span>
-            <span className="text-green-500 text-sm font-medium">Good</span>
+            <span className="text-red-500 text-sm font-medium">💸 Burning Cash</span>
+            <span className="text-orange-500 text-sm font-medium">⚠️ Fixable</span>
+            <span className="text-green-500 text-sm font-medium">🔥 Converting</span>
           </div>
         </div>
       </div>

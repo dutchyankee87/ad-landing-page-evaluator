@@ -36,7 +36,7 @@ const Results: React.FC = () => {
         <div className="flex justify-between items-center mb-8">
           <Link
             to="/evaluate"
-            className="flex items-center gap-1 text-gray-600 hover:text-blue-600 transition-colors"
+            className="flex items-center gap-1 text-gray-600 hover:text-orange-500 transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
             <span>Back to Evaluation</span>
@@ -52,14 +52,13 @@ const Results: React.FC = () => {
         </div>
         
         <div className="bg-white rounded-xl shadow-md overflow-hidden mb-8">
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-8 text-white">
-            <h1 className="text-3xl font-bold mb-2">
-              {adData.platform ? `${PLATFORM_NAMES[adData.platform as keyof typeof PLATFORM_NAMES]} ` : ''}
-              Ad Evaluation Results
+          <div className="bg-gradient-to-r from-orange-500 to-black px-6 py-8 text-white">
+            <h1 className="text-3xl md:text-4xl font-bold mb-2">
+              🎯 Your AdAlign Report
             </h1>
-            <p className="opacity-90">
-              Here's how well your ad, landing page, and audience align
-              {adData.platform ? ` for ${PLATFORM_NAMES[adData.platform as keyof typeof PLATFORM_NAMES]} advertising` : ''}
+            <p className="opacity-90 text-lg">
+              Here's exactly what's killing (or boosting) your conversions
+              {adData.platform ? ` on ${PLATFORM_NAMES[adData.platform as keyof typeof PLATFORM_NAMES]}` : ''}
             </p>
           </div>
           
@@ -68,16 +67,16 @@ const Results: React.FC = () => {
             <section className="mb-12">
               <div className="grid md:grid-cols-2 gap-8 items-center">
                 <div>
-                  <h2 className="text-2xl font-bold mb-4">Overall Relevance Score</h2>
+                  <h2 className="text-2xl font-bold mb-4">Congruence Score</h2>
                   <p className="text-gray-600 mb-4">
-                    This score reflects how well your ad assets, landing page, and target audience
-                    work together to create a cohesive and effective marketing message.
+                    This score reveals how well your ad and landing page work together to convert visitors.
+                    Higher scores = higher conversion rates.
                   </p>
                   <div className="flex items-center gap-4">
-                    <div className="text-5xl font-bold text-blue-600">{results.overallScore}</div>
+                    <div className="text-5xl font-bold text-orange-500">{results.overallScore}</div>
                     <div className="text-sm text-gray-500">
                       <div className="font-medium">out of 10</div>
-                      <div>{getScoreDescription(results.overallScore)}</div>
+                      <div className="font-semibold text-lg text-gray-700">{getScoreDescription(results.overallScore)}</div>
                     </div>
                   </div>
                 </div>
@@ -101,10 +100,10 @@ const Results: React.FC = () => {
         <div className="text-center">
           <Link
             to="/evaluate"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl hover:from-orange-600 hover:to-red-600 transition-all font-semibold shadow-lg transform hover:-translate-y-0.5"
           >
-            Start A New Evaluation
-            <ChevronRight className="h-4 w-4" />
+            Analyze Another Ad
+            <ChevronRight className="h-5 w-5" />
           </Link>
         </div>
       </div>
@@ -114,11 +113,11 @@ const Results: React.FC = () => {
 
 // Helper function to get score description
 const getScoreDescription = (score: number): string => {
-  if (score >= 9) return 'Exceptional';
-  if (score >= 7) return 'Good';
-  if (score >= 5) return 'Average';
-  if (score >= 3) return 'Needs Improvement';
-  return 'Poor';
+  if (score >= 9) return '🔥 Conversion Machine';
+  if (score >= 7) return '✅ Strong Alignment';
+  if (score >= 5) return '⚠️ Room to Improve';
+  if (score >= 3) return '🚨 Losing Money';
+  return '💸 Conversion Killer';
 };
 
 export default Results;

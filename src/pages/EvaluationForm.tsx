@@ -74,7 +74,7 @@ const EvaluationForm: React.FC = () => {
               {index > 0 && (
                 <div 
                   className={`h-1 flex-grow mx-2 rounded ${
-                    isCompleted ? 'bg-blue-600' : 'bg-gray-200'
+                    isCompleted ? 'bg-orange-500' : 'bg-gray-200'
                   }`}
                 />
               )}
@@ -82,9 +82,9 @@ const EvaluationForm: React.FC = () => {
                 <div 
                   className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${
                     isActive
-                      ? 'border-blue-600 bg-blue-50 text-blue-600'
+                      ? 'border-orange-500 bg-orange-50 text-orange-600'
                       : isCompleted
-                        ? 'border-blue-600 bg-blue-600 text-white'
+                        ? 'border-orange-500 bg-orange-500 text-white'
                         : 'border-gray-300 bg-gray-100 text-gray-400'
                   }`}
                 >
@@ -92,7 +92,7 @@ const EvaluationForm: React.FC = () => {
                 </div>
                 <span 
                   className={`text-xs font-medium mt-2 ${
-                    isActive ? 'text-blue-600' : isCompleted ? 'text-gray-700' : 'text-gray-400'
+                    isActive ? 'text-orange-600' : isCompleted ? 'text-gray-700' : 'text-gray-400'
                   }`}
                 >
                   {step.label}
@@ -113,9 +113,11 @@ const EvaluationForm: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-3xl mx-auto">
-        <h1 className="text-3xl font-bold text-center mb-2">Ad Landing Page Evaluation</h1>
-        <p className="text-gray-600 text-center mb-8">
-          Complete all steps to receive a comprehensive evaluation of your ad and landing page alignment
+        <h1 className="text-3xl md:text-4xl font-bold text-center mb-2 bg-gradient-to-r from-orange-500 to-black bg-clip-text text-transparent">
+          AdAlign Evaluation
+        </h1>
+        <p className="text-gray-600 text-center mb-8 text-lg">
+          Discover exactly what's killing your conversions in under 60 seconds
         </p>
         
         {renderStepIndicator()}
@@ -173,7 +175,7 @@ const EvaluationForm: React.FC = () => {
                     href={landingPageData.url} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline"
+                    className="text-orange-500 hover:underline"
                   >
                     {landingPageData.url}
                   </a>
@@ -197,19 +199,19 @@ const EvaluationForm: React.FC = () => {
             {currentStep !== 'review' ? (
               <button
                 onClick={handleNext}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg hover:from-orange-600 hover:to-red-600 transition-all font-semibold shadow-lg"
               >
-                Continue
+                Continue →
               </button>
             ) : (
               <button
                 onClick={handleSubmit}
                 disabled={isSubmitting}
-                className={`px-6 py-2 bg-blue-600 text-white rounded-lg flex items-center gap-2 ${
-                  isSubmitting ? 'opacity-70 cursor-not-allowed' : 'hover:bg-blue-700'
-                } transition-colors`}
+                className={`px-8 py-3 bg-gradient-to-r from-orange-500 to-black text-white rounded-lg flex items-center gap-2 font-semibold shadow-lg ${
+                  isSubmitting ? 'opacity-70 cursor-not-allowed' : 'hover:from-orange-600 hover:to-gray-800 transform hover:-translate-y-0.5'
+                } transition-all`}
               >
-                {isSubmitting ? 'Evaluating...' : 'Submit for Evaluation'}
+                {isSubmitting ? 'Analyzing Your Ads...' : 'Get My Congruence Score'}
                 {isSubmitting && (
                   <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                 )}
