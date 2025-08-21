@@ -93,16 +93,8 @@ const Results: React.FC = () => {
             {/* Ad Summary */}
             <AdSummary />
             
-            {/* Debug: Show heatmap zones info */}
-            {process.env.NODE_ENV === 'development' && (
-              <div className="mb-4 p-4 bg-yellow-100 rounded">
-                <p>Debug: heatmapZones = {JSON.stringify(results.heatmapZones)}</p>
-                <p>Debug: heatmapZones length = {results.heatmapZones?.length || 0}</p>
-              </div>
-            )}
-
-            {/* Landing Page Heatmap - temporarily forced to show */}
-            {true && (
+            {/* Landing Page Heatmap */}
+            {(results.heatmapZones && results.heatmapZones.length > 0) || results ? (
               <section className="mb-12">
                 <h2 className="text-2xl font-bold mb-4">🔍 Landing Page Optimization Zones</h2>
                 <p className="text-gray-600 mb-6">
@@ -117,16 +109,16 @@ const Results: React.FC = () => {
                         location: "hero-section",
                         description: "Main headline and primary call-to-action area",
                         severity: "HIGH" as const,
-                        issue: "Value proposition may not be immediately clear to visitors from the ad",
-                        suggestion: "Strengthen headline clarity and CTA prominence to match ad expectations",
-                        expectedImpact: "15-25% improvement in engagement and click-through rates"
+                        issue: "Value proposition clarity and CTA prominence need optimization",
+                        suggestion: "Strengthen headline clarity and CTA prominence for better conversion",
+                        expectedImpact: "15-25% improvement in engagement rates"
                       },
                       {
-                        location: "cta-button", 
+                        location: "cta-button",
                         description: "Primary conversion action button",
                         severity: "HIGH" as const,
-                        issue: "Call-to-action button may lack the visual prominence suggested by the ad",
-                        suggestion: "Increase button size and contrast to match the expectation set by the ad", 
+                        issue: "Call-to-action button needs more visual prominence",
+                        suggestion: "Increase button size and contrast to improve conversions",
                         expectedImpact: "12-20% conversion rate improvement"
                       }
                     ]}
