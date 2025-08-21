@@ -255,12 +255,70 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
     
     const mockResults: EvaluationResults = {
       overallScore,
+      overallAssessment: overallScore >= 7 ? 'STRONG' : overallScore >= 5 ? 'MODERATE' : 'WEAK',
+      executiveSummary: `This ${adData.platform || 'Meta'} ad shows ${overallScore >= 7 ? 'strong' : overallScore >= 5 ? 'moderate' : 'weak'} alignment with the landing page, with key opportunities for optimization in user journey flow and conversion elements.`,
       componentScores: {
         visualMatch: visualScore,
         contextualMatch: contextualScore,
-        toneAlignment: toneScore
+        toneAlignment: toneScore,
+        brandCoherence: visualScore,
+        userJourneyAlignment: contextualScore,
+        conversionOptimization: toneScore
       },
-      suggestions: platformSuggestions
+      suggestions: platformSuggestions,
+      insights: {
+        brandCoherence: "Brand consistency shows promise but could benefit from stronger visual alignment between ad creative and landing page elements.",
+        userJourneyAlignment: "The user journey demonstrates reasonable flow, though expectation setting could be enhanced for better conversion rates.",
+        conversionOptimization: "Conversion potential is present with strategic optimization opportunities to reduce friction and strengthen persuasion elements."
+      },
+      strategicRecommendations: [
+        {
+          priority: "HIGH",
+          recommendation: "Strengthen visual consistency between ad creative and landing page design elements",
+          expectedImpact: "15-25% improvement in user trust and engagement metrics",
+          effort: "MEDIUM"
+        },
+        {
+          priority: "MEDIUM",
+          recommendation: "Optimize conversion funnel by reducing cognitive load and clarifying value proposition",
+          expectedImpact: "10-18% conversion rate improvement", 
+          effort: "MEDIUM"
+        }
+      ],
+      riskFactors: [
+        "Potential disconnect between ad promise and landing page delivery could increase bounce rates",
+        "Platform-specific optimization gaps may impact algorithm performance and ad costs"
+      ],
+      missedOpportunities: [
+        "Leveraging platform-specific features and user behaviors for enhanced performance",
+        "Implementing advanced persuasion techniques to maximize conversion potential"
+      ],
+      heatmapZones: [
+        {
+          location: "hero-section",
+          description: "Main headline and primary call-to-action area",
+          severity: "HIGH",
+          issue: "Value proposition may not be immediately clear to visitors from the ad",
+          suggestion: "Strengthen headline clarity and CTA prominence to match ad expectations",
+          expectedImpact: "15-25% improvement in engagement and click-through rates"
+        },
+        {
+          location: "header",
+          description: "Navigation and brand identity area",
+          severity: "MEDIUM",
+          issue: "Brand consistency could be stronger between ad and landing page header",
+          suggestion: "Align navigation styling and brand presentation with ad creative elements",
+          expectedImpact: "8-15% reduction in bounce rate"
+        },
+        {
+          location: "cta-button",
+          description: "Primary conversion action button",
+          severity: "HIGH", 
+          issue: "Call-to-action button may lack the visual prominence suggested by the ad",
+          suggestion: "Increase button size and contrast to match the expectation set by the ad",
+          expectedImpact: "12-20% conversion rate improvement"
+        }
+      ]
     };
     
     setResults(mockResults);
