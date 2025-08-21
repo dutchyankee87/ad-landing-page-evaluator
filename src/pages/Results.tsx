@@ -94,7 +94,7 @@ const Results: React.FC = () => {
             <AdSummary />
             
             {/* Landing Page Heatmap */}
-            {(results.heatmapZones && results.heatmapZones.length > 0) || results ? (
+            {results && (
               <section className="mb-12">
                 <h2 className="text-2xl font-bold mb-4">🔍 Landing Page Optimization Zones</h2>
                 <p className="text-gray-600 mb-6">
