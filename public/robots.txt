@@ -1,0 +1,19 @@
+User-agent: *
+Allow: /
+
+# Block access to admin and API endpoints
+Disallow: /admin/
+Disallow: /api/
+
+# Block access to private evaluation results
+Disallow: /results
+
+# Allow crawling of main pages
+Allow: /
+Allow: /evaluate
+
+# Sitemap location
+Sitemap: https://adalign.io/sitemap.xml
+
+# Crawl-delay for respectful crawling
+Crawl-delay: 1

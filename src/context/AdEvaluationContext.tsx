@@ -21,6 +21,20 @@ interface AudienceData {
   interests: string | null;
 }
 
+interface MicroScore {
+  name: string;
+  score: number;
+  weight: number;
+  description: string;
+}
+
+interface MicroScores {
+  visual: MicroScore[];
+  content: MicroScore[];
+  alignment: MicroScore[];
+  platform: MicroScore[];
+}
+
 interface ComponentScores {
   visualMatch?: number; // Legacy support
   contextualMatch?: number; // Legacy support  
@@ -58,17 +72,38 @@ interface Insights {
   conversionOptimization?: string;
 }
 
+interface BenchmarkData {
+  percentile10: number;
+  percentile25: number;
+  percentile50: number;
+  percentile75: number;
+  percentile90: number;
+  sampleSize: number;
+  userPercentile?: number;
+}
+
+interface PerformancePrediction {
+  expectedCTR: number;
+  expectedCVR: number;
+  confidenceLevel: number;
+}
+
 interface EvaluationResults {
   overallScore: number;
   overallAssessment?: 'STRONG' | 'MODERATE' | 'WEAK';
   executiveSummary?: string;
   componentScores: ComponentScores;
+  microScores?: MicroScores;
   suggestions?: Suggestions; // Legacy support
   insights?: Insights;
   strategicRecommendations?: StrategicRecommendation[];
   riskFactors?: string[];
   missedOpportunities?: string[];
   heatmapZones?: HeatmapZone[];
+  benchmarkData?: BenchmarkData;
+  performancePrediction?: PerformancePrediction;
+  industry?: string;
+  audienceType?: string;
 }
 
 interface AdEvaluationContextType {
@@ -77,11 +112,15 @@ interface AdEvaluationContextType {
   audienceData: AudienceData;
   results: EvaluationResults | null;
   hasEvaluated: boolean;
+  showFeedbackModal: boolean;
   updateAdData: (data: Partial<AdData>) => void;
   updateLandingPageData: (data: Partial<LandingPageData>) => void;
   updateAudienceData: (data: Partial<AudienceData>) => void;
   evaluateAd: () => Promise<void>;
   resetEvaluation: () => void;
+  openFeedbackModal: () => void;
+  closeFeedbackModal: () => void;
+  submitFeedback: (feedback: any) => Promise<void>;
 }
 
 // Create context
@@ -108,6 +147,7 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
   
   const [results, setResults] = useState<EvaluationResults | null>(null);
   const [hasEvaluated, setHasEvaluated] = useState(false);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   
   const updateAdData = (data: Partial<AdData>) => {
     setAdData(prev => ({ ...prev, ...data }));
@@ -253,6 +293,22 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
     
     const platformSuggestions = getPlatformSpecificSuggestions(adData.platform || 'meta');
     
+    // Mock industry and benchmark data
+    const mockIndustry = 'ecommerce'; // In production, this would be detected from landing page
+    const mockBenchmarkData = {
+      percentile10: 4.2,
+      percentile25: 5.1,
+      percentile50: 6.3,
+      percentile75: 7.4,
+      percentile90: 8.1,
+      sampleSize: 1000,
+      userPercentile: overallScore <= 4.2 ? 10 :
+                     overallScore <= 5.1 ? 25 :
+                     overallScore <= 6.3 ? 50 :
+                     overallScore <= 7.4 ? 75 :
+                     overallScore <= 8.1 ? 90 : 95
+    };
+    
     const mockResults: EvaluationResults = {
       overallScore,
       overallAssessment: overallScore >= 7 ? 'STRONG' : overallScore >= 5 ? 'MODERATE' : 'WEAK',
@@ -318,7 +374,10 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
           suggestion: "Increase button size and contrast to match the expectation set by the ad",
           expectedImpact: "12-20% conversion rate improvement"
         }
-      ]
+      ],
+      benchmarkData: mockBenchmarkData,
+      industry: mockIndustry,
+      audienceType: 'b2c'
     };
     
     setResults(mockResults);
@@ -345,6 +404,29 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
     
     setResults(null);
     setHasEvaluated(false);
+    setShowFeedbackModal(false);
+  };
+
+  const openFeedbackModal = () => {
+    setShowFeedbackModal(true);
+  };
+
+  const closeFeedbackModal = () => {
+    setShowFeedbackModal(false);
+  };
+
+  const submitFeedback = async (feedback: any) => {
+    try {
+      // In a real implementation, this would call an API to store feedback
+      console.log('Feedback submitted:', feedback);
+      
+      // For now, just close the modal
+      closeFeedbackModal();
+      
+      // Could show a success message here
+    } catch (error) {
+      console.error('Failed to submit feedback:', error);
+    }
   };
   
   return (
@@ -355,11 +437,15 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
         audienceData,
         results,
         hasEvaluated,
+        showFeedbackModal,
         updateAdData,
         updateLandingPageData,
         updateAudienceData,
         evaluateAd,
-        resetEvaluation
+        resetEvaluation,
+        openFeedbackModal,
+        closeFeedbackModal,
+        submitFeedback
       }}
     >
       {children}

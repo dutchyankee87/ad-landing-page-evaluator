@@ -1,12 +1,15 @@
 import React, { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Download, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Download, ChevronRight, MessageCircle } from 'lucide-react';
 import { useAdEvaluation } from '../context/AdEvaluationContext';
 import ScoreGauge from '../components/results/ScoreGauge';
 import ComponentScores from '../components/results/ComponentScores';
 import Suggestions from '../components/results/Suggestions';
 import AdSummary from '../components/results/AdSummary';
 import { HeatmapOverlay } from '../components/heatmap/HeatmapOverlay';
+import { PerformanceFeedbackModal } from '../components/feedback/PerformanceFeedbackModal';
+import { IndustryBenchmarks } from '../components/benchmarks/IndustryBenchmarks';
+import SEOHead from '../components/SEOHead';
 
 const PLATFORM_NAMES = {
   meta: 'Meta (Facebook/Instagram)',
@@ -17,7 +20,15 @@ const PLATFORM_NAMES = {
 } as const;
 
 const Results: React.FC = () => {
-  const { results, hasEvaluated, adData } = useAdEvaluation();
+  const { 
+    results, 
+    hasEvaluated, 
+    adData, 
+    showFeedbackModal, 
+    openFeedbackModal, 
+    closeFeedbackModal, 
+    submitFeedback 
+  } = useAdEvaluation();
   const navigate = useNavigate();
 
   // Redirect if results aren't available
@@ -32,7 +43,15 @@ const Results: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <>
+      <SEOHead 
+        title="Your Ad Analysis Results - Optimization Recommendations"
+        description="View your personalized ad optimization recommendations. Get specific insights on visual, contextual, and tone alignment to improve campaign performance."
+        keywords="ad optimization recommendations, ad analysis results, ad performance insights, conversion optimization, ad alignment score, marketing analysis report"
+        url="/results"
+        noindex={true}
+      />
+      <div className="container mx-auto px-4 py-8">
       <div className="max-w-4xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <Link
@@ -43,13 +62,23 @@ const Results: React.FC = () => {
             <span>Back to Evaluation</span>
           </Link>
           
-          <button 
-            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
-            onClick={() => window.print()}
-          >
-            <Download className="h-4 w-4" />
-            <span>Export Results</span>
-          </button>
+          <div className="flex gap-3">
+            <button
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              onClick={openFeedbackModal}
+            >
+              <MessageCircle className="h-4 w-4" />
+              <span>Share Feedback</span>
+            </button>
+            
+            <button 
+              className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+              onClick={() => window.print()}
+            >
+              <Download className="h-4 w-4" />
+              <span>Export Results</span>
+            </button>
+          </div>
         </div>
         
         <div className="bg-white rounded-xl shadow-md overflow-hidden mb-8">
@@ -89,6 +118,18 @@ const Results: React.FC = () => {
             
             {/* Component Scores */}
             <ComponentScores componentScores={results.componentScores} />
+            
+            {/* Industry Benchmarks */}
+            <section className="mb-12">
+              <h2 className="text-2xl font-bold mb-6">📊 How You Stack Up</h2>
+              <IndustryBenchmarks
+                score={results.overallScore}
+                platform={adData.platform || 'meta'}
+                industry={results.industry || 'other'}
+                benchmarkData={results.benchmarkData}
+                userPercentile={results.benchmarkData?.userPercentile}
+              />
+            </section>
             
             {/* Ad Summary */}
             <AdSummary />
@@ -143,7 +184,17 @@ const Results: React.FC = () => {
           </Link>
         </div>
       </div>
-    </div>
+      </div>
+
+      {/* Performance Feedback Modal */}
+      <PerformanceFeedbackModal
+        isOpen={showFeedbackModal}
+        onClose={closeFeedbackModal}
+        onSubmit={submitFeedback}
+        evaluationId={results?.evaluationId || 'mock-evaluation'}
+        recommendations={results?.strategicRecommendations?.map(r => r.recommendation) || []}
+      />
+    </>
   );
 };
 

@@ -1,10 +1,17 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Home } from 'lucide-react';
+import SEOHead from '../components/SEOHead';
 
 const NotFound: React.FC = () => {
   return (
-    <div className="min-h-[80vh] flex items-center justify-center px-4">
+    <>
+      <SEOHead 
+        title="404 - Page Not Found"
+        description="The page you're looking for doesn't exist. Return to adalign.io to analyze your ad-to-landing page congruence with AI."
+        noindex={true}
+      />
+      <div className="min-h-[80vh] flex items-center justify-center px-4">
       <div className="text-center">
         <h1 className="text-9xl font-bold bg-gradient-to-r from-orange-300 to-gray-300 bg-clip-text text-transparent">404</h1>
         <h2 className="text-3xl font-bold text-gray-800 mt-4 mb-6">This Page is Misaligned</h2>
@@ -20,7 +27,8 @@ const NotFound: React.FC = () => {
           Back to adalign.io
         </Link>
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 

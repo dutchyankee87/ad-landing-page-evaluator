@@ -5,6 +5,7 @@ import { useAdEvaluation } from '../context/AdEvaluationContext';
 import AdAssetForm from '../components/forms/AdAssetForm';
 import LandingPageForm from '../components/forms/LandingPageForm';
 import UsageBanner from '../components/UsageBanner';
+import SEOHead from '../components/SEOHead';
 
 type Step = 'adAssets' | 'landingPage' | 'review';
 
@@ -111,7 +112,14 @@ const EvaluationForm: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <>
+      <SEOHead 
+        title="Analyze Your Ad Campaign - Free AI-Powered Evaluation"
+        description="Upload your ad creative and landing page URL for instant AI analysis. Get actionable insights to improve ad-to-page alignment and boost conversions."
+        keywords="analyze ad campaign, ad landing page evaluation, free ad analysis, meta ads analyzer, google ads assessment, tiktok ad evaluation, linkedin ad optimization"
+        url="/evaluate"
+      />
+      <div className="container mx-auto px-4 py-8">
       <div className="max-w-3xl mx-auto">
         <h1 className="text-3xl md:text-4xl font-bold text-center mb-2 bg-gradient-to-r from-orange-500 to-black bg-clip-text text-transparent">
           adalign.io Evaluation
@@ -220,7 +228,8 @@ const EvaluationForm: React.FC = () => {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 

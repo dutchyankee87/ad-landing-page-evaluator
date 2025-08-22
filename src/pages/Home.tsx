@@ -1,10 +1,18 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, BarChart3, Globe, TrendingUp, AlertTriangle, CheckCircle, DollarSign } from 'lucide-react';
+import { ArrowRight, TrendingUp, AlertTriangle, CheckCircle, DollarSign } from 'lucide-react';
+import SEOHead from '../components/SEOHead';
 
 const Home: React.FC = () => {
   return (
-    <div className="container mx-auto px-4 py-8">
+    <>
+      <SEOHead 
+        title="Optimize Your Ad Performance with AI-Powered Landing Page Analysis"
+        description="Analyze ad-to-landing page congruence with AI. Optimize Meta, Google, TikTok & LinkedIn ads for better conversion rates. Free analysis available."
+        keywords="ad landing page optimization tool, paid ad performance, ad congruence analysis, meta ads optimization, google ads analyzer, tiktok ad optimization, linkedin ad performance, conversion rate optimization, AI marketing tool"
+        url="/"
+      />
+      <div className="container mx-auto px-4 py-8">
       {/* Hero Section */}
       <section className="mb-16">
         <div className="max-w-5xl mx-auto text-center">
@@ -277,7 +285,8 @@ const Home: React.FC = () => {
           </div>
         </div>
       </section>
-    </div>
+      </div>
+    </>
   );
 };
 
