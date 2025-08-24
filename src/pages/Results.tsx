@@ -9,6 +9,9 @@ import AdSummary from '../components/results/AdSummary';
 import { HeatmapOverlay } from '../components/heatmap/HeatmapOverlay';
 import { PerformanceFeedbackModal } from '../components/feedback/PerformanceFeedbackModal';
 import { IndustryBenchmarks } from '../components/benchmarks/IndustryBenchmarks';
+import { DetailedScoring } from '../components/results/DetailedScoring';
+import { IndustryInsights } from '../components/insights/IndustryInsights';
+import { PersuasionAnalysis } from '../components/psychology/PersuasionAnalysis';
 import SEOHead from '../components/SEOHead';
 
 const PLATFORM_NAMES = {
@@ -130,9 +133,46 @@ const Results: React.FC = () => {
                 userPercentile={results.benchmarkData?.userPercentile}
               />
             </section>
+
+            {/* Psychological Persuasion Analysis */}
+            {results.persuasionPrinciples && (
+              <section className="mb-12">
+                <h2 className="text-2xl font-bold mb-6">🧠 Psychology & Persuasion Analysis</h2>
+                <PersuasionAnalysis
+                  persuasionPrinciples={results.persuasionPrinciples}
+                  persuasionScore={results.persuasionScore || 6.5}
+                  psychologicalInsights={results.psychologicalInsights || []}
+                />
+              </section>
+            )}
+
+            {/* Industry Insights */}
+            {results.benchmarkData && results.performancePrediction && (
+              <section className="mb-12">
+                <h2 className="text-2xl font-bold mb-6">📊 Industry Intelligence</h2>
+                <IndustryInsights
+                  industry={results.industry || 'ecommerce'}
+                  platform={adData.platform || 'meta'}
+                  score={results.overallScore}
+                  benchmarkData={results.benchmarkData}
+                  performancePrediction={results.performancePrediction}
+                />
+              </section>
+            )}
             
             {/* Ad Summary */}
             <AdSummary />
+            
+            {/* Detailed Micro-Scoring Analysis */}
+            {results.detailedScoring && (
+              <section className="mb-12">
+                <h2 className="text-2xl font-bold mb-6">🎯 Advanced Analysis</h2>
+                <DetailedScoring 
+                  scoringResult={results.detailedScoring}
+                  platform={adData.platform || 'meta'}
+                />
+              </section>
+            )}
             
             {/* Landing Page Heatmap */}
             {results && (

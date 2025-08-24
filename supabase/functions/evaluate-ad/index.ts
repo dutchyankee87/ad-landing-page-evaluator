@@ -74,11 +74,12 @@ Deno.serve(async (req) => {
 
     const platformInfo = getPlatformSpecificPrompt(adData.platform || 'meta');
     
-    const prompt = `You are a Senior Paid Media Analyst with 15+ years of experience optimizing ${platformInfo.name} campaigns and ad-to-landing page performance.
+    const prompt = `You are a Senior Conversion Psychologist and Paid Media Strategist with 15+ years of experience optimizing ${platformInfo.name} campaigns using psychological persuasion principles.
 
 EXPERTISE AREAS:
 - ${platformInfo.name} algorithm optimization and best practices
-- Paid media attribution and conversion tracking
+- Psychological persuasion and conversion psychology
+- Cialdini's 6 principles of influence implementation
 - Creative-to-landing page performance correlation
 - Campaign ROI optimization and audience targeting
 
@@ -88,13 +89,23 @@ CONTEXT:
 - Target Audience: ${audienceData.ageRange}, ${audienceData.gender}, interests: ${audienceData.interests}
 
 ANALYSIS TASK:
-Analyze this ad screenshot and provide a strategic paid media assessment of its conversion potential and performance likelihood. Focus on high-level insights that would matter to marketing executives making budget decisions.
+Analyze this ad screenshot and provide a strategic assessment of its psychological persuasion effectiveness and conversion potential. Apply Cialdini's 6 principles of influence and advanced conversion psychology.
 
 PROVIDE EXECUTIVE-LEVEL ANALYSIS FOR:
 1. **Brand Coherence**: How effectively does this ad create expectations that the landing page can fulfill?
 2. **User Journey Assessment**: Will users who click this ad find what they expect on the landing page?
 3. **Conversion Optimization**: What psychological barriers or accelerators are present in this funnel?
 4. **Platform Performance Prediction**: How likely is this combination to succeed on ${platformInfo.name}?
+
+CIALDINI'S 6 PRINCIPLES ANALYSIS:
+Evaluate how well both the ad and landing page implement these psychological triggers:
+
+1. **Reciprocity**: Free value, samples, trials, useful content before asking
+2. **Commitment/Consistency**: Getting users to take small actions, public commitments, progressive engagement
+3. **Social Proof**: Testimonials, reviews, user counts, social validation, "others like you" messaging
+4. **Authority**: Expert credentials, certifications, media mentions, thought leadership
+5. **Liking**: Similarity to target audience, attractiveness, familiarity, shared values
+6. **Scarcity**: Limited time/quantity, exclusivity, FOMO elements, urgency triggers
 
 ADDITIONALLY, identify 3-5 specific areas on the landing page that need optimization. For each area, provide:
 - Location description (header, hero-section, navigation, cta-button, footer, etc.)
@@ -118,12 +129,62 @@ Return ONLY a JSON object in this exact format:
     "score": "HIGH" | "MEDIUM" | "LOW",
     "insight": "Strategic finding about conversion barriers/accelerators"
   },
+  "persuasionPrinciples": {
+    "reciprocity": {
+      "score": "HIGH" | "MEDIUM" | "LOW",
+      "adAnalysis": "How well the ad implements reciprocity",
+      "pageAnalysis": "How well the landing page implements reciprocity", 
+      "recommendation": "Specific way to improve reciprocity implementation",
+      "examples": ["Specific reciprocity elements found or missing"]
+    },
+    "commitment": {
+      "score": "HIGH" | "MEDIUM" | "LOW",
+      "adAnalysis": "How well the ad creates commitment/consistency",
+      "pageAnalysis": "How well the page builds on commitment",
+      "recommendation": "Specific way to improve commitment/consistency",
+      "examples": ["Specific commitment elements found or missing"]
+    },
+    "socialProof": {
+      "score": "HIGH" | "MEDIUM" | "LOW",
+      "adAnalysis": "How well the ad uses social validation",
+      "pageAnalysis": "How well the page reinforces social proof",
+      "recommendation": "Specific way to improve social proof",
+      "examples": ["Specific social proof elements found or missing"]
+    },
+    "authority": {
+      "score": "HIGH" | "MEDIUM" | "LOW",
+      "adAnalysis": "How well the ad establishes authority",
+      "pageAnalysis": "How well the page reinforces authority",
+      "recommendation": "Specific way to improve authority positioning",
+      "examples": ["Specific authority elements found or missing"]
+    },
+    "liking": {
+      "score": "HIGH" | "MEDIUM" | "LOW",
+      "adAnalysis": "How well the ad creates liking/similarity",
+      "pageAnalysis": "How well the page builds liking/connection",
+      "recommendation": "Specific way to improve liking factors",
+      "examples": ["Specific liking elements found or missing"]
+    },
+    "scarcity": {
+      "score": "HIGH" | "MEDIUM" | "LOW",
+      "adAnalysis": "How well the ad creates urgency/scarcity",
+      "pageAnalysis": "How well the page reinforces scarcity",
+      "recommendation": "Specific way to improve scarcity/urgency",
+      "examples": ["Specific scarcity elements found or missing"]
+    }
+  },
+  "persuasionScore": 0.0,
+  "psychologicalInsights": [
+    "Key psychological insight about user motivation and barriers",
+    "Secondary insight about persuasion effectiveness"
+  ],
   "strategicRecommendations": [
     {
       "priority": "HIGH" | "MEDIUM" | "LOW",
       "recommendation": "Executive-level strategic recommendation",
       "expectedImpact": "Quantified or qualified business impact description",
-      "effort": "LOW" | "MEDIUM" | "HIGH"
+      "effort": "LOW" | "MEDIUM" | "HIGH",
+      "principle": "reciprocity" | "commitment" | "socialProof" | "authority" | "liking" | "scarcity" | "general"
     }
   ],
   "riskFactors": ["Primary risk factor that could hurt campaign performance", "Secondary risk factor"],
@@ -135,7 +196,8 @@ Return ONLY a JSON object in this exact format:
       "severity": "HIGH" | "MEDIUM" | "LOW",
       "issue": "Specific problem identified in this area", 
       "suggestion": "Actionable improvement recommendation",
-      "expectedImpact": "Quantified conversion impact estimate"
+      "expectedImpact": "Quantified conversion impact estimate",
+      "persuasionPrinciple": "Which Cialdini principle could be better implemented here"
     }
   ]
 }`;

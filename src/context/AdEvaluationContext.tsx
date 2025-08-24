@@ -88,12 +88,33 @@ interface PerformancePrediction {
   confidenceLevel: number;
 }
 
+interface PersuasionPrinciple {
+  score: 'HIGH' | 'MEDIUM' | 'LOW';
+  adAnalysis: string;
+  pageAnalysis: string;
+  recommendation: string;
+  examples: string[];
+}
+
+interface PersuasionPrinciples {
+  reciprocity: PersuasionPrinciple;
+  commitment: PersuasionPrinciple;
+  socialProof: PersuasionPrinciple;
+  authority: PersuasionPrinciple;
+  liking: PersuasionPrinciple;
+  scarcity: PersuasionPrinciple;
+}
+
 interface EvaluationResults {
   overallScore: number;
   overallAssessment?: 'STRONG' | 'MODERATE' | 'WEAK';
   executiveSummary?: string;
   componentScores: ComponentScores;
   microScores?: MicroScores;
+  detailedScoring?: any; // MicroScoringResult from engine
+  persuasionPrinciples?: PersuasionPrinciples;
+  persuasionScore?: number;
+  psychologicalInsights?: string[];
   suggestions?: Suggestions; // Legacy support
   insights?: Insights;
   strategicRecommendations?: StrategicRecommendation[];
@@ -284,14 +305,94 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 2000));
     
-    // Generate realistic scores based on ad content
-    const visualScore = Math.floor(Math.random() * 3) + 6; // 6-8
-    const contextualScore = Math.floor(Math.random() * 4) + 5; // 5-8
-    const toneScore = Math.floor(Math.random() * 3) + 6; // 6-8
+    // Import and use the micro-scoring engine
+    const { MicroScoringEngine } = await import('../lib/scoring/MicroScoringEngine');
     
-    const overallScore = Math.round((visualScore + contextualScore + toneScore) / 3 * 10) / 10;
+    // Get detailed micro-scoring analysis
+    const detailedScoring = await MicroScoringEngine.analyzeAd(
+      adData.imageUrl || 'https://example.com/ad.jpg',
+      landingPageData.url || 'https://example.com',
+      adData.platform || 'meta',
+      mockIndustry,
+      'b2c'
+    );
+
+    // Use micro-scoring results for more accurate evaluation
+    const overallScore = detailedScoring.overallScore;
+    const visualScore = detailedScoring.categoryScores.visual;
+    const contextualScore = detailedScoring.categoryScores.content;
+    const toneScore = detailedScoring.categoryScores.alignment;
     
     const platformSuggestions = getPlatformSpecificSuggestions(adData.platform || 'meta');
+    
+    // Mock persuasion principles analysis
+    const generateMockPersuasionPrinciples = (): PersuasionPrinciples => {
+      const getRandomScore = () => {
+        const scores: ('HIGH' | 'MEDIUM' | 'LOW')[] = ['HIGH', 'MEDIUM', 'LOW'];
+        const weights = [0.3, 0.5, 0.2]; // More likely to be MEDIUM
+        const random = Math.random();
+        if (random < weights[0]) return scores[0];
+        if (random < weights[0] + weights[1]) return scores[1];
+        return scores[2];
+      };
+
+      return {
+        reciprocity: {
+          score: getRandomScore(),
+          adAnalysis: "The ad offers a free resource download, creating initial value before asking for contact information.",
+          pageAnalysis: "Landing page provides detailed preview of the free content, reinforcing the reciprocity trigger from the ad.",
+          recommendation: "Add more free value elements like calculators, templates, or exclusive content to strengthen reciprocity.",
+          examples: ["Free PDF download", "No credit card required trial", "Valuable blog content"]
+        },
+        commitment: {
+          score: getRandomScore(),
+          adAnalysis: "Ad encourages users to take a small action (sign up), creating initial commitment to the brand.",
+          pageAnalysis: "Page builds commitment through progressive engagement but could add more micro-commitments.",
+          recommendation: "Add step-by-step onboarding or preference selection to increase commitment consistency.",
+          examples: ["Email signup form", "Preference questionnaire", "Goal setting section"]
+        },
+        socialProof: {
+          score: getRandomScore(),
+          adAnalysis: "Ad includes customer count or testimonial quote to demonstrate social validation.",
+          pageAnalysis: "Landing page displays customer logos, reviews, and usage statistics effectively.",
+          recommendation: "Add more specific social proof like 'customers in your industry' or recent customer wins.",
+          examples: ["5,000+ happy customers", "Customer testimonials", "Brand logo wall"]
+        },
+        authority: {
+          score: getRandomScore(),
+          adAnalysis: "Ad establishes credibility through professional imagery and clear value proposition.",
+          pageAnalysis: "Page reinforces authority with team credentials and industry recognition.",
+          recommendation: "Highlight more expert credentials, certifications, or media mentions to boost authority.",
+          examples: ["Industry certifications", "Expert team profiles", "Media coverage"]
+        },
+        liking: {
+          score: getRandomScore(),
+          adAnalysis: "Ad uses relatable imagery and messaging that connects with target audience values.",
+          pageAnalysis: "Page maintains friendly, approachable tone that builds connection with visitors.",
+          recommendation: "Add more personal elements like founder story or behind-the-scenes content to increase liking.",
+          examples: ["Founder photo", "Company values", "Personal testimonials"]
+        },
+        scarcity: {
+          score: getRandomScore(),
+          adAnalysis: "Ad creates urgency with limited-time offer or exclusive access messaging.",
+          pageAnalysis: "Page reinforces scarcity with countdown timer and limited availability indicators.",
+          recommendation: "Add more authentic scarcity elements like limited spots or genuine time constraints.",
+          examples: ["Limited time offer", "Only X spots left", "Exclusive beta access"]
+        }
+      };
+    };
+
+    const mockPersuasionPrinciples = generateMockPersuasionPrinciples();
+    const mockPersuasionScore = Object.values(mockPersuasionPrinciples).reduce((sum, principle) => {
+      const scoreValue = principle.score === 'HIGH' ? 8.5 : principle.score === 'MEDIUM' ? 6.5 : 4;
+      return sum + scoreValue;
+    }, 0) / 6;
+
+    const mockPsychologicalInsights = [
+      `The ad-to-page journey creates ${overallScore >= 7 ? 'strong' : 'moderate'} psychological momentum through effective expectation setting and consistent messaging.`,
+      `Social proof elements are ${mockPersuasionPrinciples.socialProof.score === 'HIGH' ? 'well-implemented' : 'underutilized'} and could be a key leverage point for increasing conversions.`,
+      `The persuasion flow shows opportunities for stronger reciprocity and commitment triggers to reduce psychological friction.`
+    ];
     
     // Mock industry and benchmark data
     const mockIndustry = 'ecommerce'; // In production, this would be detected from landing page
@@ -376,8 +477,17 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
         }
       ],
       benchmarkData: mockBenchmarkData,
+      detailedScoring: detailedScoring,
+      persuasionPrinciples: mockPersuasionPrinciples,
+      persuasionScore: mockPersuasionScore,
+      psychologicalInsights: mockPsychologicalInsights,
       industry: mockIndustry,
-      audienceType: 'b2c'
+      audienceType: 'b2c',
+      performancePrediction: {
+        expectedCTR: detailedScoring.performancePrediction.expectedCTR,
+        expectedCVR: detailedScoring.performancePrediction.expectedCVR,
+        confidenceLevel: detailedScoring.performancePrediction.confidenceLevel
+      }
     };
     
     setResults(mockResults);
