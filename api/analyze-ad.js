@@ -182,46 +182,55 @@ module.exports = async function handler(req, res) {
 
     const platformInfo = getPlatformPrompt(adData.platform);
     
-    const prompt = `You are an expert ${platformInfo} ads analyst. 
+    const prompt = `You are an expert ${platformInfo} ads analyst with STRICT evaluation standards.
 
 You will analyze TWO images:
 1. AD SCREENSHOT: The user's uploaded ad creative
 2. LANDING PAGE SCREENSHOT: The destination page (${landingPageData.url})
 
-Compare these images for congruence and effectiveness:
-
 Target Audience: ${audienceData.ageRange}, ${audienceData.gender}, interests: ${audienceData.interests}
 
-Analyze both images and evaluate (1-10 scores):
+**CRITICAL**: If the ad and landing page are completely unrelated (different products, services, or brands), give LOW scores (1-3). Only give high scores (7-10) for genuinely well-matched content.
 
-1. **Visual Match**: 
-   - Color schemes, fonts, imagery style consistency
-   - Brand visual identity alignment
-   - Design aesthetic coherence
+Analyze both images with STRICT evaluation (1-10 scores):
 
-2. **Contextual Match**: 
-   - Message/offer consistency between ad and landing page
-   - Value proposition alignment
-   - Call-to-action consistency
+1. **Visual Match** (1-10):
+   - Are colors, fonts, imagery styles consistent?
+   - Is the brand identity clearly aligned?
+   - Do design aesthetics match?
+   - If completely different visual styles: score 1-3
+   - If somewhat similar: score 4-6
+   - If very consistent: score 7-10
 
-3. **Tone Alignment**: 
-   - Voice and personality consistency
-   - Messaging style coherence
-   - Brand tone matching
+2. **Contextual Match** (1-10):
+   - Do the ad message and landing page offer match?
+   - Are value propositions aligned?
+   - Are CTAs consistent?
+   - If different products/services: score 1-3
+   - If related but inconsistent: score 4-6
+   - If perfectly aligned: score 7-10
 
-Provide specific observations about what you see in each image and how they compare.
+3. **Tone Alignment** (1-10):
+   - Is voice and personality consistent?
+   - Does messaging style match?
+   - Is brand tone coherent?
+   - If completely different tones: score 1-3
+   - If somewhat consistent: score 4-6
+   - If perfectly matched: score 7-10
+
+**First, describe what you see in each image specifically, then evaluate the match quality.**
 
 Return ONLY valid JSON:
 {
   "scores": {
-    "visualMatch": 8,
-    "contextualMatch": 7,
-    "toneAlignment": 9
+    "visualMatch": [1-10 based on actual visual consistency],
+    "contextualMatch": [1-10 based on actual content alignment], 
+    "toneAlignment": [1-10 based on actual tone consistency]
   },
   "suggestions": {
-    "visual": ["specific visual improvement based on what you see", "color/design suggestion", "layout recommendation"],
-    "contextual": ["message alignment suggestion", "content consistency tip", "offer matching advice"],
-    "tone": ["voice consistency suggestion", "messaging tone advice", "brand personality tip"]
+    "visual": ["specific improvement based on what you actually see", "color/design fix", "layout change"],
+    "contextual": ["message alignment fix based on actual content", "content consistency improvement", "offer matching advice"],
+    "tone": ["voice consistency fix based on actual tone", "messaging improvement", "brand personality alignment"]
   }
 }`;
 
@@ -335,8 +344,10 @@ Return ONLY valid JSON:
 
   } catch (error) {
     console.error('💥 Vercel Function error:', error);
+    console.error('🔍 Error stack:', error.stack);
     
-    // Fallback response
+    // Fallback response (THIS IS A FALLBACK - NOT REAL ANALYSIS)
+    console.warn('⚠️ RETURNING FALLBACK RESPONSE - NOT REAL AI ANALYSIS');
     const fallbackResponse = {
       overallScore: 7,
       componentScores: {
