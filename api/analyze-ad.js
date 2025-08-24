@@ -265,9 +265,21 @@ Return ONLY valid JSON:
       temperature: 0.7
     });
 
-    const analysis = JSON.parse(completion.choices[0].message.content || '{}');
+    const rawContent = completion.choices[0].message.content;
+    console.log('📝 Raw GPT-4o response:', rawContent);
+
+    let analysis;
+    try {
+      analysis = JSON.parse(rawContent || '{}');
+      console.log('🔍 Parsed analysis:', analysis);
+    } catch (jsonError) {
+      console.error('❌ JSON parsing failed:', jsonError.message);
+      console.error('📝 Raw content that failed to parse:', rawContent);
+      throw new Error(`Failed to parse GPT-4o response as JSON: ${jsonError.message}`);
+    }
 
     if (!analysis.scores || !analysis.suggestions) {
+      console.error('❌ Invalid GPT-4o response format. Missing scores or suggestions:', analysis);
       throw new Error('Invalid GPT-4o response format');
     }
 
