@@ -1,4 +1,12 @@
-import React, { createContext, useState, useContext, ReactNode } from 'react';
+import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
+import { 
+  canEvaluate, 
+  getRemainingEvaluations, 
+  recordEvaluation, 
+  getUsageData,
+  getDaysUntilReset,
+  type UsageData 
+} from '../lib/usage-tracking';
 
 // Types
 interface AdData {
@@ -134,6 +142,11 @@ interface AdEvaluationContextType {
   results: EvaluationResults | null;
   hasEvaluated: boolean;
   showFeedbackModal: boolean;
+  usageData: UsageData;
+  canPerformEvaluation: boolean;
+  remainingEvaluations: number;
+  daysUntilReset: number;
+  showLimitModal: boolean;
   updateAdData: (data: Partial<AdData>) => void;
   updateLandingPageData: (data: Partial<LandingPageData>) => void;
   updateAudienceData: (data: Partial<AudienceData>) => void;
@@ -142,6 +155,7 @@ interface AdEvaluationContextType {
   openFeedbackModal: () => void;
   closeFeedbackModal: () => void;
   submitFeedback: (feedback: any) => Promise<void>;
+  closeLimitModal: () => void;
 }
 
 // Create context
@@ -169,6 +183,28 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
   const [results, setResults] = useState<EvaluationResults | null>(null);
   const [hasEvaluated, setHasEvaluated] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [showLimitModal, setShowLimitModal] = useState(false);
+  const [usageData, setUsageData] = useState<UsageData>(() => getUsageData());
+  const [canPerformEvaluation, setCanPerformEvaluation] = useState(() => canEvaluate());
+  const [remainingEvaluations, setRemainingEvaluations] = useState(() => getRemainingEvaluations());
+  const [daysUntilReset, setDaysUntilReset] = useState(() => getDaysUntilReset());
+
+  // Update usage stats when component mounts or usage changes
+  useEffect(() => {
+    const updateUsageStats = () => {
+      const usage = getUsageData();
+      setUsageData(usage);
+      setCanPerformEvaluation(canEvaluate());
+      setRemainingEvaluations(getRemainingEvaluations());
+      setDaysUntilReset(getDaysUntilReset());
+    };
+
+    updateUsageStats();
+    
+    // Update stats periodically (every minute) to handle month transitions
+    const interval = setInterval(updateUsageStats, 60000);
+    return () => clearInterval(interval);
+  }, []);
   
   const updateAdData = (data: Partial<AdData>) => {
     setAdData(prev => ({ ...prev, ...data }));
@@ -183,6 +219,25 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
   };
   
   const evaluateAd = async () => {
+    // Check usage limit before proceeding
+    if (!canPerformEvaluation) {
+      setShowLimitModal(true);
+      return;
+    }
+
+    // Record the evaluation attempt
+    const success = recordEvaluation();
+    if (!success) {
+      setShowLimitModal(true);
+      return;
+    }
+
+    // Update usage stats after recording
+    const usage = getUsageData();
+    setUsageData(usage);
+    setCanPerformEvaluation(canEvaluate());
+    setRemainingEvaluations(getRemainingEvaluations());
+
     try {
       // Use the client-safe API
       const { evaluateAd: apiEvaluateAd } = await import('../lib/api');
@@ -525,6 +580,10 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
     setShowFeedbackModal(false);
   };
 
+  const closeLimitModal = () => {
+    setShowLimitModal(false);
+  };
+
   const submitFeedback = async (feedback: any) => {
     try {
       // In a real implementation, this would call an API to store feedback
@@ -548,6 +607,11 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
         results,
         hasEvaluated,
         showFeedbackModal,
+        usageData,
+        canPerformEvaluation,
+        remainingEvaluations,
+        daysUntilReset,
+        showLimitModal,
         updateAdData,
         updateLandingPageData,
         updateAudienceData,
@@ -555,7 +619,8 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
         resetEvaluation,
         openFeedbackModal,
         closeFeedbackModal,
-        submitFeedback
+        submitFeedback,
+        closeLimitModal
       }}
     >
       {children}

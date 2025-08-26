@@ -26,10 +26,116 @@ const evaluations = pgTable('evaluations', {
   contextualScore: integer('contextual_score').notNull(),
   toneScore: integer('tone_score').notNull(),
   usedAi: boolean('used_ai').default(true).notNull(),
+  ipAddress: text('ip_address'),
   createdAt: timestamp('created_at', { withTimezone: true }).default(sql`NOW()`).notNull(),
 });
 
+// IP rate limiting table
+const ipRateLimit = pgTable('ip_rate_limit', {
+  id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
+  ipAddress: text('ip_address').unique().notNull(),
+  monthlyEvaluations: integer('monthly_evaluations').default(0).notNull(),
+  currentMonth: text('current_month').notNull(), // YYYY-MM format
+  lastEvaluationAt: timestamp('last_evaluation_at', { withTimezone: true }).default(sql`NOW()`).notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).default(sql`NOW()`).notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).default(sql`NOW()`).notNull(),
+}, (table) => {
+  return {
+    ipIdx: index('ip_address_idx').on(table.ipAddress),
+    monthIdx: index('current_month_idx').on(table.currentMonth),
+  };
+});
+
 const TIER_LIMITS = { free: 1, pro: 50, enterprise: 1000 };
+const IP_MONTHLY_LIMIT = 3; // 3 evaluations per month for non-authenticated users
+
+// Helper function to get client IP address
+const getClientIp = (req) => {
+  return req.headers['x-forwarded-for'] || 
+         req.headers['x-real-ip'] || 
+         req.connection?.remoteAddress || 
+         req.socket?.remoteAddress ||
+         (req.connection?.socket?.remoteAddress) ||
+         '127.0.0.1';
+};
+
+// Helper function to get current month in YYYY-MM format
+const getCurrentMonth = () => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = (now.getMonth() + 1).toString().padStart(2, '0');
+  return `${year}-${month}`;
+};
+
+// Check IP rate limit
+const checkIpRateLimit = async (db, ipAddress) => {
+  if (!db) return { allowed: true, remaining: IP_MONTHLY_LIMIT };
+
+  try {
+    const currentMonth = getCurrentMonth();
+    
+    // Check current IP usage for this month
+    const ipUsageResult = await db
+      .select()
+      .from(ipRateLimit)
+      .where(eq(ipRateLimit.ipAddress, ipAddress))
+      .limit(1);
+    
+    const ipUsage = ipUsageResult[0];
+    
+    if (!ipUsage) {
+      // First time IP - create record
+      await db.insert(ipRateLimit).values({
+        ipAddress,
+        monthlyEvaluations: 0,
+        currentMonth,
+        lastEvaluationAt: new Date()
+      });
+      return { allowed: true, remaining: IP_MONTHLY_LIMIT };
+    }
+    
+    // Reset if new month
+    if (ipUsage.currentMonth !== currentMonth) {
+      await db
+        .update(ipRateLimit)
+        .set({
+          monthlyEvaluations: 0,
+          currentMonth,
+          updatedAt: new Date()
+        })
+        .where(eq(ipRateLimit.ipAddress, ipAddress));
+      
+      return { allowed: true, remaining: IP_MONTHLY_LIMIT };
+    }
+    
+    // Check limit
+    const remaining = IP_MONTHLY_LIMIT - ipUsage.monthlyEvaluations;
+    const allowed = ipUsage.monthlyEvaluations < IP_MONTHLY_LIMIT;
+    
+    return { allowed, remaining: Math.max(0, remaining) };
+  } catch (error) {
+    console.warn('⚠️ IP rate limit check failed:', error);
+    return { allowed: true, remaining: IP_MONTHLY_LIMIT };
+  }
+};
+
+// Record IP evaluation
+const recordIpEvaluation = async (db, ipAddress) => {
+  if (!db) return;
+
+  try {
+    await db
+      .update(ipRateLimit)
+      .set({
+        monthlyEvaluations: sql`monthly_evaluations + 1`,
+        lastEvaluationAt: new Date(),
+        updatedAt: new Date()
+      })
+      .where(eq(ipRateLimit.ipAddress, ipAddress));
+  } catch (error) {
+    console.warn('⚠️ Failed to record IP evaluation:', error);
+  }
+};
 
 // Screenshot landing page using ScreenshotAPI.net (paid service)
 const screenshotLandingPage = async (url) => {
@@ -136,6 +242,10 @@ module.exports = async function handler(req, res) {
 
     console.log('🚀 Vercel Function called for platform:', adData.platform);
 
+    // Get client IP address
+    const clientIp = getClientIp(req);
+    console.log('🌐 Client IP:', clientIp);
+
     // Initialize database connection
     let db = null;
     if (process.env.DATABASE_URL) {
@@ -144,6 +254,23 @@ module.exports = async function handler(req, res) {
       console.log('✅ Database connected');
     } else {
       console.log('⚠️ No database connection - proceeding without user tracking');
+    }
+
+    // Check IP-based rate limiting for unauthenticated users
+    if (!userEmail) {
+      const ipCheck = await checkIpRateLimit(db, clientIp);
+      
+      if (!ipCheck.allowed) {
+        console.log('🚫 IP rate limit exceeded for:', clientIp);
+        return res.status(429).json({
+          error: `Monthly limit reached (${IP_MONTHLY_LIMIT}/${IP_MONTHLY_LIMIT}). Please wait for next month or create an account.`,
+          errorCode: 'IP_RATE_LIMIT_EXCEEDED',
+          remainingEvaluations: 0,
+          nextReset: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1).toISOString()
+        });
+      }
+      
+      console.log('✅ IP rate limit check passed. Remaining:', ipCheck.remaining);
     }
 
     // Initialize OpenAI
@@ -332,7 +459,8 @@ Return ONLY valid JSON:
           visualScore: analysis.scores.visualMatch,
           contextualScore: analysis.scores.contextualMatch,
           toneScore: analysis.scores.toneAlignment,
-          usedAi: true
+          usedAi: true,
+          ipAddress: clientIp
         });
 
         console.log('✅ Evaluation stored in database');
@@ -340,6 +468,10 @@ Return ONLY valid JSON:
         console.warn('⚠️ Database storage failed:', dbError);
         // Don't fail the request if database logging fails
       }
+    } else {
+      // Record IP evaluation for unauthenticated users
+      await recordIpEvaluation(db, clientIp);
+      console.log('✅ IP evaluation recorded');
     }
 
     console.log('🎉 Analysis complete!', { overallScore });

@@ -6,6 +6,7 @@ import Home from './pages/Home';
 import EvaluationForm from './pages/EvaluationForm';
 import Results from './pages/Results';
 import NotFound from './pages/NotFound';
+import UsageLimitModal from './components/UsageLimitModal';
 import { AdEvaluationProvider } from './context/AdEvaluationContext';
 
 function App() {
@@ -28,6 +29,8 @@ function App() {
                 © {new Date().getFullYear()} adalign.io. All rights reserved.
               </div>
             </footer>
+            
+            <UsageLimitModal />
           </div>
         </AdEvaluationProvider>
       </Router>
