@@ -61,7 +61,19 @@ const Suggestions: React.FC<SuggestionsProps> = ({ suggestions }) => {
                             <Check className="h-3 w-3 text-blue-600" />
                           </div>
                         </div>
-                        <span className="text-gray-700">{item}</span>
+                        <div className="text-gray-700">
+                          <div className="mb-1">{item}</div>
+                          {item.includes('#') && (
+                            <div className="text-xs text-gray-500 italic">
+                              💡 Technical recommendation with specific values
+                            </div>
+                          )}
+                          {item.includes('"') && (
+                            <div className="text-xs text-gray-500 italic">
+                              ✏️ Copy-ready suggestion
+                            </div>
+                          )}
+                        </div>
                       </li>
                     ))}
                   </ul>

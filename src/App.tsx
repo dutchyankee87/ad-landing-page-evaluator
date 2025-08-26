@@ -26,7 +26,7 @@ function App() {
             </main>
             <footer className="bg-white py-6 border-t border-gray-200">
               <div className="container mx-auto px-4 text-center text-gray-500 text-sm">
-                © {new Date().getFullYear()} adalign.io. All rights reserved.
+                © {new Date().getFullYear()} AdAlign.io. All rights reserved.
               </div>
             </footer>
             

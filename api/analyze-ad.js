@@ -348,6 +348,14 @@ Analyze both images with HARSH evaluation (1-10 scores):
    - SCORE 5-7: Similar tone with minor variations
    - SCORE 8-10: Perfect tone and voice consistency
 
+**INSTRUCTIONS FOR SPECIFIC SUGGESTIONS**:
+- Give EXACT color codes, font names, or pixel measurements when possible
+- Reference specific elements you can see in both images
+- Provide copy-paste ready text suggestions
+- Include specific technical instructions (CSS, HTML elements)
+- Mention exact positioning, sizing, or placement changes
+- Quote specific words or phrases from the ad to use on the landing page
+
 **First, describe what you see in each image specifically, then evaluate the match quality.**
 
 Return ONLY valid JSON:
@@ -358,9 +366,9 @@ Return ONLY valid JSON:
     "toneAlignment": [1-10 based on actual tone consistency]
   },
   "suggestions": {
-    "visual": ["specific improvement based on what you actually see", "color/design fix", "layout change"],
-    "contextual": ["message alignment fix based on actual content", "content consistency improvement", "offer matching advice"],
-    "tone": ["voice consistency fix based on actual tone", "messaging improvement", "brand personality alignment"]
+    "visual": ["SPECIFIC visual changes with exact colors, fonts, or elements mentioned", "Detailed design recommendations with pixel measurements or percentages", "Precise layout modifications based on what you see"],
+    "contextual": ["Exact headline changes using specific words from the ad", "Specific CTA button text that matches the ad promise", "Detailed content additions mentioning specific features or benefits"],
+    "tone": ["Specific word replacements to match ad voice", "Exact phrases to add or remove", "Precise messaging adjustments with example copy"]
   }
 }`;
 
@@ -492,19 +500,19 @@ Return ONLY valid JSON:
       },
       suggestions: {
         visual: [
-          "Ensure brand colors are consistent between ad and landing page",
-          "Optimize images for mobile viewing",
-          "Use high-contrast visuals that stand out"
+          "Change your landing page header background to match the exact blue (#4285F4) used in your ad creative",
+          "Increase your CTA button size to 160px width x 48px height and use the same orange (#FF6B35) from your ad",
+          "Replace your hero image with a product shot that matches the 45-degree angle shown in your ad creative"
         ],
         contextual: [
-          "Match your ad's value proposition with landing page headline",
-          "Ensure CTA language is consistent",
-          "Include social proof elements"
+          "Change your headline from 'Welcome' to match your ad's promise: 'Get 50% Off Your First Order Today'",
+          "Update your CTA button text from 'Learn More' to 'Claim My 50% Discount' to match your ad offer",
+          "Add a testimonial section featuring the customer quote mentioned in your ad copy"
         ],
         tone: [
-          "Maintain consistent voice across touchpoints",
-          "Use platform-appropriate language",
-          "Focus on user benefits"
+          "Replace formal language like 'We provide solutions' with casual language like 'We've got you covered' to match your ad's casual tone",
+          "Change 'Purchase now' to 'Grab yours' to maintain the playful voice from your ad",
+          "Add urgency phrases like 'Limited time only' to match the FOMO tone in your ad creative"
         ]
       }
     };

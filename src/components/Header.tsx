@@ -12,7 +12,7 @@ const Header: React.FC = () => {
           <Link to="/" className="flex items-center gap-2">
             <BarChart3 className="h-6 w-6 text-orange-500" />
             <span className="text-xl font-bold bg-gradient-to-r from-orange-500 to-black bg-clip-text text-transparent">
-              adalign.io
+              AdAlign.io
             </span>
           </Link>
           
