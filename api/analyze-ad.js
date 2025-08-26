@@ -47,7 +47,7 @@ const ipRateLimit = pgTable('ip_rate_limit', {
 });
 
 const TIER_LIMITS = { free: 1, pro: 50, enterprise: 1000 };
-const IP_MONTHLY_LIMIT = 3; // 3 evaluations per month for non-authenticated users
+const IP_MONTHLY_LIMIT = 5; // 5 evaluations per month for non-authenticated users
 
 // Helper function to get client IP address
 const getClientIp = (req) => {
@@ -263,7 +263,7 @@ module.exports = async function handler(req, res) {
       if (!ipCheck.allowed) {
         console.log('🚫 IP rate limit exceeded for:', clientIp);
         return res.status(429).json({
-          error: `Monthly limit reached (${IP_MONTHLY_LIMIT}/${IP_MONTHLY_LIMIT}). Please wait for next month or create an account.`,
+          error: `Monthly limit reached (5/5). Please wait for next month or create an account.`,
           errorCode: 'IP_RATE_LIMIT_EXCEEDED',
           remainingEvaluations: 0,
           nextReset: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1).toISOString()

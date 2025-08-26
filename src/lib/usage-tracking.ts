@@ -7,7 +7,7 @@ export interface UsageData {
 }
 
 const STORAGE_KEY = 'adalign_usage';
-const MONTHLY_LIMIT = 3;
+const MONTHLY_LIMIT = 5;
 
 // Get current month in YYYY-MM format
 function getCurrentMonth(): string {

@@ -46,7 +46,7 @@ const UsageLimitModal: React.FC = () => {
             <Calendar className="h-5 w-5 text-gray-500" />
             <div>
               <p className="text-sm font-medium text-gray-700">Free Plan Includes</p>
-              <p className="text-sm text-gray-600">{usageData.monthlyLimit} evaluations per month</p>
+              <p className="text-sm text-gray-600">5 evaluations per month</p>
             </div>
           </div>
         </div>
