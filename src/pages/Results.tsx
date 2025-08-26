@@ -174,8 +174,8 @@ const Results: React.FC = () => {
               </section>
             )}
             
-            {/* Landing Page Heatmap */}
-            {results && (
+            {/* Landing Page Heatmap - Hidden for now */}
+            {false && results && (
               <section className="mb-12">
                 <h2 className="text-2xl font-bold mb-4">🔍 Landing Page Optimization Zones</h2>
                 <p className="text-gray-600 mb-6">

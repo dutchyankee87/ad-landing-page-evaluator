@@ -190,33 +190,36 @@ You will analyze TWO images:
 
 Target Audience: ${audienceData.ageRange}, ${audienceData.gender}, interests: ${audienceData.interests}
 
-**CRITICAL**: If the ad and landing page are completely unrelated (different products, services, or brands), give LOW scores (1-3). Only give high scores (7-10) for genuinely well-matched content.
+**CRITICAL SCORING RULES**: 
+- If the ad and landing page show COMPLETELY DIFFERENT products, services, brands, or industries (e.g., nature photo vs banking page), ALL scores MUST be 1-2
+- If they're somewhat related but inconsistent: scores 3-4
+- If they're well-matched with minor issues: scores 5-7
+- If they're perfectly aligned: scores 8-10
 
-Analyze both images with STRICT evaluation (1-10 scores):
+**BE EXTREMELY STRICT** - Most ad-to-page combinations should score 1-4 unless they're genuinely excellent matches.
+
+Analyze both images with HARSH evaluation (1-10 scores):
 
 1. **Visual Match** (1-10):
-   - Are colors, fonts, imagery styles consistent?
-   - Is the brand identity clearly aligned?
-   - Do design aesthetics match?
-   - If completely different visual styles: score 1-3
-   - If somewhat similar: score 4-6
-   - If very consistent: score 7-10
+   - SCORE 1: Completely different visual styles, colors, fonts (e.g., nature vs corporate)
+   - SCORE 2: Different industries/contexts with no visual connection
+   - SCORE 3-4: Different styles but same general category
+   - SCORE 5-7: Similar styles with some consistency
+   - SCORE 8-10: Exceptional visual consistency and brand alignment
 
 2. **Contextual Match** (1-10):
-   - Do the ad message and landing page offer match?
-   - Are value propositions aligned?
-   - Are CTAs consistent?
-   - If different products/services: score 1-3
-   - If related but inconsistent: score 4-6
-   - If perfectly aligned: score 7-10
+   - SCORE 1: Completely different products/services/industries
+   - SCORE 2: Different businesses with no logical connection
+   - SCORE 3-4: Related category but different offerings
+   - SCORE 5-7: Same business with minor message inconsistencies
+   - SCORE 8-10: Perfect message and offer alignment
 
 3. **Tone Alignment** (1-10):
-   - Is voice and personality consistent?
-   - Does messaging style match?
-   - Is brand tone coherent?
-   - If completely different tones: score 1-3
-   - If somewhat consistent: score 4-6
-   - If perfectly matched: score 7-10
+   - SCORE 1: Completely different tones (e.g., artistic vs corporate)
+   - SCORE 2: Different brand personalities with no connection
+   - SCORE 3-4: Same general tone but inconsistent execution
+   - SCORE 5-7: Similar tone with minor variations
+   - SCORE 8-10: Perfect tone and voice consistency
 
 **First, describe what you see in each image specifically, then evaluate the match quality.**
 
