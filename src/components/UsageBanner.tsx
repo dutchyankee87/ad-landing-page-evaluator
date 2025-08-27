@@ -15,6 +15,9 @@ const UsageBanner: React.FC<UsageBannerProps> = () => {
   const [showPricing, setShowPricing] = useState(false);
   const { usageData, remainingEvaluations, daysUntilReset, canPerformEvaluation } = useAdEvaluation();
 
+  // Check for admin mode
+  const isAdminMode = remainingEvaluations === 999;
+  
   // Use real usage data from context
   const currentUsage = {
     used: usageData.evaluationsUsed,
@@ -25,7 +28,20 @@ const UsageBanner: React.FC<UsageBannerProps> = () => {
   const isNearLimit = currentUsage.used >= currentUsage.limit * 0.67; // Show warning at 2/3 used
   const isOverLimit = !canPerformEvaluation;
 
-  // Always show for free tier to communicate limits
+  // Don't show banner in admin mode
+  if (isAdminMode) {
+    return (
+      <div className="rounded-lg p-4 mb-6 bg-green-50 border border-green-200">
+        <div className="flex items-center gap-3">
+          <Crown className="h-5 w-5 text-green-600" />
+          <div>
+            <h3 className="font-medium text-green-900">Admin Mode Active</h3>
+            <p className="text-sm text-green-700">Unlimited evaluations enabled</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>

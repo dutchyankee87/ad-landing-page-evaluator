@@ -62,20 +62,45 @@ export function saveUsageData(data: UsageData): void {
   }
 }
 
+// Check for admin bypass
+function hasAdminBypass(): boolean {
+  try {
+    const adminKey = localStorage.getItem('adalign_admin_key');
+    return adminKey === 'adalign_dev_2024_unlimited';
+  } catch {
+    return false;
+  }
+}
+
 // Check if user can perform another evaluation
 export function canEvaluate(): boolean {
+  // Admin bypass
+  if (hasAdminBypass()) {
+    return true;
+  }
+  
   const usage = getUsageData();
   return usage.evaluationsUsed < usage.monthlyLimit;
 }
 
 // Get remaining evaluations
 export function getRemainingEvaluations(): number {
+  // Admin bypass shows unlimited
+  if (hasAdminBypass()) {
+    return 999;
+  }
+  
   const usage = getUsageData();
   return Math.max(0, usage.monthlyLimit - usage.evaluationsUsed);
 }
 
 // Record a new evaluation
 export function recordEvaluation(): boolean {
+  // Admin bypass - don't record usage
+  if (hasAdminBypass()) {
+    return true;
+  }
+  
   const usage = getUsageData();
   
   if (!canEvaluate()) {

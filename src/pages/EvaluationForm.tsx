@@ -122,7 +122,7 @@ const EvaluationForm: React.FC = () => {
       <div className="container mx-auto px-4 py-8">
       <div className="max-w-3xl mx-auto">
         <h1 className="text-3xl md:text-4xl font-bold text-center mb-2 bg-gradient-to-r from-orange-500 to-black bg-clip-text text-transparent">
-          AdAlign.io Evaluation
+          ADalign.io Evaluation
         </h1>
         <p className="text-gray-600 text-center mb-8 text-lg">
           Discover exactly what's killing your conversions in under 60 seconds

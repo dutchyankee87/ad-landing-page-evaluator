@@ -278,7 +278,7 @@ const Home: React.FC = () => {
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle className="h-4 w-4" />
-                  Used by 2,847+ marketers
+                  Used by marketers
                 </div>
               </div>
             </div>

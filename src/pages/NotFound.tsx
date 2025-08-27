@@ -8,7 +8,7 @@ const NotFound: React.FC = () => {
     <>
       <SEOHead 
         title="404 - Page Not Found"
-        description="The page you're looking for doesn't exist. Return to AdAlign.io to analyze your ad-to-landing page congruence with AI."
+        description="The page you're looking for doesn't exist. Return to ADalign.io to analyze your ad-to-landing page congruence with AI."
         noindex={true}
       />
       <div className="min-h-[80vh] flex items-center justify-center px-4">
@@ -24,7 +24,7 @@ const NotFound: React.FC = () => {
           className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl hover:from-orange-600 hover:to-red-600 transition-all font-semibold shadow-lg transform hover:-translate-y-0.5"
         >
           <Home className="h-5 w-5" />
-          Back to AdAlign.io
+          Back to ADalign.io
         </Link>
       </div>
       </div>
