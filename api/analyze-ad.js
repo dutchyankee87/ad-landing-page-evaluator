@@ -291,7 +291,7 @@ module.exports = async function handler(req, res) {
           
           if (user.monthlyEvaluations >= limit) {
             return res.status(429).json({
-              error: `Monthly limit reached (${user.monthlyEvaluations}/${limit}). Please upgrade your plan.`,
+              error: `Monthly limit reached (${user.monthlyEvaluations}/${limit}). Limit resets next month.`,
               errorCode: 'USAGE_LIMIT_EXCEEDED'
             });
           }

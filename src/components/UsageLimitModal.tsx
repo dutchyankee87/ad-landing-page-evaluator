@@ -53,31 +53,11 @@ const UsageLimitModal: React.FC = () => {
 
         <div className="space-y-3">
           <button
-            onClick={() => {
-              closeLimitModal();
-              // TODO: Open pricing modal or redirect to upgrade page
-              console.log('Upgrade clicked');
-            }}
-            className="w-full px-4 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg hover:from-orange-600 hover:to-red-600 transition-all font-semibold flex items-center justify-center gap-2"
-          >
-            <Crown className="h-4 w-4" />
-            Upgrade for Unlimited Access
-          </button>
-          
-          <button
             onClick={closeLimitModal}
-            className="w-full px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+            className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold"
           >
-            I'll Wait for Reset
+            I Understand
           </button>
-        </div>
-
-        <div className="mt-4 pt-4 border-t border-gray-200">
-          <div className="text-center">
-            <p className="text-xs text-gray-500">
-              Upgrade to get unlimited evaluations, priority support, and advanced features.
-            </p>
-          </div>
         </div>
       </div>
     </div>
