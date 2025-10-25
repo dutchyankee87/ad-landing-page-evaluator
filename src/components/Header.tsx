@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { BarChart3, Home } from 'lucide-react';
+import { BarChart3, Home, BookOpen } from 'lucide-react';
 
 const Header: React.FC = () => {
   const location = useLocation();
@@ -28,6 +28,14 @@ const Header: React.FC = () => {
               <Home className="h-4 w-4" />
               <span>Home</span>
             </Link>
+            
+            <a 
+              href="/#articles" 
+              className="flex items-center gap-1 text-sm font-medium text-gray-600 hover:text-black transition-colors"
+            >
+              <BookOpen className="h-4 w-4" />
+              <span>Articles</span>
+            </a>
             
             <Link 
               to="/evaluate" 

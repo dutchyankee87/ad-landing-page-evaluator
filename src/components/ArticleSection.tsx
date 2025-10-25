@@ -5,7 +5,7 @@ import { articles } from '../data/articles';
 
 const ArticleSection: React.FC = () => {
   return (
-    <section className="mb-16">
+    <section id="articles" className="mb-16">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 px-4 py-2 rounded-full text-sm font-medium mb-6">
