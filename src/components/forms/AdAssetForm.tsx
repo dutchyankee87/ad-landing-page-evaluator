@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
-import { Image, Upload, X, Info } from 'lucide-react';
+import { Image, Upload, X, Info, Loader2 } from 'lucide-react';
 import { useAdEvaluation } from '../../context/AdEvaluationContext';
+import { uploadAdImage, validateFileSize, validateFileType, deleteAdImage } from '../../lib/storage';
 
 const SUPPORTED_PLATFORMS = [
   { id: 'meta', name: 'Meta (Facebook/Instagram)', guidance: 'Screenshot your ad from Facebook Ads Manager or Instagram promotion. Include the full ad creative and any text overlay.' },
@@ -13,6 +14,9 @@ const SUPPORTED_PLATFORMS = [
 const AdAssetForm: React.FC = () => {
   const { adData, updateAdData } = useAdEvaluation();
   const [isDragging, setIsDragging] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
@@ -39,23 +43,62 @@ const AdAssetForm: React.FC = () => {
     }
   };
 
-  const handleFileUpload = (file: File) => {
-    if (!file.type.match('image.*')) {
-      alert('Please upload an image file');
+  const handleFileUpload = async (file: File) => {
+    // Reset error state
+    setUploadError(null);
+    
+    // Validate file type
+    if (!validateFileType(file)) {
+      setUploadError('Please upload a valid image file (JPEG, PNG, GIF, or WebP)');
       return;
     }
     
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      if (e.target && typeof e.target.result === 'string') {
-        updateAdData({ imageUrl: e.target.result });
-      }
-    };
-    reader.readAsDataURL(file);
+    // Validate file size (5MB limit)
+    if (!validateFileSize(file, 5)) {
+      setUploadError('File size must be less than 5MB');
+      return;
+    }
+    
+    setIsUploading(true);
+    setUploadProgress(0);
+    
+    try {
+      // Upload to Supabase storage
+      const result = await uploadAdImage(file, (progress) => {
+        setUploadProgress(progress);
+      });
+      
+      // Update ad data with Supabase URL and metadata
+      updateAdData({ 
+        imageUrl: result.url,
+        imageStoragePath: result.path,
+        imageFileSize: result.size
+      });
+      
+    } catch (error) {
+      console.error('Upload failed:', error);
+      setUploadError(error instanceof Error ? error.message : 'Upload failed. Please try again.');
+    } finally {
+      setIsUploading(false);
+      setUploadProgress(0);
+    }
   };
 
-  const handleRemoveImage = () => {
-    updateAdData({ imageUrl: null });
+  const handleRemoveImage = async () => {
+    // If there's a storage path, try to delete the file from Supabase
+    if (adData.imageStoragePath) {
+      try {
+        await deleteAdImage(adData.imageStoragePath);
+      } catch (error) {
+        console.warn('Failed to delete image from storage:', error);
+      }
+    }
+    
+    updateAdData({ 
+      imageUrl: null, 
+      imageStoragePath: undefined,
+      imageFileSize: undefined
+    });
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -110,31 +153,59 @@ const AdAssetForm: React.FC = () => {
         </label>
         
         {!adData.imageUrl ? (
-          <div
-            className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
-              isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'
-            }`}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
-            onClick={() => fileInputRef.current?.click()}
-          >
-            <div className="flex flex-col items-center">
-              <Upload className="h-10 w-10 text-gray-400 mb-2" />
-              <p className="text-sm font-medium text-gray-900 mb-1">
-                Drag and drop or click to upload
-              </p>
-              <p className="text-xs text-gray-500">
-                PNG, JPG, GIF up to 5MB • Complete ad screenshot including all text and visuals
-              </p>
+          <div>
+            <div
+              className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
+                isDragging ? 'border-blue-500 bg-blue-50' : 
+                isUploading ? 'border-blue-500 bg-blue-50' :
+                'border-gray-300 hover:border-gray-400'
+              } ${isUploading ? 'cursor-not-allowed' : ''}`}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+              onClick={() => !isUploading && fileInputRef.current?.click()}
+            >
+              <div className="flex flex-col items-center">
+                {isUploading ? (
+                  <>
+                    <Loader2 className="h-10 w-10 text-blue-500 mb-2 animate-spin" />
+                    <p className="text-sm font-medium text-blue-900 mb-1">
+                      Uploading... {uploadProgress}%
+                    </p>
+                    <div className="w-48 bg-gray-200 rounded-full h-2 mb-2">
+                      <div 
+                        className="bg-blue-500 h-2 rounded-full transition-all duration-300" 
+                        style={{ width: `${uploadProgress}%` }}
+                      ></div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <Upload className="h-10 w-10 text-gray-400 mb-2" />
+                    <p className="text-sm font-medium text-gray-900 mb-1">
+                      Drag and drop or click to upload
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      PNG, JPG, GIF, WebP up to 5MB • Complete ad screenshot including all text and visuals
+                    </p>
+                  </>
+                )}
+              </div>
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                disabled={isUploading}
+              />
             </div>
-            <input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              ref={fileInputRef}
-              onChange={handleFileChange}
-            />
+            
+            {uploadError && (
+              <div className="mt-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-sm text-red-800">{uploadError}</p>
+              </div>
+            )}
           </div>
         ) : (
           <div className="relative border rounded-lg overflow-hidden">

@@ -41,12 +41,10 @@ const LandingPageForm: React.FC = () => {
     setIsValidating(true);
     setValidationError(null);
     
-    // Simulate URL validation and content scraping
-    // In a real implementation, this would send a request to your backend
     try {
+      // Simple URL validation (mock for now)
       await new Promise(resolve => setTimeout(resolve, 1500));
       
-      // This is a mock - in a real app, you'd perform actual validation
       const mockValidationPassed = url.includes('.');
       
       if (!mockValidationPassed) {

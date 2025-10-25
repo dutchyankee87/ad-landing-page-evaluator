@@ -4,16 +4,12 @@ import {
   users, 
   evaluations, 
   performanceFeedback,
-  performanceMetrics,
   industryBenchmarks,
-  recommendationTracking,
   TIER_LIMITS, 
   type User, 
   type NewUser, 
   type NewEvaluation,
   type NewPerformanceFeedback,
-  type NewPerformanceMetrics,
-  type NewRecommendationTracking,
   type Industry,
   type AudienceType
 } from './schema';
@@ -105,24 +101,24 @@ export async function getPerformanceFeedback(evaluationId: string) {
     .orderBy(desc(performanceFeedback.createdAt));
 }
 
-// Performance Metrics Operations (Anonymous)
-export async function createPerformanceMetrics(metricsData: NewPerformanceMetrics) {
-  const result = await db.insert(performanceMetrics).values(metricsData).returning();
-  return result[0];
-}
+// Performance Metrics Operations (Anonymous) - DISABLED until table is implemented
+// export async function createPerformanceMetrics(metricsData: NewPerformanceMetrics) {
+//   const result = await db.insert(performanceMetrics).values(metricsData).returning();
+//   return result[0];
+// }
 
-export async function getPerformanceMetricsByPlatform(platform: string, industry?: string) {
-  const conditions = [eq(performanceMetrics.platform, platform)];
-  if (industry) {
-    conditions.push(eq(performanceMetrics.industry, industry));
-  }
+// export async function getPerformanceMetricsByPlatform(platform: string, industry?: string) {
+//   const conditions = [eq(performanceMetrics.platform, platform)];
+//   if (industry) {
+//     conditions.push(eq(performanceMetrics.industry, industry));
+//   }
 
-  return await db
-    .select()
-    .from(performanceMetrics)
-    .where(and(...conditions))
-    .orderBy(desc(performanceMetrics.createdAt));
-}
+//   return await db
+//     .select()
+//     .from(performanceMetrics)
+//     .where(and(...conditions))
+//     .orderBy(desc(performanceMetrics.createdAt));
+// }
 
 // Industry Benchmarks Operations
 export async function getIndustryBenchmarks(platform: string, industry: string, scoreType = 'overall') {
@@ -208,54 +204,54 @@ export async function updateIndustryBenchmarks(platform: string, industry: strin
   return result[0];
 }
 
-// Recommendation Tracking Operations
-export async function createRecommendationTracking(trackingData: NewRecommendationTracking) {
-  const result = await db.insert(recommendationTracking).values(trackingData).returning();
-  return result[0];
-}
+// Recommendation Tracking Operations - DISABLED until table is implemented
+// export async function createRecommendationTracking(trackingData: NewRecommendationTracking) {
+//   const result = await db.insert(recommendationTracking).values(trackingData).returning();
+//   return result[0];
+// }
 
-export async function updateRecommendationImplementation(
-  evaluationId: string, 
-  recommendationType: string,
-  implemented: boolean,
-  effectivenessRating?: number
-) {
-  return await db
-    .update(recommendationTracking)
-    .set({
-      implemented,
-      implementedAt: implemented ? new Date() : null,
-      effectivenessRating
-    })
-    .where(
-      and(
-        eq(recommendationTracking.evaluationId, evaluationId),
-        eq(recommendationTracking.recommendationType, recommendationType)
-      )
-    )
-    .returning();
-}
+// export async function updateRecommendationImplementation(
+//   evaluationId: string, 
+//   recommendationType: string,
+//   implemented: boolean,
+//   effectivenessRating?: number
+// ) {
+//   return await db
+//     .update(recommendationTracking)
+//     .set({
+//       implemented,
+//       implementedAt: implemented ? new Date() : null,
+//       effectivenessRating
+//     })
+//     .where(
+//       and(
+//         eq(recommendationTracking.evaluationId, evaluationId),
+//         eq(recommendationTracking.recommendationType, recommendationType)
+//       )
+//     )
+//     .returning();
+// }
 
-export async function getRecommendationStats(evaluationId: string) {
-  const recommendations = await db
-    .select()
-    .from(recommendationTracking)
-    .where(eq(recommendationTracking.evaluationId, evaluationId));
+// export async function getRecommendationStats(evaluationId: string) {
+//   const recommendations = await db
+//     .select()
+//     .from(recommendationTracking)
+//     .where(eq(recommendationTracking.evaluationId, evaluationId));
 
-  const total = recommendations.length;
-  const implemented = recommendations.filter(r => r.implemented).length;
-  const averageRating = recommendations
-    .filter(r => r.effectivenessRating)
-    .reduce((sum, r) => sum + (r.effectivenessRating || 0), 0) / 
-    recommendations.filter(r => r.effectivenessRating).length || 0;
+//   const total = recommendations.length;
+//   const implemented = recommendations.filter(r => r.implemented).length;
+//   const averageRating = recommendations
+//     .filter(r => r.effectivenessRating)
+//     .reduce((sum, r) => sum + (r.effectivenessRating || 0), 0) / 
+//     recommendations.filter(r => r.effectivenessRating).length || 0;
 
-  return {
-    total,
-    implemented,
-    implementationRate: total > 0 ? implemented / total : 0,
-    averageEffectivenessRating: averageRating
-  };
-}
+//   return {
+//     total,
+//     implemented,
+//     implementationRate: total > 0 ? implemented / total : 0,
+//     averageEffectivenessRating: averageRating
+//   };
+// }
 
 // Industry Classification Helper
 export async function detectIndustry(landingPageUrl: string): Promise<Industry> {
@@ -313,30 +309,20 @@ export async function getEvaluationPercentile(
   return 95;
 }
 
-// Data Flywheel Analytics
+// Data Flywheel Analytics - SIMPLIFIED until all tables are implemented
 export async function getDataFlywheelMetrics() {
   const [
     totalEvaluations,
-    totalFeedback,
-    totalMetrics,
-    implementationRate
+    totalFeedback
   ] = await Promise.all([
     db.select({ count: count() }).from(evaluations),
-    db.select({ count: count() }).from(performanceFeedback),
-    db.select({ count: count() }).from(performanceMetrics),
-    db.select({ 
-      implemented: count(),
-      total: sql`COUNT(*) OVER()`
-    })
-    .from(recommendationTracking)
-    .where(eq(recommendationTracking.implemented, true))
+    db.select({ count: count() }).from(performanceFeedback)
   ]);
 
   return {
     totalEvaluations: totalEvaluations[0].count,
     totalFeedback: totalFeedback[0].count,
-    totalMetrics: totalMetrics[0].count,
-    implementationRate: implementationRate[0] ? 
-      Number(implementationRate[0].implemented) / Number(implementationRate[0].total) : 0
+    totalMetrics: 0, // Will be implemented later
+    implementationRate: 0 // Will be implemented later
   };
 }

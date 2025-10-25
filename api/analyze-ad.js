@@ -1,7 +1,7 @@
 const OpenAI = require('openai').default || require('openai');
 const { drizzle } = require('drizzle-orm/postgres-js');
 const postgres = require('postgres');
-const { pgTable, uuid, text, integer, boolean, timestamp, index } = require('drizzle-orm/pg-core');
+const { pgTable, uuid, text, integer, boolean, timestamp, index, decimal, jsonb } = require('drizzle-orm/pg-core');
 const { eq, sql } = require('drizzle-orm');
 // Remove Puppeteer - using screenshot service instead
 
@@ -9,25 +9,32 @@ const { eq, sql } = require('drizzle-orm');
 const users = pgTable('users', {
   id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
   email: text('email').unique().notNull(),
-  tier: text('tier', { enum: ['free', 'pro', 'enterprise'] }).default('free').notNull(),
+  tier: text('tier').default('free').notNull(),
   monthlyEvaluations: integer('monthly_evaluations').default(0).notNull(),
+  storageUsedMb: decimal('storage_used_mb', { precision: 8, scale: 2 }).default('0').notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).default(sql`NOW()`).notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).default(sql`NOW()`).notNull(),
 });
 
 const evaluations = pgTable('evaluations', {
   id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
-  userId: uuid('user_id').references(() => users.id),
+  userId: uuid('user_id'),
   platform: text('platform').default('meta').notNull(),
-  adScreenshotUrl: text('ad_screenshot_url').notNull(),
   landingPageUrl: text('landing_page_url').notNull(),
-  overallScore: integer('overall_score').notNull(),
-  visualScore: integer('visual_score').notNull(),
-  contextualScore: integer('contextual_score').notNull(),
-  toneScore: integer('tone_score').notNull(),
+  overallScore: decimal('overall_score', { precision: 3, scale: 1 }).notNull(),
+  adScreenshotUrl: text('ad_screenshot_url'),
+  adImageFileSize: integer('ad_image_file_size'),
+  visualScore: decimal('visual_score', { precision: 3, scale: 1 }),
+  contextualScore: decimal('contextual_score', { precision: 3, scale: 1 }),
+  toneScore: decimal('tone_score', { precision: 3, scale: 1 }),
+  visualSuggestions: jsonb('visual_suggestions'),
+  contextualSuggestions: jsonb('contextual_suggestions'),
+  toneSuggestions: jsonb('tone_suggestions'),
+  analysisModel: text('analysis_model'),
+  processingTimeMs: integer('processing_time_ms'),
   usedAi: boolean('used_ai').default(true).notNull(),
-  ipAddress: text('ip_address'),
   createdAt: timestamp('created_at', { withTimezone: true }).default(sql`NOW()`).notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).default(sql`NOW()`).notNull(),
 });
 
 // IP rate limiting table
@@ -457,18 +464,22 @@ Return ONLY valid JSON:
           })
           .where(eq(users.id, userId));
         
-        // Store evaluation
+        // Store evaluation with visual assets
         await db.insert(evaluations).values({
           userId: userId,
           platform: adData.platform,
-          adScreenshotUrl: adData.imageUrl,
           landingPageUrl: landingPageData.url,
           overallScore: overallScore,
+          adScreenshotUrl: adData.imageUrl,
+          adImageFileSize: adData.imageFileSize || null,
           visualScore: analysis.scores.visualMatch,
           contextualScore: analysis.scores.contextualMatch,
           toneScore: analysis.scores.toneAlignment,
-          usedAi: true,
-          ipAddress: clientIp
+          visualSuggestions: analysis.suggestions.visual,
+          contextualSuggestions: analysis.suggestions.contextual,
+          toneSuggestions: analysis.suggestions.tone,
+          analysisModel: 'gpt-4o-vision',
+          usedAi: true
         });
 
         console.log('✅ Evaluation stored in database');
