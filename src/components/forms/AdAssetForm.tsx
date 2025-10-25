@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Image, Upload, X, Info, Loader2 } from 'lucide-react';
 import { useAdEvaluation } from '../../context/AdEvaluationContext';
-// import { uploadAdImage, validateFileSize, validateFileType, deleteAdImage } from '../../lib/storage';
+import { uploadAdImageSmart, validateFileSize, validateFileType } from '../../lib/storage-dynamic';
 
 const SUPPORTED_PLATFORMS = [
   { id: 'meta', name: 'Meta (Facebook/Instagram)', guidance: 'Screenshot your ad from Facebook Ads Manager or Instagram promotion. Include the full ad creative and any text overlay.' },
@@ -47,13 +47,14 @@ const AdAssetForm: React.FC = () => {
     // Reset error state
     setUploadError(null);
     
-    // Simple validation
-    if (!file.type.match('image.*')) {
-      setUploadError('Please upload an image file');
+    // Validate file type
+    if (!validateFileType(file)) {
+      setUploadError('Please upload a valid image file (JPEG, PNG, GIF, or WebP)');
       return;
     }
     
-    if (file.size > 5 * 1024 * 1024) { // 5MB limit
+    // Validate file size (5MB limit)
+    if (!validateFileSize(file, 5)) {
       setUploadError('File size must be less than 5MB');
       return;
     }
@@ -62,27 +63,28 @@ const AdAssetForm: React.FC = () => {
     setUploadProgress(0);
     
     try {
-      // Simulate upload progress
-      for (let i = 0; i <= 100; i += 10) {
-        setUploadProgress(i);
-        await new Promise(resolve => setTimeout(resolve, 50));
-      }
+      // Smart upload - tries Supabase first, falls back to base64
+      const result = await uploadAdImageSmart(file, (progress) => {
+        setUploadProgress(progress);
+      });
       
-      // Convert to base64 for now (temporary solution)
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        if (e.target && typeof e.target.result === 'string') {
-          updateAdData({ 
-            imageUrl: e.target.result,
-            imageFileSize: file.size
-          });
-        }
-      };
-      reader.readAsDataURL(file);
+      // Update ad data with result
+      updateAdData({ 
+        imageUrl: result.url,
+        imageFileSize: result.size,
+        imageStoragePath: result.isSupabase ? result.path : undefined
+      });
+      
+      // Show success message if using Supabase
+      if (result.isSupabase) {
+        console.log('✅ Image uploaded to Supabase storage');
+      } else {
+        console.log('ℹ️ Using local storage (base64)');
+      }
       
     } catch (error) {
       console.error('Upload failed:', error);
-      setUploadError('Upload failed. Please try again.');
+      setUploadError(error instanceof Error ? error.message : 'Upload failed. Please try again.');
     } finally {
       setIsUploading(false);
       setUploadProgress(0);
