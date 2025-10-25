@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, TrendingUp, AlertTriangle, CheckCircle, DollarSign } from 'lucide-react';
 import SEOHead from '../components/SEOHead';
+import ArticleSection from '../components/ArticleSection';
 
 const Home: React.FC = () => {
   return (
@@ -236,6 +237,9 @@ const Home: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* Articles Section */}
+      <ArticleSection />
 
       {/* Final CTA */}
       <section>
