@@ -17,41 +17,43 @@ import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 // Phase 3: Add performance tracking and benchmarking
 export const evaluations = pgTable('evaluations', {
   id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
-  
-  // Phase 2: User accounts (nullable for backward compatibility)
-  userId: uuid('user_id'), // Will reference users table when implemented
-  
-  // Core evaluation data
-  platform: text('platform').default('meta').notNull(),
+  userId: uuid('user_id'),
+  title: text('title'),
+  adScreenshotUrl: text('ad_screenshot_url'),
   landingPageUrl: text('landing_page_url').notNull(),
+  landingPageTitle: text('landing_page_title'),
+  landingPageContent: text('landing_page_content'),
+  landingPageCta: text('landing_page_cta'),
+  targetAgeRange: text('target_age_range'),
+  targetGender: text('target_gender'),
+  targetLocation: text('target_location'),
+  targetInterests: text('target_interests'),
   overallScore: decimal('overall_score', { precision: 3, scale: 1 }).notNull(),
-  
-  // Phase 2: File storage URLs (nullable for Phase 1)
-  adImageUrl: text('ad_image_url'), // Future: R2/S3 URL
-  adThumbnailUrl: text('ad_thumbnail_url'), // Future: optimized thumbnail
-  landingPageScreenshotUrl: text('landing_page_screenshot_url'), // Future: auto-capture
-  
-  // Analysis results (always stored)
-  gpt4Analysis: jsonb('gpt4_analysis').notNull(),
-  persuasionPrinciples: jsonb('persuasion_principles'),
-  recommendations: jsonb('recommendations'),
-  
-  // Phase 2: Enhanced metadata (nullable for Phase 1)
-  industry: text('industry'), // Auto-detected
-  audienceType: text('audience_type'), // B2B/B2C
+  visualMatchScore: decimal('visual_match_score', { precision: 3, scale: 1 }),
+  contextualMatchScore: decimal('contextual_match_score', { precision: 3, scale: 1 }),
+  toneAlignmentScore: decimal('tone_alignment_score', { precision: 3, scale: 1 }),
+  visualSuggestions: jsonb('visual_suggestions'),
+  contextualSuggestions: jsonb('contextual_suggestions'),
+  toneSuggestions: jsonb('tone_suggestions'),
+  analysisModel: text('analysis_model'),
   processingTimeMs: integer('processing_time_ms'),
-  aiCost: decimal('ai_cost', { precision: 6, scale: 4 }),
-  
-  // Usage tracking
-  usedAi: boolean('used_ai').default(true).notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).default(sql`NOW()`).notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).default(sql`NOW()`).notNull(),
+  platform: text('platform').default('meta').notNull(),
+  landingPageScreenshotUrl: text('landing_page_screenshot_url'),
+  landingPageScreenshotPath: text('landing_page_screenshot_path'),
+  screenshotFileSize: integer('screenshot_file_size'),
+  screenshotCapturedAt: timestamp('screenshot_captured_at', { withTimezone: true }),
+  screenshotIsPlaceholder: boolean('screenshot_is_placeholder').default(false),
+  contextualScore: decimal('contextual_score', { precision: 3, scale: 1 }),
+  toneScore: decimal('tone_score', { precision: 3, scale: 1 }),
+  adImageFileSize: integer('ad_image_file_size'),
+  visualScore: decimal('visual_score', { precision: 3, scale: 1 }),
 }, (table) => {
   return {
     createdAtIdx: index('idx_evaluations_created_at').on(table.createdAt),
     platformIdx: index('idx_evaluations_platform').on(table.platform),
-    industryIdx: index('idx_evaluations_industry').on(table.industry),
-    userIdIdx: index('idx_evaluations_user_id').on(table.userId), // Future use
+    userIdIdx: index('idx_evaluations_user_id').on(table.userId),
     landingPageUrlIdx: index('idx_evaluations_url').on(table.landingPageUrl),
   };
 });
@@ -100,6 +102,22 @@ export const industryBenchmarks = pgTable('industry_benchmarks', {
 }, (table) => {
   return {
     platformIndustryIdx: index('idx_benchmarks_platform_industry').on(table.platform, table.industry),
+  };
+});
+
+// IP rate limiting for anonymous users
+export const ipRateLimit = pgTable('ip_rate_limit', {
+  id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
+  ipAddress: text('ip_address').unique().notNull(),
+  monthlyEvaluations: integer('monthly_evaluations').default(0).notNull(),
+  currentMonth: text('current_month').notNull(), // YYYY-MM format
+  lastEvaluationAt: timestamp('last_evaluation_at', { withTimezone: true }).default(sql`NOW()`).notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).default(sql`NOW()`).notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).default(sql`NOW()`).notNull(),
+}, (table) => {
+  return {
+    ipIdx: index('ip_address_idx').on(table.ipAddress),
+    monthIdx: index('current_month_idx').on(table.currentMonth),
   };
 });
 
