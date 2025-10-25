@@ -12,7 +12,6 @@ import {
 interface AdData {
   imageUrl: string | null;
   platform: string | null;
-  imageStoragePath?: string;
   imageFileSize?: number;
 }
 

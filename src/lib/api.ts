@@ -6,7 +6,6 @@ export interface EvaluationRequest {
   adData: {
     imageUrl: string;
     platform: string;
-    imageStoragePath?: string;
     imageFileSize?: number;
   };
   landingPageData: {

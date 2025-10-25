@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Image, Upload, X, Info, Loader2 } from 'lucide-react';
 import { useAdEvaluation } from '../../context/AdEvaluationContext';
-import { uploadAdImage, validateFileSize, validateFileType, deleteAdImage } from '../../lib/storage';
+// import { uploadAdImage, validateFileSize, validateFileType, deleteAdImage } from '../../lib/storage';
 
 const SUPPORTED_PLATFORMS = [
   { id: 'meta', name: 'Meta (Facebook/Instagram)', guidance: 'Screenshot your ad from Facebook Ads Manager or Instagram promotion. Include the full ad creative and any text overlay.' },
@@ -47,14 +47,13 @@ const AdAssetForm: React.FC = () => {
     // Reset error state
     setUploadError(null);
     
-    // Validate file type
-    if (!validateFileType(file)) {
-      setUploadError('Please upload a valid image file (JPEG, PNG, GIF, or WebP)');
+    // Simple validation
+    if (!file.type.match('image.*')) {
+      setUploadError('Please upload an image file');
       return;
     }
     
-    // Validate file size (5MB limit)
-    if (!validateFileSize(file, 5)) {
+    if (file.size > 5 * 1024 * 1024) { // 5MB limit
       setUploadError('File size must be less than 5MB');
       return;
     }
@@ -63,40 +62,36 @@ const AdAssetForm: React.FC = () => {
     setUploadProgress(0);
     
     try {
-      // Upload to Supabase storage
-      const result = await uploadAdImage(file, (progress) => {
-        setUploadProgress(progress);
-      });
+      // Simulate upload progress
+      for (let i = 0; i <= 100; i += 10) {
+        setUploadProgress(i);
+        await new Promise(resolve => setTimeout(resolve, 50));
+      }
       
-      // Update ad data with Supabase URL and metadata
-      updateAdData({ 
-        imageUrl: result.url,
-        imageStoragePath: result.path,
-        imageFileSize: result.size
-      });
+      // Convert to base64 for now (temporary solution)
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (e.target && typeof e.target.result === 'string') {
+          updateAdData({ 
+            imageUrl: e.target.result,
+            imageFileSize: file.size
+          });
+        }
+      };
+      reader.readAsDataURL(file);
       
     } catch (error) {
       console.error('Upload failed:', error);
-      setUploadError(error instanceof Error ? error.message : 'Upload failed. Please try again.');
+      setUploadError('Upload failed. Please try again.');
     } finally {
       setIsUploading(false);
       setUploadProgress(0);
     }
   };
 
-  const handleRemoveImage = async () => {
-    // If there's a storage path, try to delete the file from Supabase
-    if (adData.imageStoragePath) {
-      try {
-        await deleteAdImage(adData.imageStoragePath);
-      } catch (error) {
-        console.warn('Failed to delete image from storage:', error);
-      }
-    }
-    
+  const handleRemoveImage = () => {
     updateAdData({ 
       imageUrl: null, 
-      imageStoragePath: undefined,
       imageFileSize: undefined
     });
   };
