@@ -5,6 +5,7 @@ import Header from './components/Header';
 import Home from './pages/Home';
 import EvaluationForm from './pages/EvaluationForm';
 import Results from './pages/Results';
+import Article from './pages/Article';
 import NotFound from './pages/NotFound';
 import UsageLimitModal from './components/UsageLimitModal';
 import { AdEvaluationProvider } from './context/AdEvaluationContext';
@@ -21,6 +22,7 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/evaluate" element={<EvaluationForm />} />
                 <Route path="/results" element={<Results />} />
+                <Route path="/articles/:slug" element={<Article />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

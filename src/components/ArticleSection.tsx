@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Clock, User, ArrowRight, BookOpen } from 'lucide-react';
 import { articles } from '../data/articles';
 
@@ -23,9 +24,10 @@ const ArticleSection: React.FC = () => {
         
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {articles.map((article) => (
-            <article 
+            <Link
               key={article.id}
-              className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group cursor-pointer border border-gray-100"
+              to={`/articles/${article.slug}`}
+              className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group cursor-pointer border border-gray-100 block"
             >
               <div className="p-6">
                 <div className="flex items-center gap-2 mb-4">
@@ -79,7 +81,7 @@ const ArticleSection: React.FC = () => {
                   )}
                 </div>
               </div>
-            </article>
+            </Link>
           ))}
         </div>
         
