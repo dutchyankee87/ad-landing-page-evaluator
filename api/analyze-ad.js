@@ -1,8 +1,8 @@
-const OpenAI = require('openai').default || require('openai');
-const { drizzle } = require('drizzle-orm/postgres-js');
-const postgres = require('postgres');
-const { pgTable, uuid, text, integer, boolean, timestamp, index, decimal, jsonb } = require('drizzle-orm/pg-core');
-const { eq, sql } = require('drizzle-orm');
+import OpenAI from 'openai';
+import { drizzle } from 'drizzle-orm/postgres-js';
+import postgres from 'postgres';
+import { pgTable, uuid, text, integer, boolean, timestamp, index, decimal, jsonb } from 'drizzle-orm/pg-core';
+import { eq, sql } from 'drizzle-orm';
 // Remove Puppeteer - using screenshot service instead
 
 // Database schema (inline to avoid import issues)
@@ -245,7 +245,7 @@ const getPlatformPrompt = (platform) => {
   return prompts[platform] || prompts.meta;
 };
 
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
