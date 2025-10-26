@@ -2,6 +2,7 @@
   "name": "ADalign.io",
   "private": true,
   "version": "0.1.0",
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -13,6 +14,7 @@
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
+    "@clerk/clerk-react": "^6.1.0",
     "@supabase/supabase-js": "^2.55.0",
     "lucide-react": "^0.344.0",
     "openai": "^4.104.0",
