@@ -4,10 +4,13 @@ export interface UsageData {
   monthlyLimit: number;
   currentMonth: string; // YYYY-MM format
   lastEvaluationDate: string;
+  userId?: string; // Add user ID for authenticated tracking
 }
 
 const STORAGE_KEY = 'adalign_usage';
-const MONTHLY_LIMIT = 5;
+const ANONYMOUS_STORAGE_KEY = 'adalign_anonymous_usage';
+const ANONYMOUS_LIMIT = 1; // 1 free check for anonymous users
+const AUTHENTICATED_LIMIT = 2; // 2 additional checks for authenticated users
 
 // Get current month in YYYY-MM format
 function getCurrentMonth(): string {
@@ -17,12 +20,13 @@ function getCurrentMonth(): string {
   return `${year}-${month}`;
 }
 
-// Get usage data from localStorage
-export function getUsageData(): UsageData {
+// Get usage data from localStorage (with optional user ID for authenticated users)
+export function getUsageData(userId?: string): UsageData {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY);
+    const storageKey = userId ? `${STORAGE_KEY}_${userId}` : ANONYMOUS_STORAGE_KEY;
+    const stored = localStorage.getItem(storageKey);
     if (!stored) {
-      return initializeUsageData();
+      return initializeUsageData(userId);
     }
 
     const parsed = JSON.parse(stored) as UsageData;
@@ -30,33 +34,35 @@ export function getUsageData(): UsageData {
 
     // Reset if new month
     if (parsed.currentMonth !== currentMonth) {
-      return initializeUsageData();
+      return initializeUsageData(userId);
     }
 
     return parsed;
   } catch (error) {
     console.warn('Failed to parse usage data:', error);
-    return initializeUsageData();
+    return initializeUsageData(userId);
   }
 }
 
 // Initialize fresh usage data
-function initializeUsageData(): UsageData {
+function initializeUsageData(userId?: string): UsageData {
   const data: UsageData = {
     evaluationsUsed: 0,
-    monthlyLimit: MONTHLY_LIMIT,
+    monthlyLimit: userId ? AUTHENTICATED_LIMIT : ANONYMOUS_LIMIT,
     currentMonth: getCurrentMonth(),
-    lastEvaluationDate: ''
+    lastEvaluationDate: '',
+    userId
   };
   
-  saveUsageData(data);
+  saveUsageData(data, userId);
   return data;
 }
 
 // Save usage data to localStorage
-export function saveUsageData(data: UsageData): void {
+export function saveUsageData(data: UsageData, userId?: string): void {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    const storageKey = userId ? `${STORAGE_KEY}_${userId}` : ANONYMOUS_STORAGE_KEY;
+    localStorage.setItem(storageKey, JSON.stringify(data));
   } catch (error) {
     console.warn('Failed to save usage data:', error);
   }
@@ -73,44 +79,45 @@ function hasAdminBypass(): boolean {
 }
 
 // Check if user can perform another evaluation
-export function canEvaluate(): boolean {
+export function canEvaluate(userId?: string): boolean {
   // Admin bypass
   if (hasAdminBypass()) {
     return true;
   }
   
-  const usage = getUsageData();
+  const usage = getUsageData(userId);
   return usage.evaluationsUsed < usage.monthlyLimit;
 }
 
 // Get remaining evaluations
-export function getRemainingEvaluations(): number {
+export function getRemainingEvaluations(userId?: string): number {
   // Admin bypass shows unlimited
   if (hasAdminBypass()) {
     return 999;
   }
   
-  const usage = getUsageData();
+  const usage = getUsageData(userId);
   return Math.max(0, usage.monthlyLimit - usage.evaluationsUsed);
 }
 
 // Record a new evaluation
-export function recordEvaluation(): boolean {
+export function recordEvaluation(userId?: string): boolean {
   // Admin bypass - don't record usage
   if (hasAdminBypass()) {
     return true;
   }
   
-  const usage = getUsageData();
+  const usage = getUsageData(userId);
   
-  if (!canEvaluate()) {
+  if (!canEvaluate(userId)) {
     return false;
   }
 
   usage.evaluationsUsed += 1;
   usage.lastEvaluationDate = new Date().toISOString();
+  usage.userId = userId; // Ensure userId is set
   
-  saveUsageData(usage);
+  saveUsageData(usage, userId);
   return true;
 }
 
@@ -126,4 +133,23 @@ export function getDaysUntilReset(): number {
 export function getNextResetDate(): Date {
   const now = new Date();
   return new Date(now.getFullYear(), now.getMonth() + 1, 1);
+}
+
+// Check if anonymous user has used their free check
+export function hasUsedAnonymousCheck(): boolean {
+  const anonymousUsage = getUsageData(); // No userId = anonymous
+  return anonymousUsage.evaluationsUsed >= ANONYMOUS_LIMIT;
+}
+
+// Get total evaluations available (anonymous + authenticated combined)
+export function getTotalEvaluationsAvailable(userId?: string): number {
+  if (hasAdminBypass()) return 999;
+  
+  if (userId) {
+    // Authenticated user gets 2 additional checks
+    return AUTHENTICATED_LIMIT;
+  } else {
+    // Anonymous user gets 1 check
+    return ANONYMOUS_LIMIT;
+  }
 }

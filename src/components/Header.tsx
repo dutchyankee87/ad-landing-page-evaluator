@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { BarChart3, Home, BookOpen } from 'lucide-react';
+import { BarChart3, BookOpen } from 'lucide-react';
 
 const Header: React.FC = () => {
   const location = useLocation();
@@ -16,19 +16,7 @@ const Header: React.FC = () => {
             </span>
           </Link>
           
-          <nav className="flex items-center gap-2">
-            <Link 
-              to="/" 
-              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                location.pathname === '/' 
-                  ? 'bg-orange-50 text-orange-600 shadow-sm' 
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-              }`}
-            >
-              <Home className="h-4 w-4" />
-              <span>Home</span>
-            </Link>
-            
+          <nav className="flex items-center gap-4">
             <a 
               href="/#articles" 
               className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all duration-200"

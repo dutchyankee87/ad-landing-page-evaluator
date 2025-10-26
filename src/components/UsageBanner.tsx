@@ -1,6 +1,8 @@
 import React from 'react';
 import { AlertCircle, Crown, Zap, Clock } from 'lucide-react';
+import { useAuth } from '@clerk/clerk-react';
 import { useAdEvaluation } from '../context/AdEvaluationContext';
+import { hasUsedAnonymousCheck } from '../lib/usage-tracking';
 
 interface UsageBannerProps {
   usage?: {
@@ -12,6 +14,7 @@ interface UsageBannerProps {
 
 const UsageBanner: React.FC<UsageBannerProps> = () => {
   const { usageData, remainingEvaluations, daysUntilReset, canPerformEvaluation } = useAdEvaluation();
+  const { isSignedIn } = useAuth();
 
   // Check for admin mode
   const isAdminMode = remainingEvaluations === 999;
@@ -25,6 +28,21 @@ const UsageBanner: React.FC<UsageBannerProps> = () => {
 
   const isNearLimit = currentUsage.used >= currentUsage.limit * 0.67; // Show warning at 2/3 used
   const isOverLimit = !canPerformEvaluation;
+
+  // For anonymous users who haven't used their free check, show different messaging
+  if (!isSignedIn && !hasUsedAnonymousCheck()) {
+    return (
+      <div className="rounded-lg p-4 mb-6 bg-green-50 border border-green-200">
+        <div className="flex items-center gap-3">
+          <Zap className="h-5 w-5 text-green-600" />
+          <div>
+            <h3 className="font-medium text-green-900">Free Analysis Available</h3>
+            <p className="text-sm text-green-700">Get your first ad-to-page congruence score completely free</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Don't show banner in admin mode
   if (isAdminMode) {

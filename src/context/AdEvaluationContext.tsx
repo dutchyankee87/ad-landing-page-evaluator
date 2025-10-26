@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
+import { useUser } from '@clerk/clerk-react';
 import { 
   canEvaluate, 
   getRemainingEvaluations, 
@@ -164,6 +165,9 @@ const AdEvaluationContext = createContext<AdEvaluationContextType | undefined>(u
 
 // Provider component
 export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const { user } = useUser();
+  const userId = user?.id;
+  
   const [adData, setAdData] = useState<AdData>({
     imageUrl: null,
     platform: null
@@ -185,18 +189,18 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
   const [hasEvaluated, setHasEvaluated] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [showLimitModal, setShowLimitModal] = useState(false);
-  const [usageData, setUsageData] = useState<UsageData>(() => getUsageData());
-  const [canPerformEvaluation, setCanPerformEvaluation] = useState(() => canEvaluate());
-  const [remainingEvaluations, setRemainingEvaluations] = useState(() => getRemainingEvaluations());
+  const [usageData, setUsageData] = useState<UsageData>(() => getUsageData(userId));
+  const [canPerformEvaluation, setCanPerformEvaluation] = useState(() => canEvaluate(userId));
+  const [remainingEvaluations, setRemainingEvaluations] = useState(() => getRemainingEvaluations(userId));
   const [daysUntilReset, setDaysUntilReset] = useState(() => getDaysUntilReset());
 
   // Update usage stats when component mounts or usage changes
   useEffect(() => {
     const updateUsageStats = () => {
-      const usage = getUsageData();
+      const usage = getUsageData(userId);
       setUsageData(usage);
-      setCanPerformEvaluation(canEvaluate());
-      setRemainingEvaluations(getRemainingEvaluations());
+      setCanPerformEvaluation(canEvaluate(userId));
+      setRemainingEvaluations(getRemainingEvaluations(userId));
       setDaysUntilReset(getDaysUntilReset());
     };
 
@@ -205,7 +209,7 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
     // Update stats periodically (every minute) to handle month transitions
     const interval = setInterval(updateUsageStats, 60000);
     return () => clearInterval(interval);
-  }, []);
+  }, [userId]); // Update when userId changes
   
   const updateAdData = (data: Partial<AdData>) => {
     setAdData(prev => ({ ...prev, ...data }));
@@ -220,24 +224,33 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
   };
   
   const evaluateAd = async () => {
-    // Check usage limit before proceeding
-    if (!canPerformEvaluation) {
-      setShowLimitModal(true);
-      return;
+    // For anonymous users, check if they've already used their free evaluation
+    if (!userId) {
+      const anonymousUsage = getUsageData(); // No userId = anonymous usage
+      if (anonymousUsage.evaluationsUsed >= 1) {
+        setShowLimitModal(true);
+        return;
+      }
+    } else {
+      // For authenticated users, check their limit (2 evaluations)
+      if (!canPerformEvaluation) {
+        setShowLimitModal(true);
+        return;
+      }
     }
 
     // Record the evaluation attempt
-    const success = recordEvaluation();
+    const success = recordEvaluation(userId);
     if (!success) {
       setShowLimitModal(true);
       return;
     }
 
     // Update usage stats after recording
-    const usage = getUsageData();
+    const usage = getUsageData(userId);
     setUsageData(usage);
-    setCanPerformEvaluation(canEvaluate());
-    setRemainingEvaluations(getRemainingEvaluations());
+    setCanPerformEvaluation(canEvaluate(userId));
+    setRemainingEvaluations(getRemainingEvaluations(userId));
 
     try {
       // Use the client-safe API

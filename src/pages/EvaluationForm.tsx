@@ -22,6 +22,8 @@ const EvaluationForm: React.FC = () => {
         setError('Please select a platform and upload an ad screenshot before proceeding.');
         return;
       }
+      
+      // No auth check - allow anonymous users to proceed for first free check
       setCurrentStep('landingPage');
     } else if (currentStep === 'landingPage') {
       if (!landingPageData.url) {
@@ -33,6 +35,7 @@ const EvaluationForm: React.FC = () => {
     
     setError(null);
   };
+
 
   const handleBack = () => {
     if (currentStep === 'landingPage') setCurrentStep('adAssets');
@@ -180,7 +183,7 @@ const EvaluationForm: React.FC = () => {
                 <p className="text-sm text-gray-700">
                   <span className="font-medium">URL: </span>
                   <a 
-                    href={landingPageData.url} 
+                    href={landingPageData.url || ''} 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="text-orange-500 hover:underline"

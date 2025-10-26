@@ -1,7 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Download, ChevronRight, MessageCircle } from 'lucide-react';
+import { useAuth } from '@clerk/clerk-react';
 import { useAdEvaluation } from '../context/AdEvaluationContext';
+import { hasUsedAnonymousCheck } from '../lib/usage-tracking';
 import ScoreGauge from '../components/results/ScoreGauge';
 import ComponentScores from '../components/results/ComponentScores';
 import Suggestions from '../components/results/Suggestions';
@@ -12,6 +14,7 @@ import { IndustryBenchmarks } from '../components/benchmarks/IndustryBenchmarks'
 import { DetailedScoring } from '../components/results/DetailedScoring';
 import { IndustryInsights } from '../components/insights/IndustryInsights';
 import { PersuasionAnalysis } from '../components/psychology/PersuasionAnalysis';
+import PostResultSignupModal from '../components/auth/PostResultSignupModal';
 import SEOHead from '../components/SEOHead';
 
 const PLATFORM_NAMES = {
@@ -32,7 +35,20 @@ const Results: React.FC = () => {
     closeFeedbackModal, 
     submitFeedback 
   } = useAdEvaluation();
+  const { isSignedIn } = useAuth();
   const navigate = useNavigate();
+  const [showSignupModal, setShowSignupModal] = useState(false);
+
+  // Show signup modal for anonymous users who just completed their first evaluation
+  useEffect(() => {
+    if (hasEvaluated && !isSignedIn && hasUsedAnonymousCheck()) {
+      // Small delay to let results load first
+      const timer = setTimeout(() => {
+        setShowSignupModal(true);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [hasEvaluated, isSignedIn]);
 
   // Redirect if results aren't available
   useEffect(() => {
@@ -40,6 +56,11 @@ const Results: React.FC = () => {
       navigate('/evaluate');
     }
   }, [hasEvaluated, navigate]);
+
+  const handleSignupSuccess = () => {
+    setShowSignupModal(false);
+    // Could redirect to dashboard or show success message
+  };
 
   if (!hasEvaluated || !results) {
     return null; // Will redirect via useEffect
@@ -233,6 +254,14 @@ const Results: React.FC = () => {
         onSubmit={submitFeedback}
         evaluationId={results?.evaluationId || 'mock-evaluation'}
         recommendations={results?.strategicRecommendations?.map(r => r.recommendation) || []}
+      />
+
+      {/* Post-Result Signup Modal */}
+      <PostResultSignupModal
+        isOpen={showSignupModal}
+        onClose={() => setShowSignupModal(false)}
+        onSuccess={handleSignupSuccess}
+        overallScore={results.overallScore}
       />
     </>
   );
