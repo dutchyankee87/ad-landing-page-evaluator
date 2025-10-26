@@ -16,13 +16,13 @@ const Header: React.FC = () => {
             </span>
           </Link>
           
-          <nav className="flex items-center gap-6">
+          <nav className="flex items-center gap-2">
             <Link 
               to="/" 
-              className={`flex items-center gap-1 text-sm font-medium ${
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                 location.pathname === '/' 
-                  ? 'text-black' 
-                  : 'text-gray-600 hover:text-black transition-colors'
+                  ? 'bg-orange-50 text-orange-600 shadow-sm' 
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
               }`}
             >
               <Home className="h-4 w-4" />
@@ -31,7 +31,7 @@ const Header: React.FC = () => {
             
             <a 
               href="/#articles" 
-              className="flex items-center gap-1 text-sm font-medium text-gray-600 hover:text-black transition-colors"
+              className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all duration-200"
             >
               <BookOpen className="h-4 w-4" />
               <span>Articles</span>
@@ -39,13 +39,14 @@ const Header: React.FC = () => {
             
             <Link 
               to="/evaluate" 
-              className={`px-4 py-2 rounded-full text-sm font-medium ${
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
                 location.pathname === '/evaluate' 
-                  ? 'bg-black text-white' 
-                  : 'bg-gray-50 text-black hover:bg-gray-100 transition-colors'
+                  ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/25' 
+                  : 'bg-gray-900 text-white hover:bg-gray-800 shadow-md hover:shadow-lg hover:scale-105'
               }`}
             >
-              Start Evaluation
+              <BarChart3 className="h-4 w-4" />
+              <span>Start Evaluation</span>
             </Link>
           </nav>
         </div>
