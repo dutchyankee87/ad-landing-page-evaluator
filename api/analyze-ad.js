@@ -453,20 +453,11 @@ Return ONLY valid JSON:
     };
 
     // Store evaluation in database
-    if (userId && db) {
+    if (db) {
       try {
-        // Increment user usage
-        await db
-          .update(users)
-          .set({ 
-            monthlyEvaluations: sql`monthly_evaluations + 1`,
-            updatedAt: new Date()
-          })
-          .where(eq(users.id, userId));
-        
-        // Store evaluation with visual assets
+        // Store evaluation for all users (authenticated and unauthenticated)
         await db.insert(evaluations).values({
-          userId: userId,
+          userId: userId, // Will be null for unauthenticated users
           platform: adData.platform,
           landingPageUrl: landingPageData.url,
           overallScore: overallScore,
@@ -482,15 +473,26 @@ Return ONLY valid JSON:
           usedAi: true
         });
 
+        // Increment user usage only for authenticated users
+        if (userId) {
+          await db
+            .update(users)
+            .set({ 
+              monthlyEvaluations: sql`monthly_evaluations + 1`,
+              updatedAt: new Date()
+            })
+            .where(eq(users.id, userId));
+        } else {
+          // Record IP evaluation for unauthenticated users
+          await recordIpEvaluation(db, clientIp);
+        }
+
         console.log('✅ Evaluation stored in database');
       } catch (dbError) {
         console.warn('⚠️ Database storage failed:', dbError);
+        console.error('Database error details:', dbError);
         // Don't fail the request if database logging fails
       }
-    } else {
-      // Record IP evaluation for unauthenticated users
-      await recordIpEvaluation(db, clientIp);
-      console.log('✅ IP evaluation recorded');
     }
 
     console.log('🎉 Analysis complete!', { overallScore });
