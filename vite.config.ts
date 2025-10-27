@@ -13,7 +13,7 @@ export default defineConfig({
         // Exclude server-side packages from client build
         return id.includes('postgres') || 
                id.includes('pg') || 
-               id.includes('drizzle-orm/postgres-js');
+               id.includes('drizzle-orm');
       },
     },
   },
