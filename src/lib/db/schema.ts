@@ -62,15 +62,27 @@ export const evaluations = pgTable('evaluations', {
 export const users = pgTable('users', {
   id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
   email: text('email').unique().notNull(),
-  tier: text('tier', { enum: ['free', 'pro', 'enterprise'] }).default('free').notNull(),
+  tier: text('tier', { enum: ['free', 'pro', 'agency', 'enterprise'] }).default('free').notNull(),
   monthlyEvaluations: integer('monthly_evaluations').default(0).notNull(),
+  bonusEvaluations: integer('bonus_evaluations').default(0).notNull(), // For signup bonus
   storageUsedMb: decimal('storage_used_mb', { precision: 8, scale: 2 }).default('0').notNull(),
+  
+  // Stripe subscription fields
+  stripeCustomerId: text('stripe_customer_id').unique(),
+  stripeSubscriptionId: text('stripe_subscription_id').unique(),
+  subscriptionStatus: text('subscription_status', { 
+    enum: ['active', 'canceled', 'incomplete', 'incomplete_expired', 'past_due', 'paused', 'trialing', 'unpaid'] 
+  }),
+  subscriptionCurrentPeriodEnd: timestamp('subscription_current_period_end', { withTimezone: true }),
+  
   createdAt: timestamp('created_at', { withTimezone: true }).default(sql`NOW()`).notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).default(sql`NOW()`).notNull(),
 }, (table) => {
   return {
     emailIdx: index('idx_users_email').on(table.email),
     tierIdx: index('idx_users_tier').on(table.tier),
+    stripeCustomerIdx: index('idx_users_stripe_customer').on(table.stripeCustomerId),
+    stripeSubscriptionIdx: index('idx_users_stripe_subscription').on(table.stripeSubscriptionId),
   };
 });
 
@@ -137,12 +149,15 @@ export type NewUser = typeof users.$inferInsert;
 export type PerformanceFeedback = typeof performanceFeedback.$inferSelect;
 export type NewPerformanceFeedback = typeof performanceFeedback.$inferInsert;
 
-// Business logic constants
+// Business logic constants - updated pricing strategy
 export const TIER_LIMITS = {
-  free: 5, // 5 evaluations per month
-  pro: 100, // 100 evaluations per month  
-  enterprise: 2000, // 2000 evaluations per month
+  free: 1, // 1 base evaluation + 2 bonus on signup = 3 total
+  pro: 25, // 25 evaluations per month ($29/month)
+  agency: 200, // 200 evaluations per month ($99/month)  
+  enterprise: 2000, // 2000 evaluations per month ($299/month)
 } as const;
+
+export const SIGNUP_BONUS_EVALUATIONS = 2; // Bonus evaluations when signing up
 
 export const STORAGE_LIMITS_MB = {
   free: 0, // No file storage

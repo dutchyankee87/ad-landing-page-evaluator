@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { BarChart3, BookOpen } from 'lucide-react';
+import { BarChart3, BookOpen, CreditCard } from 'lucide-react';
 
 const Header: React.FC = () => {
   const location = useLocation();
@@ -24,6 +24,14 @@ const Header: React.FC = () => {
               <BookOpen className="h-4 w-4" />
               <span>Articles</span>
             </a>
+            
+            <Link 
+              to="/pricing" 
+              className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all duration-200"
+            >
+              <CreditCard className="h-4 w-4" />
+              <span>Pricing</span>
+            </Link>
             
             <Link 
               to="/evaluate" 

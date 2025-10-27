@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { AlertCircle, Crown, Zap, Clock, UserPlus } from 'lucide-react';
+import { AlertCircle, Crown, Zap, Clock, UserPlus, ArrowUpCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '@clerk/clerk-react';
 import { useAdEvaluation } from '../context/AdEvaluationContext';
 import { hasUsedAnonymousCheck } from '../lib/usage-tracking';
@@ -109,7 +110,7 @@ const UsageBanner: React.FC<UsageBannerProps> = () => {
         ) : (
           <Zap className="h-5 w-5 text-blue-600 mt-0.5" />
         )}
-        <div>
+        <div className="flex-1">
           <h3 className={`font-medium ${
             isOverLimit ? 'text-red-900' : isNearLimit ? 'text-yellow-900' : 'text-blue-900'
           }`}>
@@ -126,6 +127,17 @@ const UsageBanner: React.FC<UsageBannerProps> = () => {
               : `${remainingEvaluations} evaluation${remainingEvaluations !== 1 ? 's' : ''} remaining. Resets in ${daysUntilReset} day${daysUntilReset !== 1 ? 's' : ''}.`
             }
           </p>
+          {(isOverLimit || isNearLimit) && (
+            <div className="mt-3">
+              <Link
+                to="/pricing"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-500 to-red-500 text-white text-sm font-medium rounded-lg hover:from-orange-600 hover:to-red-600 transition-all"
+              >
+                <ArrowUpCircle className="h-4 w-4" />
+                Upgrade for More Evaluations
+              </Link>
+            </div>
+          )}
           {isOverLimit && (
             <div className="flex items-center gap-2 mt-2 text-sm text-red-600">
               <Clock className="h-4 w-4" />
