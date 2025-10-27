@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Image, Link, Upload, AlertCircle } from 'lucide-react';
+import { useAuth } from '@clerk/clerk-react';
 import { useAdEvaluation } from '../context/AdEvaluationContext';
+import { hasUsedAnonymousCheck } from '../lib/usage-tracking';
 import AdAssetForm from '../components/forms/AdAssetForm';
 import LandingPageForm from '../components/forms/LandingPageForm';
 import UsageBanner from '../components/UsageBanner';
@@ -13,8 +15,12 @@ const EvaluationForm: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<Step>('adAssets');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { adData, landingPageData, evaluateAd } = useAdEvaluation();
+  const { adData, landingPageData, evaluateAd, canPerformEvaluation } = useAdEvaluation();
+  const { isSignedIn } = useAuth();
   const navigate = useNavigate();
+
+  // Check if user needs to sign up before evaluating
+  const needsSignup = !isSignedIn && hasUsedAnonymousCheck();
 
   const handleNext = () => {
     if (currentStep === 'adAssets') {
@@ -210,19 +216,31 @@ const EvaluationForm: React.FC = () => {
             {currentStep !== 'review' ? (
               <button
                 onClick={handleNext}
-                className="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg hover:from-orange-600 hover:to-red-600 transition-all font-semibold shadow-lg"
+                disabled={needsSignup}
+                className={`px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg font-semibold shadow-lg transition-all ${
+                  needsSignup 
+                    ? 'opacity-50 cursor-not-allowed' 
+                    : 'hover:from-orange-600 hover:to-red-600'
+                }`}
               >
                 Continue →
               </button>
             ) : (
               <button
                 onClick={handleSubmit}
-                disabled={isSubmitting}
+                disabled={isSubmitting || needsSignup}
                 className={`px-8 py-3 bg-gradient-to-r from-orange-500 to-black text-white rounded-lg flex items-center gap-2 font-semibold shadow-lg ${
-                  isSubmitting ? 'opacity-70 cursor-not-allowed' : 'hover:from-orange-600 hover:to-gray-800 transform hover:-translate-y-0.5'
+                  isSubmitting || needsSignup 
+                    ? 'opacity-70 cursor-not-allowed' 
+                    : 'hover:from-orange-600 hover:to-gray-800 transform hover:-translate-y-0.5'
                 } transition-all`}
               >
-                {isSubmitting ? 'Analyzing Your Ads...' : 'Get My Congruence Score'}
+                {needsSignup 
+                  ? 'Sign Up Required' 
+                  : isSubmitting 
+                    ? 'Analyzing Your Ads...' 
+                    : 'Get My Congruence Score'
+                }
                 {isSubmitting && (
                   <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                 )}

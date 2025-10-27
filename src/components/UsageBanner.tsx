@@ -1,8 +1,9 @@
-import React from 'react';
-import { AlertCircle, Crown, Zap, Clock } from 'lucide-react';
+import React, { useState } from 'react';
+import { AlertCircle, Crown, Zap, Clock, UserPlus } from 'lucide-react';
 import { useAuth } from '@clerk/clerk-react';
 import { useAdEvaluation } from '../context/AdEvaluationContext';
 import { hasUsedAnonymousCheck } from '../lib/usage-tracking';
+import AuthModal from './auth/AuthModal';
 
 interface UsageBannerProps {
   usage?: {
@@ -15,6 +16,7 @@ interface UsageBannerProps {
 const UsageBanner: React.FC<UsageBannerProps> = () => {
   const { usageData, remainingEvaluations, daysUntilReset, canPerformEvaluation } = useAdEvaluation();
   const { isSignedIn } = useAuth();
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   // Check for admin mode
   const isAdminMode = remainingEvaluations === 999;
@@ -41,6 +43,40 @@ const UsageBanner: React.FC<UsageBannerProps> = () => {
           </div>
         </div>
       </div>
+    );
+  }
+
+  // For anonymous users who have used their free check, show signup prompt
+  if (!isSignedIn && hasUsedAnonymousCheck()) {
+    return (
+      <>
+        <div className="rounded-lg p-4 mb-6 bg-orange-50 border border-orange-200">
+          <div className="flex items-start gap-3">
+            <UserPlus className="h-5 w-5 text-orange-600 mt-0.5" />
+            <div className="flex-1">
+              <h3 className="font-medium text-orange-900">Sign up to analyze more ads</h3>
+              <p className="text-sm text-orange-700 mt-1">
+                You've used your free analysis! Sign up to get 2 more evaluations this month.
+              </p>
+              <button
+                onClick={() => setShowAuthModal(true)}
+                className="mt-3 px-4 py-2 bg-orange-500 text-white text-sm font-medium rounded-lg hover:bg-orange-600 transition-colors"
+              >
+                Sign Up - It's Free
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <AuthModal
+          isOpen={showAuthModal}
+          onClose={() => setShowAuthModal(false)}
+          onSuccess={() => {
+            setShowAuthModal(false);
+            // The page will refresh and show updated usage limits
+          }}
+        />
+      </>
     );
   }
 
