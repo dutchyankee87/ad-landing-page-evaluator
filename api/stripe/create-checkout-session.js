@@ -55,7 +55,7 @@ export default async function handler(req, res) {
       }
     });
 
-    res.status(200).json({ sessionId: session.id });
+    res.status(200).json({ url: session.url });
   } catch (error) {
     console.error('Stripe checkout session creation error:', error);
     res.status(500).json({ error: 'Failed to create checkout session' });

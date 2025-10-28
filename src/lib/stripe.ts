@@ -18,7 +18,7 @@ export const getStripe = () => {
   return stripePromise;
 };
 
-// Helper function to redirect to Stripe Checkout (following Stripe quickstart pattern)
+// Helper function to redirect to Stripe Checkout (updated for new Stripe.js)
 export async function redirectToCheckout(priceId: string, userEmail?: string) {
   try {
     // Create checkout session on server
@@ -37,19 +37,13 @@ export async function redirectToCheckout(priceId: string, userEmail?: string) {
       throw new Error('Failed to create checkout session');
     }
 
-    const { sessionId } = await response.json();
+    const { url } = await response.json();
     
-    // Redirect to Stripe Checkout
-    const stripe = await getStripe();
-    if (!stripe) {
-      throw new Error('Stripe not initialized');
-    }
-
-    const { error } = await stripe.redirectToCheckout({ sessionId });
-    
-    if (error) {
-      console.error('Stripe checkout error:', error);
-      throw error;
+    // Redirect to Stripe Checkout URL directly
+    if (url) {
+      window.location.href = url;
+    } else {
+      throw new Error('No checkout URL received');
     }
   } catch (error) {
     console.error('Checkout redirect error:', error);
