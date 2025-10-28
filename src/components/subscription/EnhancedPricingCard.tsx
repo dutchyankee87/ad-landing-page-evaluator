@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Check, Star, ArrowRight, Zap, Crown, Sparkles } from 'lucide-react';
+import { Check, Star, ArrowRight, Zap, Crown, Sparkles, Shield } from 'lucide-react';
 import { SubscriptionTier } from '../../lib/subscription';
 import { redirectToCheckout } from '../../lib/stripe';
 
