@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import Header from './components/Header';
+import Footer from './components/Footer';
 import Home from './pages/Home';
 import EvaluationForm from './pages/EvaluationForm';
 import Results from './pages/Results';
@@ -32,11 +33,7 @@ function App() {
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
-            <footer className="bg-white py-6 border-t border-gray-200">
-              <div className="container mx-auto px-4 text-center text-gray-500 text-sm">
-                © {new Date().getFullYear()} ADalign.io. All rights reserved.
-              </div>
-            </footer>
+            <Footer />
             
             <UsageLimitModal />
           </div>

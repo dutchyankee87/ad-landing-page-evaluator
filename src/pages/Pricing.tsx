@@ -37,9 +37,9 @@ const Pricing: React.FC = () => {
   return (
     <>
       <SEOHead 
-        title="Pricing - ADalign.io | Beat Hotjar & VWO with AI-Powered Ad Analysis"
-        description="Finally, an ad optimization tool that costs less than Hotjar ($99/mo) but delivers 10x better insights. Start free, upgrade when you see results."
-        keywords="ad analysis pricing, hotjar alternative, vwo alternative, unbounce alternative, conversion optimization"
+        title="Pricing - ADalign.io | AI-Powered Ad Analysis"
+        description="Get instant insights on why your ads aren't converting. AI-powered ad analysis starting free."
+        keywords="ad analysis pricing, conversion optimization, ai ad analysis, marketing analytics"
         url="/pricing"
       />
       
@@ -55,7 +55,7 @@ const Pricing: React.FC = () => {
           >
             <motion.div variants={itemVariants} className="mb-6">
               <span className="inline-block bg-orange-100 text-orange-800 text-sm font-semibold px-4 py-2 rounded-full mb-4">
-                🚀 Cheaper than Hotjar, smarter than VWO
+                🚀 AI-powered ad optimization
               </span>
             </motion.div>
             
@@ -74,7 +74,7 @@ const Pricing: React.FC = () => {
               variants={itemVariants}
               className="text-xl md:text-2xl text-gray-600 mb-8 max-w-4xl mx-auto leading-relaxed"
             >
-              While <strong>Hotjar costs $99/mo</strong> just to see where users click, we tell you exactly <strong>why your ads aren't converting</strong> — starting free.
+              Get instant AI-powered insights on <strong>why your ads aren't converting</strong> and exactly how to fix them — starting free.
             </motion.p>
 
             {/* Social Proof */}
@@ -129,53 +129,6 @@ const Pricing: React.FC = () => {
             </motion.div>
           </motion.div>
 
-          {/* Competitor Comparison */}
-          <motion.div 
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8, duration: 0.6 }}
-            className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 mb-16 max-w-5xl mx-auto border border-gray-200 shadow-xl"
-          >
-            <h2 className="text-2xl font-bold text-center mb-8">How We Compare to The "Big Players"</h2>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Tool</h3>
-                <div className="space-y-4 text-sm">
-                  <div className="font-bold text-orange-600">ADalign.io</div>
-                  <div className="text-gray-600">Hotjar</div>
-                  <div className="text-gray-600">VWO</div>
-                  <div className="text-gray-600">Unbounce</div>
-                </div>
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Starting Price</h3>
-                <div className="space-y-4 text-sm">
-                  <div className="font-bold text-green-600">Free</div>
-                  <div className="text-red-600">$39/mo</div>
-                  <div className="text-red-600">$99/mo</div>
-                  <div className="text-red-600">$79/mo</div>
-                </div>
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Ad Analysis</h3>
-                <div className="space-y-4 text-sm">
-                  <div className="font-bold text-green-600">✅ AI-Powered</div>
-                  <div className="text-red-600">❌ Manual</div>
-                  <div className="text-red-600">❌ Basic</div>
-                  <div className="text-red-600">❌ None</div>
-                </div>
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Time to Insights</h3>
-                <div className="space-y-4 text-sm">
-                  <div className="font-bold text-green-600">60 seconds</div>
-                  <div className="text-red-600">Days/Weeks</div>
-                  <div className="text-red-600">Hours/Days</div>
-                  <div className="text-red-600">Manual</div>
-                </div>
-              </div>
-            </div>
-          </motion.div>
 
           {/* Pricing Grid */}
           <motion.div 
@@ -204,11 +157,11 @@ const Pricing: React.FC = () => {
             className="text-center mb-16"
           >
             <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-8 max-w-4xl mx-auto border border-gray-200">
-              <h3 className="text-xl font-semibold mb-6">Join 500+ Growth Teams Who've Stopped Overpaying</h3>
+              <h3 className="text-xl font-semibold mb-6">Join 500+ Growth Teams Optimizing Their Ads</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-orange-600 mb-2">$2,000+</div>
-                  <div className="text-gray-600">Average monthly savings vs Hotjar + VWO</div>
+                  <div className="text-3xl font-bold text-orange-600 mb-2">73%</div>
+                  <div className="text-gray-600">Average conversion rate improvement</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl font-bold text-green-600 mb-2">10x</div>
@@ -257,7 +210,7 @@ const Pricing: React.FC = () => {
                   Can I cancel anytime?
                 </h3>
                 <p className="text-gray-600">
-                  Absolutely. Cancel with one click, no questions asked. Plus, we offer a <strong>14-day money-back guarantee</strong>.
+                  Absolutely. Cancel with one click, no questions asked. No contracts, no hidden fees.
                 </p>
               </div>
               

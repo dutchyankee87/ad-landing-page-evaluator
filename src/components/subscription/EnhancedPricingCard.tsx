@@ -198,18 +198,6 @@ export default function EnhancedPricingCard({
         </span>
       </motion.button>
       
-      {/* Money back guarantee */}
-      {!isFree && (
-        <motion.p 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: index * 0.1 + 1 }}
-          className="text-xs text-gray-500 text-center mt-4 flex items-center justify-center gap-1"
-        >
-          <Shield className="h-3 w-3" />
-          14-day money-back guarantee
-        </motion.p>
-      )}
     </motion.div>
   );
 }
