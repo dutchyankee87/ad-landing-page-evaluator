@@ -9,7 +9,7 @@ const Pricing: React.FC = () => {
   const { user } = useUser();
   const [isYearly, setIsYearly] = useState(false);
   
-  const tiers = isYearly ? ANNUAL_SUBSCRIPTION_TIERS : SUBSCRIPTION_TIERS;
+  const paidTiers = isYearly ? ANNUAL_SUBSCRIPTION_TIERS : SUBSCRIPTION_TIERS.filter(tier => tier.id !== 'free');
   const freeTier = SUBSCRIPTION_TIERS[0]; // Always show free tier
 
   return (
@@ -63,8 +63,8 @@ const Pricing: React.FC = () => {
               isYearly={false}
             />
             
-            {/* Show selected billing cycle tiers */}
-            {tiers.map((tier) => (
+            {/* Show paid tiers for selected billing cycle */}
+            {paidTiers.map((tier) => (
               <PricingCard
                 key={tier.id}
                 tier={tier}
