@@ -1,5 +1,5 @@
 // Subscription and usage management with Stripe integration
-import { TIER_LIMITS, SIGNUP_BONUS_EVALUATIONS } from './db/schema';
+import { TIER_LIMITS, SIGNUP_BONUS_EVALUATIONS } from './constants';
 
 export interface SubscriptionTier {
   id: string;
