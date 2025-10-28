@@ -10,6 +10,9 @@ import Article from './pages/Article';
 import Pricing from './pages/Pricing';
 import SubscriptionSuccess from './pages/SubscriptionSuccess';
 import SubscriptionCanceled from './pages/SubscriptionCanceled';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
+import Disclaimer from './pages/Disclaimer';
 import NotFound from './pages/NotFound';
 import UsageLimitModal from './components/UsageLimitModal';
 import { AdEvaluationProvider } from './context/AdEvaluationContext';
@@ -29,6 +32,9 @@ function App() {
                 <Route path="/pricing" element={<Pricing />} />
                 <Route path="/subscription/success" element={<SubscriptionSuccess />} />
                 <Route path="/subscription/canceled" element={<SubscriptionCanceled />} />
+                <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                <Route path="/terms-of-service" element={<TermsOfService />} />
+                <Route path="/disclaimer" element={<Disclaimer />} />
                 <Route path="/articles/:slug" element={<Article />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>

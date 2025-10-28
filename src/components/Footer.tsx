@@ -54,58 +54,24 @@ const Footer: React.FC = () => {
             </h3>
             <ul className="space-y-3">
               <li>
-                <a href="#privacy" className="text-gray-600 hover:text-blue-600 transition-colors text-sm">
+                <Link to="/privacy-policy" className="text-gray-600 hover:text-blue-600 transition-colors text-sm">
                   Privacy Policy
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#terms" className="text-gray-600 hover:text-blue-600 transition-colors text-sm">
+                <Link to="/terms-of-service" className="text-gray-600 hover:text-blue-600 transition-colors text-sm">
                   Terms of Service
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#disclaimer" className="text-gray-600 hover:text-blue-600 transition-colors text-sm">
+                <Link to="/disclaimer" className="text-gray-600 hover:text-blue-600 transition-colors text-sm">
                   Disclaimer
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
         </div>
 
-        {/* Legal Statements */}
-        <div className="border-t border-gray-200 py-8">
-          <div className="space-y-6">
-            {/* Privacy Statement */}
-            <div>
-              <h4 className="text-sm font-semibold text-gray-900 mb-2">Privacy & Data Handling</h4>
-              <p className="text-xs text-gray-600 leading-relaxed">
-                We respect your privacy. Ad assets and landing page URLs you provide are processed by our AI analysis system 
-                and are not stored permanently on our servers. Data is transmitted securely and used solely for generating 
-                your evaluation report. We do not share your content with third parties.
-              </p>
-            </div>
-
-            {/* Disclaimer */}
-            <div>
-              <h4 className="text-sm font-semibold text-gray-900 mb-2">AI Analysis Disclaimer</h4>
-              <p className="text-xs text-gray-600 leading-relaxed">
-                Our AI-powered analysis provides insights and recommendations based on algorithmic evaluation of visual, 
-                contextual, and tonal elements. Results are for informational purposes only and should not be considered 
-                as guaranteed performance indicators. Marketing success depends on many factors beyond ad-to-page congruence. 
-                Always test and validate recommendations in your specific market context.
-              </p>
-            </div>
-
-            {/* Terms Notice */}
-            <div>
-              <h4 className="text-sm font-semibold text-gray-900 mb-2">Terms of Use</h4>
-              <p className="text-xs text-gray-600 leading-relaxed">
-                By using ADalign.io, you agree to our terms of service. You retain ownership of all content you submit. 
-                You are responsible for ensuring you have the right to analyze any ads or landing pages you submit to our service.
-              </p>
-            </div>
-          </div>
-        </div>
 
         {/* Bottom Bar */}
         <div className="border-t border-gray-200 py-6">
