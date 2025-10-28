@@ -7,6 +7,8 @@ import EvaluationForm from './pages/EvaluationForm';
 import Results from './pages/Results';
 import Article from './pages/Article';
 import Pricing from './pages/Pricing';
+import SubscriptionSuccess from './pages/SubscriptionSuccess';
+import SubscriptionCanceled from './pages/SubscriptionCanceled';
 import NotFound from './pages/NotFound';
 import UsageLimitModal from './components/UsageLimitModal';
 import { AdEvaluationProvider } from './context/AdEvaluationContext';
@@ -24,6 +26,8 @@ function App() {
                 <Route path="/evaluate" element={<EvaluationForm />} />
                 <Route path="/results" element={<Results />} />
                 <Route path="/pricing" element={<Pricing />} />
+                <Route path="/subscription/success" element={<SubscriptionSuccess />} />
+                <Route path="/subscription/canceled" element={<SubscriptionCanceled />} />
                 <Route path="/articles/:slug" element={<Article />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>

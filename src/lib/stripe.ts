@@ -18,25 +18,41 @@ export const getStripe = () => {
   return stripePromise;
 };
 
-// Helper function to redirect to Stripe Checkout
+// Helper function to redirect to Stripe Checkout (following Stripe quickstart pattern)
 export async function redirectToCheckout(priceId: string, userEmail?: string) {
-  const stripe = await getStripe();
-  
-  if (!stripe) {
-    throw new Error('Stripe not initialized');
-  }
+  try {
+    // Create checkout session on server
+    const response = await fetch('/api/stripe/create-checkout-session', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        priceId,
+        customerEmail: userEmail,
+      }),
+    });
 
-  const { error } = await stripe.redirectToCheckout({
-    lineItems: [{ price: priceId, quantity: 1 }],
-    mode: 'subscription',
-    successUrl: `${window.location.origin}/subscription/success`,
-    cancelUrl: `${window.location.origin}/subscription/canceled`,
-    customerEmail: userEmail,
-    allowPromotionCodes: true, // Allow discount codes
-  });
+    if (!response.ok) {
+      throw new Error('Failed to create checkout session');
+    }
 
-  if (error) {
-    console.error('Stripe checkout error:', error);
+    const { sessionId } = await response.json();
+    
+    // Redirect to Stripe Checkout
+    const stripe = await getStripe();
+    if (!stripe) {
+      throw new Error('Stripe not initialized');
+    }
+
+    const { error } = await stripe.redirectToCheckout({ sessionId });
+    
+    if (error) {
+      console.error('Stripe checkout error:', error);
+      throw error;
+    }
+  } catch (error) {
+    console.error('Checkout redirect error:', error);
     throw error;
   }
 }

@@ -1,5 +1,5 @@
 // Subscription and usage management with Stripe integration
-import { TIER_LIMITS, SIGNUP_BONUS_EVALUATIONS } from './constants';
+import { TIER_LIMITS, SIGNUP_BONUS_EVALUATIONS } from './db/schema';
 
 export interface SubscriptionTier {
   id: string;
@@ -11,14 +11,14 @@ export interface SubscriptionTier {
   popular?: boolean;
 }
 
-// Stripe price IDs (these will be created in Stripe dashboard)
+// Stripe price IDs from Stripe dashboard
 export const STRIPE_PRICE_IDS = {
-  pro_monthly: 'price_pro_monthly_29',
-  pro_yearly: 'price_pro_yearly_290', 
-  agency_monthly: 'price_agency_monthly_99',
-  agency_yearly: 'price_agency_yearly_990',
-  enterprise_monthly: 'price_enterprise_monthly_299',
-  enterprise_yearly: 'price_enterprise_yearly_2990',
+  pro_monthly: 'price_1SN97pFhgriIx8RjiK7LApeS',
+  pro_yearly: 'price_1SN9BeFhgriIx8RjSUBZm7rx', 
+  agency_monthly: 'price_1SN99FFhgriIx8RjPqiWWOgl',
+  agency_yearly: 'price_1SN9DTFhgriIx8RjL6PIx6aX',
+  enterprise_monthly: 'price_1SN9EmFhgriIx8Rj2tFxCps4',
+  enterprise_yearly: 'price_1SN9GJFhgriIx8RjwFrMKhnx',
 } as const;
 
 export const SUBSCRIPTION_TIERS: SubscriptionTier[] = [

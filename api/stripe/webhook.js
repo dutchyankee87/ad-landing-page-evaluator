@@ -139,12 +139,12 @@ async function handlePaymentFailed(invoice, db) {
 
 function getTierFromPriceId(priceId) {
   const tierMap = {
-    'price_pro_monthly_29': 'pro',
-    'price_pro_yearly_290': 'pro',
-    'price_agency_monthly_99': 'agency', 
-    'price_agency_yearly_990': 'agency',
-    'price_enterprise_monthly_299': 'enterprise',
-    'price_enterprise_yearly_2990': 'enterprise',
+    'price_1SN97pFhgriIx8RjiK7LApeS': 'pro',    // Pro Monthly
+    'price_1SN9BeFhgriIx8RjSUBZm7rx': 'pro',    // Pro Yearly
+    'price_1SN99FFhgriIx8RjPqiWWOgl': 'agency', // Agency Monthly
+    'price_1SN9DTFhgriIx8RjL6PIx6aX': 'agency', // Agency Yearly
+    'price_1SN9EmFhgriIx8Rj2tFxCps4': 'enterprise', // Enterprise Monthly
+    'price_1SN9GJFhgriIx8RjwFrMKhnx': 'enterprise', // Enterprise Yearly
   };
   
   return tierMap[priceId] || 'free';
