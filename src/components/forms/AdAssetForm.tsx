@@ -134,13 +134,20 @@ const AdAssetForm: React.FC = () => {
     setInputMode(mode);
     setUploadError(null);
     setUrlError(null);
-    // Clear any existing data when switching modes
-    updateAdData({ 
-      imageUrl: null, 
-      imageFileSize: undefined,
-      adUrl: null
-    });
-    setAdUrl('');
+    
+    // Clear data from the mode we're switching away from
+    if (mode === 'upload') {
+      // Switching to upload mode - clear URL data
+      updateAdData({ adUrl: null });
+      setAdUrl('');
+    } else {
+      // Switching to URL mode - clear image data
+      updateAdData({ 
+        imageUrl: null, 
+        imageFileSize: undefined,
+        imageStoragePath: undefined
+      });
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {

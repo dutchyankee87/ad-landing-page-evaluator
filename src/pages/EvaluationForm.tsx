@@ -25,8 +25,8 @@ const EvaluationForm: React.FC = () => {
 
   const handleNext = () => {
     if (currentStep === 'adAssets') {
-      if (!adData.platform || !adData.imageUrl) {
-        setError('Please select a platform and upload an ad screenshot before proceeding.');
+      if (!adData.platform || (!adData.imageUrl && !adData.adUrl)) {
+        setError('Please select a platform and either upload an ad screenshot or enter an ad URL before proceeding.');
         return;
       }
       
