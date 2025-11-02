@@ -14,6 +14,8 @@ interface AdData {
   imageUrl: string | null;
   platform: string | null;
   imageFileSize?: number;
+  adUrl?: string | null;
+  imageStoragePath?: string;
 }
 
 interface LandingPageData {

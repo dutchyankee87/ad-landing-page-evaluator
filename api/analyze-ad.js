@@ -159,6 +159,61 @@ const recordIpEvaluation = async (db, ipAddress) => {
   }
 };
 
+// Screenshot ad URL using ScreenshotAPI.net (paid service)
+const screenshotAdUrl = async (adUrl) => {
+  const screenshotApiToken = process.env.SCREENSHOT_API_TOKEN;
+  
+  if (!screenshotApiToken) {
+    console.warn('⚠️ No SCREENSHOT_API_TOKEN found - skipping ad screenshot');
+    return null;
+  }
+
+  try {
+    console.log('📸 Taking screenshot of ad URL:', adUrl);
+    
+    // Use ScreenshotAPI.net with ad-optimized settings
+    const screenshotApiUrl = `https://shot.screenshotapi.net/screenshot`;
+    
+    const response = await fetch(screenshotApiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        token: screenshotApiToken,
+        url: adUrl,
+        width: 1200,
+        height: 1200, // Square-ish for social ads
+        output: 'json',
+        file_type: 'png',
+        wait_for_event: 'load',
+        delay: 3000, // Extra wait for ad content to load
+        block_ads: true, // Block other ads to focus on target ad
+        block_trackers: true,
+        block_cookie_banners: true
+      }),
+      timeout: 25000 // Longer timeout for ad pages
+    });
+
+    if (!response.ok) {
+      throw new Error(`Ad screenshot API failed: ${response.status} - ${await response.text()}`);
+    }
+
+    const result = await response.json();
+    
+    if (result && result.screenshot) {
+      console.log('✅ Ad screenshot captured successfully');
+      return result.screenshot;
+    } else {
+      throw new Error('No screenshot URL returned from API');
+    }
+    
+  } catch (error) {
+    console.error('❌ Ad screenshot failed:', error);
+    return null;
+  }
+};
+
 // Screenshot landing page using ScreenshotAPI.net (paid service)
 const screenshotLandingPage = async (url) => {
   const screenshotApiToken = process.env.SCREENSHOT_API_TOKEN;
@@ -326,6 +381,30 @@ export default async function handler(req, res) {
       }
     }
 
+    // Handle ad asset - either uploaded image or URL screenshot
+    let adImageUrl = adData.imageUrl;
+    let adSourceType = 'upload';
+    
+    if (adData.adUrl && !adData.imageUrl) {
+      console.log('🔗 Ad URL provided, taking screenshot:', adData.adUrl);
+      adImageUrl = await screenshotAdUrl(adData.adUrl);
+      adSourceType = 'url';
+      
+      if (!adImageUrl) {
+        return res.status(400).json({
+          error: 'Failed to capture screenshot of the provided ad URL. Please check the URL or try uploading an image instead.',
+          errorCode: 'AD_SCREENSHOT_FAILED'
+        });
+      }
+    }
+    
+    if (!adImageUrl) {
+      return res.status(400).json({
+        error: 'Either an ad image upload or a valid ad URL is required.',
+        errorCode: 'NO_AD_ASSET'
+      });
+    }
+
     // Capture landing page screenshot
     const landingPageScreenshot = await screenshotLandingPage(landingPageData.url);
 
@@ -334,7 +413,7 @@ export default async function handler(req, res) {
     const prompt = `You are an expert ${platformInfo} ads analyst with STRICT evaluation standards.
 
 You will analyze TWO images:
-1. AD SCREENSHOT: The user's uploaded ad creative
+1. AD SCREENSHOT: The user's ${adSourceType === 'url' ? 'ad library URL screenshot' : 'uploaded ad creative'}
 2. LANDING PAGE SCREENSHOT: The destination page (${landingPageData.url})
 
 Target Audience: ${audienceData.ageRange}, ${audienceData.gender}, interests: ${audienceData.interests}
@@ -402,7 +481,7 @@ Return ONLY valid JSON:
       { 
         type: "image_url", 
         image_url: { 
-          url: adData.imageUrl,
+          url: adImageUrl,
           detail: "high" 
         } 
       }
@@ -475,7 +554,9 @@ Return ONLY valid JSON:
           userId: userId, // Will be null for unauthenticated users
           title: `${adData.platform || 'Meta'} Ad Evaluation - ${new Date().toISOString().split('T')[0]}`,
           platform: adData.platform,
-          adScreenshotUrl: adData.imageUrl,
+          adScreenshotUrl: adImageUrl,
+          adUrl: adData.adUrl || null,
+          adSourceType: adSourceType,
           landingPageUrl: landingPageData.url,
           landingPageTitle: landingPageData.title || null,
           landingPageContent: landingPageData.mainContent || null,

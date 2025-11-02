@@ -1,7 +1,8 @@
 import React, { useState, useRef } from 'react';
-import { Image, Upload, X, Info, Loader2 } from 'lucide-react';
+import { Image, Upload, X, Info, Loader2, Link, FileImage } from 'lucide-react';
 import { useAdEvaluation } from '../../context/AdEvaluationContext';
 import { uploadAdImageSmart, validateFileSize, validateFileType } from '../../lib/storage-dynamic';
+import { validateAdUrl, detectPlatform, getPlatformConfig, formatUrlForDisplay } from '../../lib/platform-detection';
 
 const SUPPORTED_PLATFORMS = [
   { id: 'meta', name: 'Meta (Facebook/Instagram)', guidance: 'Screenshot your ad from Facebook Ads Manager or Instagram promotion. Include the full ad creative and any text overlay.' },
@@ -11,12 +12,17 @@ const SUPPORTED_PLATFORMS = [
   { id: 'reddit', name: 'Reddit', guidance: 'Screenshot your promoted post or ad from Reddit Ads. Include the full post format and any media.' }
 ];
 
+type InputMode = 'upload' | 'url';
+
 const AdAssetForm: React.FC = () => {
   const { adData, updateAdData } = useAdEvaluation();
+  const [inputMode, setInputMode] = useState<InputMode>('upload');
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [adUrl, setAdUrl] = useState('');
+  const [urlError, setUrlError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
@@ -94,8 +100,47 @@ const AdAssetForm: React.FC = () => {
   const handleRemoveImage = () => {
     updateAdData({ 
       imageUrl: null, 
-      imageFileSize: undefined
+      imageFileSize: undefined,
+      adUrl: null
     });
+    setAdUrl('');
+    setUrlError(null);
+  };
+
+  const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const url = e.target.value;
+    setAdUrl(url);
+    setUrlError(null);
+    
+    if (url.trim()) {
+      const validation = validateAdUrl(url);
+      if (!validation.isValid) {
+        setUrlError(validation.error || 'Invalid URL');
+      } else {
+        // Auto-detect and update platform if different
+        const detectedPlatform = validation.platform;
+        if (detectedPlatform && detectedPlatform !== adData.platform) {
+          updateAdData({ platform: detectedPlatform });
+        }
+        // Store the URL in adData
+        updateAdData({ adUrl: url });
+      }
+    } else {
+      updateAdData({ adUrl: null });
+    }
+  };
+
+  const handleModeToggle = (mode: InputMode) => {
+    setInputMode(mode);
+    setUploadError(null);
+    setUrlError(null);
+    // Clear any existing data when switching modes
+    updateAdData({ 
+      imageUrl: null, 
+      imageFileSize: undefined,
+      adUrl: null
+    });
+    setAdUrl('');
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -110,7 +155,7 @@ const AdAssetForm: React.FC = () => {
       <div>
         <h2 className="text-xl font-semibold mb-1">Ad Assets</h2>
         <p className="text-gray-600 mb-6">
-          Select your platform and upload a screenshot of your complete ad
+          Select your platform and upload a screenshot or paste an ad library URL
         </p>
       </div>
 
@@ -143,11 +188,83 @@ const AdAssetForm: React.FC = () => {
         )}
       </div>
       
-      {/* Image Upload */}
+      {/* Input Mode Toggle */}
       <div className="space-y-2">
         <label className="block text-sm font-medium text-gray-700">
-          Ad Screenshot <span className="text-red-500">*</span>
+          Ad Input Method <span className="text-red-500">*</span>
         </label>
+        <div className="flex rounded-lg border border-gray-300 p-1 bg-gray-50">
+          <button
+            type="button"
+            onClick={() => handleModeToggle('upload')}
+            className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+              inputMode === 'upload' 
+                ? 'bg-white text-gray-900 shadow-sm border border-gray-200' 
+                : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            <FileImage className="h-4 w-4" />
+            Upload Screenshot
+          </button>
+          <button
+            type="button"
+            onClick={() => handleModeToggle('url')}
+            className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+              inputMode === 'url' 
+                ? 'bg-white text-gray-900 shadow-sm border border-gray-200' 
+                : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            <Link className="h-4 w-4" />
+            Paste Ad URL
+          </button>
+        </div>
+      </div>
+
+      {/* URL Input */}
+      {inputMode === 'url' && (
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-gray-700">
+            Ad Library URL <span className="text-red-500">*</span>
+          </label>
+          <div className="relative">
+            <input
+              type="url"
+              value={adUrl}
+              onChange={handleUrlChange}
+              placeholder="Paste ad library URL (e.g., facebook.com/ads/library/...)"
+              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors pl-10 ${
+                urlError ? 'border-red-300' : 'border-gray-300'
+              }`}
+            />
+            <Link className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+          </div>
+          
+          {selectedPlatform && !urlError && adUrl && (
+            <div className="flex items-start gap-2 p-3 bg-green-50 rounded-lg border border-green-200">
+              <Info className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
+              <div className="text-sm text-green-800">
+                <p className="font-medium mb-1">✓ Valid {selectedPlatform.name} URL detected</p>
+                <p>{getPlatformConfig(selectedPlatform.id)?.screenshotTips}</p>
+              </div>
+            </div>
+          )}
+          
+          {urlError && (
+            <div className="flex items-start gap-2 p-3 bg-red-50 rounded-lg border border-red-200">
+              <Info className="h-5 w-5 text-red-600 mt-0.5 flex-shrink-0" />
+              <p className="text-sm text-red-800">{urlError}</p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Image Upload */}
+      {inputMode === 'upload' && (
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-gray-700">
+            Ad Screenshot <span className="text-red-500">*</span>
+          </label>
         
         {!adData.imageUrl ? (
           <div>
@@ -220,7 +337,8 @@ const AdAssetForm: React.FC = () => {
             </button>
           </div>
         )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

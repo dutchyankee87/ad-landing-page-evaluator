@@ -49,12 +49,15 @@ export const evaluations = pgTable('evaluations', {
   toneScore: decimal('tone_score', { precision: 3, scale: 1 }),
   adImageFileSize: integer('ad_image_file_size'),
   visualScore: decimal('visual_score', { precision: 3, scale: 1 }),
+  adUrl: text('ad_url'),
+  adSourceType: text('ad_source_type', { enum: ['upload', 'url'] }).default('upload'),
 }, (table) => {
   return {
     createdAtIdx: index('idx_evaluations_created_at').on(table.createdAt),
     platformIdx: index('idx_evaluations_platform').on(table.platform),
     userIdIdx: index('idx_evaluations_user_id').on(table.userId),
     landingPageUrlIdx: index('idx_evaluations_url').on(table.landingPageUrl),
+    adUrlIdx: index('idx_evaluations_ad_url').on(table.adUrl),
   };
 });
 

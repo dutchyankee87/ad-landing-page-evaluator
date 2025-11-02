@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Platform Detection Test</title>
+</head>
+<body>
+    <h1>Platform Detection Test</h1>
+    <input type="text" id="urlInput" placeholder="Enter ad library URL..." style="width: 500px; padding: 10px;">
+    <button onclick="testUrl()" style="padding: 10px;">Test URL</button>
+    <div id="result" style="margin-top: 20px; padding: 10px; border: 1px solid #ccc;"></div>
+
+    <script type="module">
+        // Import the platform detection functions
+        import { detectPlatform, validateAdUrl, getPlatformConfig } from './lib/platform-detection.js';
+        
+        window.testUrl = function() {
+            const url = document.getElementById('urlInput').value;
+            const resultDiv = document.getElementById('result');
+            
+            if (!url) {
+                resultDiv.innerHTML = '<p style="color: red;">Please enter a URL</p>';
+                return;
+            }
+            
+            const validation = validateAdUrl(url);
+            const platform = detectPlatform(url);
+            const config = platform ? getPlatformConfig(platform) : null;
+            
+            resultDiv.innerHTML = `
+                <h3>Results:</h3>
+                <p><strong>URL:</strong> ${url}</p>
+                <p><strong>Valid:</strong> <span style="color: ${validation.isValid ? 'green' : 'red'}">${validation.isValid ? 'Yes' : 'No'}</span></p>
+                ${validation.error ? `<p><strong>Error:</strong> <span style="color: red;">${validation.error}</span></p>` : ''}
+                <p><strong>Detected Platform:</strong> ${platform || 'None'}</p>
+                ${config ? `
+                    <p><strong>Platform Name:</strong> ${config.name}</p>
+                    <p><strong>Guidance:</strong> ${config.guidance}</p>
+                    <p><strong>Screenshot Tips:</strong> ${config.screenshotTips}</p>
+                ` : ''}
+            `;
+        };
+        
+        // Test URLs for quick testing
+        const testUrls = [
+            'https://facebook.com/ads/library/?id=123456',
+            'https://library.tiktok.com/ads?region=all&start_time=123',
+            'https://adstransparency.google.com/advertiser/AR1234567890',
+            'https://linkedin.com/ad-library/advertiser/12345',
+            'https://reddit.com/r/RedditPoliticalAds/comments/abc123',
+            'https://invalid-site.com/ads'
+        ];
+        
+        const testList = document.createElement('div');
+        testList.innerHTML = `
+            <h3>Test URLs (click to try):</h3>
+            ${testUrls.map(url => `
+                <p><a href="#" onclick="document.getElementById('urlInput').value='${url}'; testUrl(); return false;" style="color: blue; text-decoration: underline;">${url}</a></p>
+            `).join('')}
+        `;
+        document.body.appendChild(testList);
+    </script>
+</body>
+</html>
