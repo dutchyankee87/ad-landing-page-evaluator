@@ -10,9 +10,9 @@ export default defineConfig({
   build: {
     rollupOptions: {
       external: (id) => {
-        // Exclude server-side packages from client build
-        return id.includes('postgres') || 
-               id.includes('pg') || 
+        // Exclude server-side packages from client build, but allow Supabase client packages
+        return (id.includes('postgres') && !id.includes('@supabase')) || 
+               (id.includes('pg') && !id.includes('@supabase')) || 
                id.includes('drizzle-orm');
       },
     },

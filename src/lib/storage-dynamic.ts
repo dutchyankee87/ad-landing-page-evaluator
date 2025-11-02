@@ -13,14 +13,31 @@ async function getSupabaseClient() {
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
     const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
     
-    if (!supabaseUrl || !supabaseAnonKey) {
-      throw new Error('Missing Supabase environment variables');
+    // Check if environment variables are properly configured (not placeholder values)
+    if (!supabaseUrl || 
+        !supabaseAnonKey || 
+        supabaseUrl === 'your_supabase_project_url' ||
+        supabaseAnonKey === 'your_supabase_anon_key') {
+      console.warn('Supabase not configured - using fallback storage');
+      throw new Error('Supabase environment variables not configured');
     }
     
     supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
+    
+    // Test the connection
+    const { error: testError } = await supabaseClient
+      .from('users')
+      .select('count', { count: 'exact', head: true })
+      .limit(1);
+    
+    if (testError && testError.code !== 'PGRST116') { // PGRST116 is "table not found" which is OK
+      console.warn('Supabase connection test failed:', testError);
+      throw new Error('Supabase connection failed');
+    }
+    
     return supabaseClient;
   } catch (error) {
-    console.error('Failed to initialize Supabase client:', error);
+    console.warn('Supabase client initialization failed, will use fallback:', error);
     throw error;
   }
 }

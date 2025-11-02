@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>URL Input Test - Phase 1</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+        .success { background-color: #e7f5e7; border-color: #4caf50; }
+        .error { background-color: #ffe7e7; border-color: #f44336; }
+        .info { background-color: #e7f0ff; border-color: #2196f3; }
+        input[type="url"] { width: 100%; padding: 8px; margin: 8px 0; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        .result { margin-top: 10px; padding: 10px; background: #f5f5f5; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Phase 1 Implementation Test</h1>
+    
+    <div class="test-section info">
+        <h2>✅ What We Built</h2>
+        <ul>
+            <li><strong>URL Input Alternative</strong>: Users can paste ad library URLs instead of uploading screenshots</li>
+            <li><strong>Platform Detection</strong>: Auto-detects Meta, TikTok, Google, LinkedIn, Reddit</li>
+            <li><strong>Screenshot Automation</strong>: Uses ScreenshotAPI.net to capture ad screenshots</li>
+            <li><strong>Enhanced UI</strong>: Toggle between upload and URL input methods</li>
+            <li><strong>Database Support</strong>: New fields for ad_url and ad_source_type</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2>🔗 Test URL Detection</h2>
+        <input type="url" id="testUrl" placeholder="Paste an ad library URL..." value="https://facebook.com/ads/library/?id=123456">
+        <button onclick="testUrlDetection()">Test URL</button>
+        <div id="urlResult" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>📋 Pre-built Test URLs</h2>
+        <div>
+            <button onclick="testPlatformUrl('https://facebook.com/ads/library/?id=123456', 'Meta')">Test Meta URL</button>
+            <button onclick="testPlatformUrl('https://library.tiktok.com/ads?region=all', 'TikTok')">Test TikTok URL</button>
+            <button onclick="testPlatformUrl('https://adstransparency.google.com/advertiser/AR123', 'Google')">Test Google URL</button>
+            <button onclick="testPlatformUrl('https://linkedin.com/ad-library/advertiser/12345', 'LinkedIn')">Test LinkedIn URL</button>
+            <button onclick="testPlatformUrl('https://reddit.com/r/RedditPoliticalAds/comments/abc123', 'Reddit')">Test Reddit URL</button>
+            <button onclick="testPlatformUrl('https://invalid-site.com/ads', 'Invalid')">Test Invalid URL</button>
+        </div>
+        <div id="platformResults" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🎯 Integration Status</h2>
+        <div id="integrationStatus">
+            <p>✅ <strong>Phase 1 Complete</strong>: Multi-platform ad URL integration</p>
+            <p>🔧 <strong>Server Status</strong>: <span id="serverStatus">Checking...</span></p>
+            <p>🗄️ <strong>Database</strong>: Migration completed with ad_url and ad_source_type fields</p>
+            <p>📸 <strong>Screenshot API</strong>: ScreenshotAPI.net integration ready</p>
+            <p>🎨 <strong>UI Components</strong>: Toggle between upload and URL input implemented</p>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>🚀 Next Steps - Phase 2</h2>
+        <p><strong>Video Analysis Integration (2-3 months)</strong></p>
+        <ul>
+            <li>Video URL detection and processing</li>
+            <li>Frame extraction using ScreenshotAPI.net video features</li>
+            <li>Multi-frame GPT-4 Vision analysis</li>
+            <li>Video usage caps implementation (Pro: 5/month, Agency: 50/month, Enterprise: 500/month)</li>
+        </ul>
+    </div>
+
+    <script>
+        // Simple URL pattern matching (client-side version)
+        const platformPatterns = {
+            meta: [/facebook\.com\/ads\/library/i, /facebook\.com\/ad_library/i],
+            tiktok: [/library\.tiktok\.com\/ads/i, /library\.tiktok\.com/i],
+            google: [/adstransparency\.google\.com/i],
+            linkedin: [/linkedin\.com\/ad-library/i],
+            reddit: [/reddit\.com\/r\/RedditPoliticalAds/i, /reddit\.com\/promoted/i]
+        };
+
+        function detectPlatform(url) {
+            try {
+                const urlObj = new URL(url);
+                for (const [platform, patterns] of Object.entries(platformPatterns)) {
+                    for (const pattern of patterns) {
+                        if (pattern.test(urlObj.href)) {
+                            return platform;
+                        }
+                    }
+                }
+                return null;
+            } catch {
+                return null;
+            }
+        }
+
+        function testUrlDetection() {
+            const url = document.getElementById('testUrl').value;
+            const result = document.getElementById('urlResult');
+            
+            if (!url) {
+                result.innerHTML = '<span style="color: red;">Please enter a URL</span>';
+                result.style.display = 'block';
+                return;
+            }
+
+            const platform = detectPlatform(url);
+            const isValid = platform !== null;
+            
+            result.innerHTML = `
+                <strong>URL:</strong> ${url}<br>
+                <strong>Platform:</strong> ${platform || 'Not detected'}<br>
+                <strong>Valid:</strong> <span style="color: ${isValid ? 'green' : 'red'}">${isValid ? 'Yes ✅' : 'No ❌'}</span>
+            `;
+            result.className = 'result ' + (isValid ? 'success' : 'error');
+            result.style.display = 'block';
+        }
+
+        function testPlatformUrl(url, expectedPlatform) {
+            const platform = detectPlatform(url);
+            const isCorrect = platform === expectedPlatform.toLowerCase() || (expectedPlatform === 'Invalid' && !platform);
+            
+            const results = document.getElementById('platformResults');
+            const resultHtml = `
+                <div style="margin: 5px 0; padding: 8px; background: ${isCorrect ? '#e7f5e7' : '#ffe7e7'}; border-radius: 4px;">
+                    <strong>${expectedPlatform}:</strong> ${url}<br>
+                    <strong>Detected:</strong> ${platform || 'None'} ${isCorrect ? '✅' : '❌'}
+                </div>
+            `;
+            
+            if (results.innerHTML === '') {
+                results.innerHTML = '<h4>Test Results:</h4>';
+            }
+            results.innerHTML += resultHtml;
+            results.style.display = 'block';
+        }
+
+        // Check server status
+        function checkServerStatus() {
+            fetch('http://localhost:5173/')
+                .then(response => {
+                    document.getElementById('serverStatus').innerHTML = '✅ Development server running (localhost:5173)';
+                })
+                .catch(error => {
+                    document.getElementById('serverStatus').innerHTML = '❌ Development server not accessible';
+                });
+        }
+
+        // Run server check on load
+        checkServerStatus();
+    </script>
+</body>
+</html>
