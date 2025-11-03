@@ -59,9 +59,14 @@ export function getUsageData(userId?: string): UsageData {
     const parsed = JSON.parse(stored) as UsageData;
     const currentMonth = getCurrentMonth();
 
-    // Reset if new month
-    if (parsed.currentMonth !== currentMonth) {
+    // Reset if new month or if tier is missing (data corruption)
+    if (parsed.currentMonth !== currentMonth || !parsed.tier) {
       return initializeUsageData(userId);
+    }
+
+    // Ensure tier is set (fallback for corrupted data)
+    if (!parsed.tier) {
+      parsed.tier = getUserTier(userId);
     }
 
     return parsed;

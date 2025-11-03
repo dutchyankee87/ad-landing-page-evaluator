@@ -1,5 +1,6 @@
 import React from 'react';
 import { TrendingUp, Target, AlertCircle, Award, DollarSign, Users } from 'lucide-react';
+import { safeFormatTitle } from '../../lib/string-utils';
 
 interface IndustryInsightsProps {
   industry: string;
@@ -30,9 +31,7 @@ export const IndustryInsights: React.FC<IndustryInsightsProps> = ({
 }) => {
   
   const formatIndustry = (industry: string) => {
-    return industry.split('-').map(word => 
-      word.charAt(0).toUpperCase() + word.slice(1)
-    ).join(' ');
+    return safeFormatTitle(industry) || 'Unknown Industry';
   };
 
   const formatPlatform = (platform: string) => {

@@ -1,5 +1,6 @@
 import React from 'react';
 import { TrendingUp, Award, BarChart3 } from 'lucide-react';
+import { safeFormatTitle } from '../../lib/string-utils';
 
 interface IndustryBenchmarksProps {
   score: number;
@@ -52,9 +53,7 @@ export const IndustryBenchmarks: React.FC<IndustryBenchmarksProps> = ({
   };
 
   const formatIndustry = (industry: string) => {
-    return industry.split('-').map(word => 
-      word.charAt(0).toUpperCase() + word.slice(1)
-    ).join(' ');
+    return safeFormatTitle(industry) || 'Unknown Industry';
   };
 
   const formatPlatform = (platform: string) => {

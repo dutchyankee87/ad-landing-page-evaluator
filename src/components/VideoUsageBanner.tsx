@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Film, Image, Zap, Crown, AlertTriangle } from 'lucide-react';
 import { useUser } from '@clerk/clerk-react';
 import { getUsageSummary, getTierLimits } from '../lib/usage-tracking';
+import { safeCapitalize } from '../lib/string-utils';
 
 const VideoUsageBanner: React.FC = () => {
   const { user } = useUser();
@@ -67,7 +68,7 @@ const VideoUsageBanner: React.FC = () => {
                 ) : (
                   <>
                     <Crown className="h-3 w-3 mr-1" />
-                    {usageSummary.tier.charAt(0).toUpperCase() + usageSummary.tier.slice(1)}
+                    {safeCapitalize(usageSummary.tier) || 'Free'}
                   </>
                 )}
               </span>
