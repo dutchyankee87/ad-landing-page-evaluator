@@ -25,7 +25,9 @@ const UsageLimitModal: React.FC = () => {
           </div>
           
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            You've Used All Your Free Evaluations
+            {usageData.imageEvaluationsUsed >= usageData.imageMonthlyLimit 
+              ? "You've Used All Your Free Evaluations" 
+              : "Evaluation Limit Reached"}
           </h2>
           
           <p className="text-gray-600">

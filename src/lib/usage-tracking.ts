@@ -12,6 +12,7 @@ export interface UsageData {
   lastEvaluationDate: string;
   userId?: string;
   tier: 'free' | 'pro' | 'agency' | 'enterprise';
+  version?: number; // For handling limit changes
 }
 
 // Tier configurations with video caps
@@ -38,6 +39,7 @@ const STORAGE_KEY = 'adalign_usage';
 const ANONYMOUS_STORAGE_KEY = 'adalign_anonymous_usage';
 const ANONYMOUS_LIMIT = 1; // 1 free check for anonymous users
 const AUTHENTICATED_LIMIT = 3; // 3 total checks for authenticated users (was 2 additional)
+const USAGE_DATA_VERSION = 2; // Increment when limits change to force reset
 
 // Get current month in YYYY-MM format
 function getCurrentMonth(): string {
@@ -59,8 +61,8 @@ export function getUsageData(userId?: string): UsageData {
     const parsed = JSON.parse(stored) as UsageData;
     const currentMonth = getCurrentMonth();
 
-    // Reset if new month or if tier is missing (data corruption)
-    if (parsed.currentMonth !== currentMonth || !parsed.tier) {
+    // Reset if new month, tier is missing, or version mismatch (limit changes)
+    if (parsed.currentMonth !== currentMonth || !parsed.tier || (parsed.version || 0) !== USAGE_DATA_VERSION) {
       return initializeUsageData(userId);
     }
 
@@ -100,7 +102,8 @@ function initializeUsageData(userId?: string): UsageData {
     currentMonth: getCurrentMonth(),
     lastEvaluationDate: '',
     userId,
-    tier
+    tier,
+    version: USAGE_DATA_VERSION
   };
   
   saveUsageData(data, userId);
@@ -295,4 +298,26 @@ export function isEvaluationTypeAllowed(userId?: string, evaluationType: Evaluat
   }
   
   return usage.imageMonthlyLimit > 0;
+}
+
+// Reset all usage data (for development/testing)
+export function resetAllUsageData(): void {
+  try {
+    // Clear anonymous usage
+    localStorage.removeItem(ANONYMOUS_STORAGE_KEY);
+    
+    // Clear all stored usage data keys
+    const keysToRemove: string[] = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith(STORAGE_KEY)) {
+        keysToRemove.push(key);
+      }
+    }
+    
+    keysToRemove.forEach(key => localStorage.removeItem(key));
+    console.log('All usage data reset');
+  } catch (error) {
+    console.warn('Failed to reset usage data:', error);
+  }
 }
