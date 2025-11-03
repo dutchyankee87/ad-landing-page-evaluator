@@ -58,16 +58,16 @@ const Home: React.FC = () => {
             className="inline-flex items-center gap-2 bg-red-50 text-red-700 px-4 py-2 rounded-full text-sm font-medium mb-6 border border-red-200"
           >
             <AlertTriangle className="h-4 w-4" />
-            78% of paid ads lose money due to poor landing page alignment
+            78% of paid ads fail because they don't match their landing pages
           </motion.div>
           
           <motion.h1 
             variants={itemVariants}
             className="text-4xl md:text-6xl font-bold mb-6 leading-tight"
           >
-            Stop Burning Money on
+            Does Your Ad Match
             <span className="block bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent">
-              Misaligned Paid Ads
+              Your Landing Page?
             </span>
           </motion.h1>
           
@@ -75,7 +75,7 @@ const Home: React.FC = () => {
             variants={itemVariants}
             className="text-xl md:text-2xl text-gray-600 mb-8 leading-relaxed max-w-3xl mx-auto"
           >
-            Discover exactly why your Meta, TikTok, LinkedIn, Reddit & Google ads aren't converting with our AI-powered congruence analyzer. Get a detailed report in under 60 seconds.
+            Find out if your ads and landing pages are working together or working against each other. Our AI compares your Meta, TikTok, LinkedIn, Reddit & Google ads to your landing pages and shows you exactly where they don't align.
           </motion.p>
           
           <motion.div 
@@ -90,7 +90,7 @@ const Home: React.FC = () => {
                 to="/evaluate" 
                 className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold px-8 py-4 rounded-xl transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-orange-300"
               >
-                Analyze My Ads Now - Free
+                Check My Ad-Page Alignment - Free
                 <ArrowRight className="h-5 w-5" />
               </Link>
             </motion.div>
@@ -109,7 +109,7 @@ const Home: React.FC = () => {
           >
             <div className="flex items-center gap-2">
               <TrendingUp className="h-4 w-4 text-green-500" />
-              <span>Average 34% CTR improvement</span>
+              <span>Average 34% CTR boost after fixing alignment</span>
             </div>
             <div className="flex items-center gap-2">
               <DollarSign className="h-4 w-4 text-green-500" />
@@ -151,13 +151,13 @@ const Home: React.FC = () => {
               >
                 <AlertTriangle className="h-8 w-8 text-red-600" />
               </motion.div>
-              <h2 className="text-2xl font-bold text-red-800 mb-4">Why Your Paid Ads Fail</h2>
+              <h2 className="text-2xl font-bold text-red-800 mb-4">Why Ads & Landing Pages Don't Match</h2>
               <ul className="space-y-3 text-red-700">
                 {[
-                  "Ad promises don't match landing page reality",
-                  "Visual disconnect confuses potential customers", 
-                  "Tone and messaging inconsistency kills trust",
-                  "No systematic way to identify these gaps"
+                  "Your ad shows one thing, landing page shows another",
+                  "Visual styles clash between ad and page", 
+                  "Ad tone is urgent, page tone is corporate",
+                  "You can't see these mismatches until it's too late"
                 ].map((item, index) => (
                   <motion.li 
                     key={index}
@@ -192,13 +192,13 @@ const Home: React.FC = () => {
               >
                 <CheckCircle className="h-8 w-8 text-green-600" />
               </motion.div>
-              <h2 className="text-2xl font-bold text-green-800 mb-4">Our AI Solution Delivers</h2>
+              <h2 className="text-2xl font-bold text-green-800 mb-4">We Compare Everything Side-by-Side</h2>
               <ul className="space-y-3 text-green-700">
                 {[
-                  "Precise visual alignment scoring (0-10 scale)",
-                  "Content congruence analysis with GPT-4",
-                  "Tone consistency evaluation", 
-                  "Actionable fixes to boost conversions 2x"
+                  "Visual match score: Does your ad image match your page?",
+                  "Content alignment: Do your ad promises match page reality?",
+                  "Tone consistency: Does the messaging feel cohesive?", 
+                  "Specific fixes to align your ad with your landing page"
                 ].map((item, index) => (
                   <motion.li 
                     key={index}
@@ -234,7 +234,7 @@ const Home: React.FC = () => {
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
           >
-            Get Your Congruence Score in 3 Steps
+            Get Your Ad-Landing Page Alignment Score in 3 Steps
           </motion.h2>
           <motion.p 
             className="text-xl text-gray-600 text-center mb-12"
@@ -251,21 +251,21 @@ const Home: React.FC = () => {
               {
                 step: 1,
                 title: "Upload Your Ad",
-                description: "Paste your ad image URL, headline, and description. Works with Meta, TikTok, LinkedIn, Reddit & Google ads.",
+                description: "Share your ad creative, headline, and copy. We support Meta, TikTok, LinkedIn, Reddit & Google ad formats.",
                 color: "bg-blue-600",
                 icon: Target
               },
               {
                 step: 2, 
-                title: "Enter Landing Page URL",
-                description: "Our AI scrapes and analyzes your landing page content, design, and messaging automatically.",
+                title: "Add Landing Page URL",
+                description: "We'll analyze your landing page content, visuals, and messaging to compare against your ad.",
                 color: "bg-purple-600",
                 icon: Zap
               },
               {
                 step: 3,
-                title: "Get Your Report", 
-                description: "Receive detailed scores and specific recommendations to improve your conversion rates.",
+                title: "See the Alignment Report", 
+                description: "Get scores showing how well your ad and landing page work together, plus fixes to improve alignment.",
                 color: "bg-green-600",
                 icon: BarChart3
               }
@@ -312,7 +312,7 @@ const Home: React.FC = () => {
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
           >
-            See Exactly What's Killing Your Conversions
+            See Where Your Ad and Landing Page Don't Match
           </motion.h2>
           <motion.p 
             className="text-xl text-gray-600 text-center mb-12"
@@ -321,7 +321,7 @@ const Home: React.FC = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
             viewport={{ once: true }}
           >
-            Real analysis from our AI engine
+            Real ad-to-page comparison analysis
           </motion.p>
           
           <motion.div 
@@ -340,7 +340,7 @@ const Home: React.FC = () => {
               viewport={{ once: true }}
             >
               <div className="flex items-center justify-between">
-                <h3 className="text-2xl font-bold">Congruence Analysis Report</h3>
+                <h3 className="text-2xl font-bold">Ad-Landing Page Alignment Report</h3>
                 <motion.div 
                   className="bg-white/20 px-4 py-2 rounded-lg backdrop-blur-sm"
                   initial={{ scale: 0 }}
@@ -356,9 +356,9 @@ const Home: React.FC = () => {
             
             <div className="p-8 grid md:grid-cols-3 gap-6">
               {[
-                { score: "2.8", color: "red", title: "Visual Match", description: "Ad shows luxury watch, landing page features budget accessories" },
-                { score: "5.1", color: "yellow", title: "Content Alignment", description: "Messaging partially matches but lacks key value propositions" },
-                { score: "4.7", color: "orange", title: "Tone Consistency", description: "Ad uses urgent language, page feels corporate and slow" }
+                { score: "2.8", color: "red", title: "Visual Match", description: "Ad shows luxury watch, but landing page shows budget accessories" },
+                { score: "5.1", color: "yellow", title: "Content Alignment", description: "Ad promises premium quality, page talks about affordability" },
+                { score: "4.7", color: "orange", title: "Tone Consistency", description: "Ad feels urgent and exciting, page feels slow and corporate" }
               ].map((item, index) => (
                 <motion.div 
                   key={index}
@@ -396,9 +396,9 @@ const Home: React.FC = () => {
               </h4>
               <ul className="space-y-2 text-sm text-gray-700">
                 {[
-                  "Replace landing page hero image with luxury watch to match ad visual",
-                  "Add urgency elements (\"Limited time offer\") to page headline",
-                  "Update product descriptions to emphasize premium quality mentioned in ad"
+                  "Match your landing page hero image to your ad's luxury watch visual",
+                  "Add urgency to your page headline to match your ad's tone",
+                  "Emphasize premium quality on your page to match your ad promises"
                 ].map((fix, index) => (
                   <motion.li 
                     key={index}
@@ -432,7 +432,7 @@ const Home: React.FC = () => {
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
           >
-            Join 2,847 Marketers Already Saving Money
+            Join 2,847 Marketers Who Fixed Their Ad-Page Alignment
           </motion.h2>
           
           <div className="grid md:grid-cols-3 gap-8">
@@ -443,7 +443,7 @@ const Home: React.FC = () => {
                 bgColor: "from-green-50 to-emerald-50",
                 borderColor: "border-green-200",
                 title: "Average CTR Increase",
-                quote: "Fixed our TikTok ad-page disconnect in one day. CTR jumped from 1.2% to 2.1%",
+                quote: "Found our TikTok ad and landing page were totally mismatched. Fixed it in one day, CTR jumped from 1.2% to 2.1%",
                 author: "Sarah K, E-commerce Director"
               },
               {
@@ -452,7 +452,7 @@ const Home: React.FC = () => {
                 bgColor: "from-blue-50 to-cyan-50",
                 borderColor: "border-blue-200",
                 title: "Monthly Ad Spend Saved",
-                quote: "Stopped wasting money on misaligned LinkedIn campaigns. ROI improved 2.3x",
+                quote: "Discovered our LinkedIn ads promised one thing, landing page delivered another. Fixed the alignment, ROI improved 2.3x",
                 author: "Mike T, SaaS Marketing"
               },
               {
@@ -461,7 +461,7 @@ const Home: React.FC = () => {
                 bgColor: "from-purple-50 to-violet-50",
                 borderColor: "border-purple-200",
                 title: "Average Analysis Time",
-                quote: "Tested our Google & Meta ads - way faster than hiring expensive consultants",
+                quote: "Compared our Google & Meta ads to our landing pages - found mismatches we never noticed",
                 author: "Jennifer L, Agency Owner"
               }
             ].map((item, index) => (
@@ -532,7 +532,7 @@ const Home: React.FC = () => {
                 viewport={{ once: true }}
               >
                 <DollarSign className="h-4 w-4" />
-                Stop losing $2,400+ monthly to misaligned ads
+                Stop losing $2,400+ monthly to ad-page mismatches
               </motion.div>
               
               <motion.h2 
@@ -543,7 +543,7 @@ const Home: React.FC = () => {
                 viewport={{ once: true }}
               >
                 Your Competitors Are Already 
-                <span className="block">Optimizing Their Ad Alignment</span>
+                <span className="block">Aligning Their Ads & Landing Pages</span>
               </motion.h2>
               
               <motion.p 
@@ -553,7 +553,7 @@ const Home: React.FC = () => {
                 transition={{ delay: 0.8 }}
                 viewport={{ once: true }}
               >
-                Don't let another day pass burning money on misaligned paid ads. Get your congruence score and fix what's broken.
+                Don't let another day pass with ads and landing pages that don't match. Get your alignment score and fix the disconnect.
               </motion.p>
               
               <motion.div 
@@ -571,7 +571,7 @@ const Home: React.FC = () => {
                     to="/evaluate" 
                     className="inline-flex items-center gap-2 bg-white text-orange-600 hover:bg-orange-50 font-bold text-lg px-10 py-5 rounded-2xl transition-all shadow-xl hover:shadow-2xl transform hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-white/30"
                   >
-                    Analyze My Ads Now - It's Free
+                    Check My Ad-Page Alignment - It's Free
                     <ArrowRight className="h-6 w-6" />
                   </Link>
                 </motion.div>
