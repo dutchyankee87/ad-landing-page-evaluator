@@ -165,6 +165,38 @@ const recordIpEvaluation = async (db, ipAddress) => {
   }
 };
 
+// Check if URL is a preview URL
+const isPreviewUrl = (url) => {
+  return url.includes('fb.me') || 
+         url.includes('/ads/experience/confirmation') ||
+         url.includes('v-ttam.tiktok.com') ||
+         url.includes('ttam.tiktok.com');
+};
+
+// Get preview URL specific settings
+const getPreviewScreenshotSettings = (url) => {
+  if (url.includes('fb.me') || url.includes('/ads/experience/confirmation')) {
+    return {
+      delay: 8000, // Longer delay for Facebook preview pages
+      wait_for_selector: '[data-testid*="ad"], [role="img"], video',
+      user_agent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+    };
+  }
+  
+  if (url.includes('v-ttam.tiktok.com') || url.includes('ttam.tiktok.com')) {
+    return {
+      delay: 10000, // Longer delay for TikTok preview pages
+      wait_for_selector: 'video, [data-e2e="video-player"], canvas',
+      user_agent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1'
+    };
+  }
+  
+  return {
+    delay: 3000,
+    user_agent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+  };
+};
+
 // Screenshot ad URL using ScreenshotAPI.net (paid service)
 const screenshotAdUrl = async (adUrl) => {
   const screenshotApiToken = process.env.SCREENSHOT_API_TOKEN;
@@ -175,7 +207,15 @@ const screenshotAdUrl = async (adUrl) => {
   }
 
   try {
+    const isPreview = isPreviewUrl(adUrl);
+    if (isPreview) {
+      console.log('🔗 Preview URL detected, using enhanced screenshot settings');
+    }
+    
     console.log('📸 Taking screenshot of ad URL:', adUrl);
+    
+    // Get preview-specific settings if needed
+    const previewSettings = isPreview ? getPreviewScreenshotSettings(adUrl) : {};
     
     // Use ScreenshotAPI.net with ad-optimized settings
     const screenshotApiUrl = `https://shot.screenshotapi.net/screenshot`;
@@ -193,12 +233,14 @@ const screenshotAdUrl = async (adUrl) => {
         output: 'json',
         file_type: 'png',
         wait_for_event: 'load',
-        delay: 3000, // Extra wait for ad content to load
+        delay: previewSettings.delay || 3000,
+        wait_for_selector: previewSettings.wait_for_selector,
+        user_agent: previewSettings.user_agent,
         block_ads: true, // Block other ads to focus on target ad
         block_trackers: true,
         block_cookie_banners: true
       }),
-      timeout: 25000 // Longer timeout for ad pages
+      timeout: isPreview ? 35000 : 25000 // Longer timeout for preview pages
     });
 
     if (!response.ok) {

@@ -26,14 +26,22 @@ export const PLATFORM_CONFIGS: PlatformConfig[] = [
       /facebook\.com\/ads\/library/i,
       /facebook\.com\/ad_library/i,
       /www\.facebook\.com\/ads\/library/i,
-      /m\.facebook\.com\/ads\/library/i
+      /m\.facebook\.com\/ads\/library/i,
+      // Ad preview URLs
+      /fb\.me\/adspreview\/facebook\/[a-zA-Z0-9]+/i,
+      /fb\.me\/[a-zA-Z0-9]+/i,
+      /facebook\.com\/ads\/experience\/confirmation/i,
+      /business\.facebook\.com\/ads\/experience\/confirmation/i
     ],
     videoPatterns: [
       /facebook\.com\/ads\/library.*media_type=video/i,
-      /facebook\.com\/ads\/library.*video/i
+      /facebook\.com\/ads\/library.*video/i,
+      // Preview URLs for video ads
+      /fb\.me\/adspreview\/facebook\/[a-zA-Z0-9]+/i,
+      /fb\.me\/[a-zA-Z0-9]+/i
     ],
-    guidance: 'Paste a URL from Facebook Ad Library (facebook.com/ads/library)',
-    screenshotTips: 'We\'ll capture a clean screenshot of the ad from Facebook Ad Library for analysis.',
+    guidance: 'Paste a URL from Facebook Ad Library (facebook.com/ads/library) or ad preview link (fb.me/adspreview)',
+    screenshotTips: 'We\'ll capture a clean screenshot of the ad from Facebook Ad Library or preview link for analysis.',
     supportsVideo: true,
     videoGuidance: 'Video ads will be analyzed using extracted frames for comprehensive visual assessment.'
   },
@@ -43,12 +51,18 @@ export const PLATFORM_CONFIGS: PlatformConfig[] = [
     patterns: [
       /library\.tiktok\.com\/ads/i,
       /ads\.tiktok\.com\/library/i,
-      /library\.tiktok\.com/i
+      /library\.tiktok\.com/i,
+      // TikTok ad preview URLs
+      /v-ttam\.tiktok\.com\/s\/[a-zA-Z0-9]+/i,
+      /ttam\.tiktok\.com\/s\/[a-zA-Z0-9]+/i
     ],
     videoPatterns: [
-      /library\.tiktok\.com/i // TikTok ads are primarily video
+      /library\.tiktok\.com/i, // TikTok ads are primarily video
+      // Preview URLs are always video for TikTok
+      /v-ttam\.tiktok\.com\/s\/[a-zA-Z0-9]+/i,
+      /ttam\.tiktok\.com\/s\/[a-zA-Z0-9]+/i
     ],
-    guidance: 'Paste a URL from TikTok Commercial Content Library (library.tiktok.com)',
+    guidance: 'Paste a URL from TikTok Commercial Content Library (library.tiktok.com) or ad preview link (v-ttam.tiktok.com)',
     screenshotTips: 'We\'ll capture the ad content and any video preview frames for comprehensive analysis.',
     supportsVideo: true,
     videoGuidance: 'TikTok video ads will be analyzed using multiple representative frames and audio transcript analysis.'
@@ -272,6 +286,8 @@ export interface UrlValidationResult {
   mediaType?: MediaType;
   confidence?: 'high' | 'medium' | 'low';
   isVideoAd?: boolean;
+  isPreviewUrl?: boolean;
+  urlType?: string;
 }
 
 /**
@@ -309,12 +325,16 @@ export const validateAdUrl = (url: string): UrlValidationResult => {
       };
     }
     
+    const isPreview = isPreviewUrl(url);
+    
     return { 
       isValid: true, 
       platform: mediaDetection.platform,
       mediaType: mediaDetection.mediaType,
       confidence: mediaDetection.confidence,
-      isVideoAd: mediaDetection.mediaType === 'video'
+      isVideoAd: mediaDetection.mediaType === 'video',
+      isPreviewUrl: isPreview,
+      urlType: getUrlTypeDescription(url)
     };
     
   } catch {
@@ -389,4 +409,43 @@ export const formatUrlForDisplay = (url: string, maxLength: number = 50): string
   } catch {
     return url.substring(0, maxLength - 3) + '...';
   }
+};
+
+/**
+ * Detect if URL is an ad preview URL vs library URL
+ */
+export const isPreviewUrl = (url: string): boolean => {
+  if (!url) return false;
+  
+  try {
+    const urlObj = new URL(url);
+    
+    // Meta preview URL patterns
+    if (urlObj.hostname.includes('fb.me') ||
+        urlObj.pathname.includes('/ads/experience/confirmation')) {
+      return true;
+    }
+    
+    // TikTok preview URL patterns
+    if (urlObj.hostname.includes('v-ttam.tiktok.com') ||
+        urlObj.hostname.includes('ttam.tiktok.com')) {
+      return true;
+    }
+    
+    // Add other platforms as needed
+    
+    return false;
+  } catch {
+    return false;
+  }
+};
+
+/**
+ * Get URL type description for UI
+ */
+export const getUrlTypeDescription = (url: string): string => {
+  if (isPreviewUrl(url)) {
+    return 'Ad Preview Link';
+  }
+  return 'Ad Library URL';
 };

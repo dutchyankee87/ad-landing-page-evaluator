@@ -223,6 +223,42 @@ export const isVideoUrl = (platform, url) => {
 };
 
 /**
+ * Check if URL is a preview URL (requires special handling)
+ */
+const isPreviewUrl = (url) => {
+  return url.includes('fb.me') || 
+         url.includes('/ads/experience/confirmation') ||
+         url.includes('v-ttam.tiktok.com') ||
+         url.includes('ttam.tiktok.com');
+};
+
+/**
+ * Get preview URL specific processing options
+ */
+const getPreviewUrlOptions = (url) => {
+  if (url.includes('fb.me') || url.includes('/ads/experience/confirmation')) {
+    return {
+      delay: 10000, // Longer delay for Facebook preview pages
+      wait_for_selector: 'video, [data-testid*="video"], [role="img"]',
+      user_agent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+    };
+  }
+  
+  if (url.includes('v-ttam.tiktok.com') || url.includes('ttam.tiktok.com')) {
+    return {
+      delay: 12000, // Even longer for TikTok preview pages
+      wait_for_selector: 'video, [data-e2e="video-player"]',
+      user_agent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1'
+    };
+  }
+  
+  return {
+    delay: 8000,
+    wait_for_selector: 'video, iframe'
+  };
+};
+
+/**
  * Process video URL for ad analysis
  * Main entry point for video processing
  */
@@ -230,8 +266,20 @@ export const processVideoForAnalysis = async (platform, videoUrl) => {
   try {
     console.log(`🎬 Processing ${platform} video for analysis:`, videoUrl);
     
+    // Check if this is a preview URL
+    const isPreview = isPreviewUrl(videoUrl);
+    if (isPreview) {
+      console.log('🔗 Preview URL detected, using enhanced settings');
+    }
+    
     // Get platform-specific processing strategy
     const strategy = getVideoProcessingStrategy(platform, videoUrl);
+    
+    // Override with preview URL options if needed
+    if (isPreview) {
+      const previewOptions = getPreviewUrlOptions(videoUrl);
+      Object.assign(strategy, previewOptions);
+    }
     
     // Extract frames using optimal strategy
     const result = await extractVideoFrames(videoUrl, strategy);
@@ -248,7 +296,8 @@ export const processVideoForAnalysis = async (platform, videoUrl) => {
       additionalFrames: result.frames,
       processingMethod: result.extractionMethod,
       platform: platform,
-      sourceType: 'video'
+      sourceType: isPreview ? 'preview_video' : 'video',
+      isPreviewUrl: isPreview
     };
     
   } catch (error) {

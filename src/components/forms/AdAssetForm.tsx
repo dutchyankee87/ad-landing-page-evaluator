@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Image, Upload, X, Info, Loader2, Link, FileImage } from 'lucide-react';
 import { useAdEvaluation } from '../../context/AdEvaluationContext';
 import { uploadAdImageSmart, validateFileSize, validateFileType } from '../../lib/storage-dynamic';
-import { validateAdUrl, detectPlatform, getPlatformConfig, formatUrlForDisplay, type UrlValidationResult } from '../../lib/platform-detection';
+import { validateAdUrl, detectPlatform, getPlatformConfig, formatUrlForDisplay, isPreviewUrl, type UrlValidationResult } from '../../lib/platform-detection';
 import VideoUsageBanner from '../VideoUsageBanner';
 
 const SUPPORTED_PLATFORMS = [
@@ -249,7 +249,7 @@ const AdAssetForm: React.FC = () => {
               type="url"
               value={adUrl}
               onChange={handleUrlChange}
-              placeholder="Paste ad library URL (e.g., facebook.com/ads/library/...)"
+              placeholder="Paste ad library URL or preview link (e.g., fb.me/adspreview/facebook/... or v-ttam.tiktok.com/s/...)"
               className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors pl-10 ${
                 urlError ? 'border-red-300' : 'border-gray-300'
               }`}
@@ -261,8 +261,22 @@ const AdAssetForm: React.FC = () => {
             <div className="flex items-start gap-2 p-3 bg-green-50 rounded-lg border border-green-200">
               <Info className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
               <div className="text-sm text-green-800">
-                <div className="flex items-center gap-2 mb-1">
+                <div className="flex items-center gap-2 mb-1 flex-wrap">
                   <p className="font-medium">✓ Valid {selectedPlatform.name} URL detected</p>
+                  
+                  {/* URL Type Badge */}
+                  {urlValidation.isPreviewUrl && (
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 border border-emerald-200">
+                      🔗 Preview Link
+                    </span>
+                  )}
+                  {!urlValidation.isPreviewUrl && (
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-cyan-100 text-cyan-800 border border-cyan-200">
+                      📚 Library URL
+                    </span>
+                  )}
+                  
+                  {/* Media Type Badge */}
                   {urlValidation.isVideoAd && (
                     <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 border border-purple-200">
                       🎥 Video Ad
@@ -275,14 +289,21 @@ const AdAssetForm: React.FC = () => {
                   )}
                 </div>
                 <p className="mb-2">
-                  {urlValidation.isVideoAd 
-                    ? getPlatformConfig(selectedPlatform.id)?.videoGuidance || 'Video content will be analyzed using representative frames.'
-                    : getPlatformConfig(selectedPlatform.id)?.screenshotTips
+                  {urlValidation.isPreviewUrl 
+                    ? `Preview link detected! We'll capture a screenshot of the ad preview for analysis.${urlValidation.isVideoAd ? ' Video frames will be extracted for comprehensive assessment.' : ''}`
+                    : urlValidation.isVideoAd 
+                      ? getPlatformConfig(selectedPlatform.id)?.videoGuidance || 'Video content will be analyzed using representative frames.'
+                      : getPlatformConfig(selectedPlatform.id)?.screenshotTips
                   }
                 </p>
                 {urlValidation.isVideoAd && (
                   <div className="text-xs text-purple-700 bg-purple-50 px-2 py-1 rounded border border-purple-200">
                     <strong>Note:</strong> Video analysis uses additional processing and counts toward video evaluation limits.
+                  </div>
+                )}
+                {urlValidation.isPreviewUrl && (
+                  <div className="text-xs text-emerald-700 bg-emerald-50 px-2 py-1 rounded border border-emerald-200 mt-2">
+                    <strong>Preview Link:</strong> Make sure the preview link is still valid and accessible. Preview links may expire after 30 days.
                   </div>
                 )}
               </div>
