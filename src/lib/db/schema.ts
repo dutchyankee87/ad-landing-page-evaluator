@@ -163,7 +163,7 @@ export {
   type Platform,
   type Industry,
   type AudienceType
-} from '../constants';
+} from '../constants.js';
 
 // Analysis interfaces for type safety
 export interface PersuasionPrinciple {
