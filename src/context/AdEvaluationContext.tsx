@@ -241,7 +241,15 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
     
     // Check specific limits for this evaluation type
     if (!canEvaluate(userId, evaluationType)) {
-      setShowLimitModal(true);
+      // Only show modal if user has reached their limit (not if limit is 0)
+      const usage = getUsageData(userId);
+      const isAtLimit = evaluationType === 'video' ? 
+        (usage.videoMonthlyLimit > 0 && usage.videoEvaluationsUsed >= usage.videoMonthlyLimit) : 
+        (usage.imageMonthlyLimit > 0 && usage.imageEvaluationsUsed >= usage.imageMonthlyLimit);
+      
+      if (isAtLimit) {
+        setShowLimitModal(true);
+      }
       return;
     }
 

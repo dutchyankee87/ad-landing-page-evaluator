@@ -6,7 +6,15 @@ import './index.css';
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
+// Debug environment variables
+console.log('🔍 Debug Environment Variables:');
+console.log('- VITE_CLERK_PUBLISHABLE_KEY:', PUBLISHABLE_KEY);
+console.log('- Has Key:', !!PUBLISHABLE_KEY);
+console.log('- Key Length:', PUBLISHABLE_KEY?.length);
+console.log('- All VITE_ vars:', Object.keys(import.meta.env).filter(k => k.startsWith('VITE_')));
+
 if (!PUBLISHABLE_KEY) {
+  console.error('❌ VITE_CLERK_PUBLISHABLE_KEY is missing or empty');
   throw new Error("Missing Publishable Key")
 }
 

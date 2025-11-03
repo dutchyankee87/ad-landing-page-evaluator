@@ -29,7 +29,7 @@ const UsageLimitModal: React.FC = () => {
           </h2>
           
           <p className="text-gray-600">
-            You've completed {usageData.evaluationsUsed} of {usageData.monthlyLimit} free evaluations this month.
+            You've completed {usageData.imageEvaluationsUsed} of {usageData.imageMonthlyLimit} free evaluations this month.
           </p>
         </div>
 
@@ -46,7 +46,7 @@ const UsageLimitModal: React.FC = () => {
             <Calendar className="h-5 w-5 text-gray-500" />
             <div>
               <p className="text-sm font-medium text-gray-700">Free Plan Includes</p>
-              <p className="text-sm text-gray-600">5 evaluations per month</p>
+              <p className="text-sm text-gray-600">{usageData.imageMonthlyLimit} evaluation{usageData.imageMonthlyLimit !== 1 ? 's' : ''} per month</p>
             </div>
           </div>
         </div>
