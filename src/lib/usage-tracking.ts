@@ -17,7 +17,7 @@ export interface UsageData {
 // Tier configurations with video caps
 const TIER_LIMITS = {
   free: {
-    image: 1,
+    image: 3,
     video: 0 // No video for free tier
   },
   pro: {
@@ -37,7 +37,7 @@ const TIER_LIMITS = {
 const STORAGE_KEY = 'adalign_usage';
 const ANONYMOUS_STORAGE_KEY = 'adalign_anonymous_usage';
 const ANONYMOUS_LIMIT = 1; // 1 free check for anonymous users
-const AUTHENTICATED_LIMIT = 2; // 2 additional checks for authenticated users
+const AUTHENTICATED_LIMIT = 3; // 3 total checks for authenticated users (was 2 additional)
 
 // Get current month in YYYY-MM format
 function getCurrentMonth(): string {
