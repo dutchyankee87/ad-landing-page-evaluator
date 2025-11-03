@@ -7,6 +7,8 @@ export interface SubscriptionTier {
   price: number;
   priceId: string; // Stripe price ID
   evaluationsPerMonth: number;
+  imageEvaluationsPerMonth: number;
+  videoEvaluationsPerMonth: number;
   features: string[];
   popular?: boolean;
 }
@@ -27,12 +29,15 @@ export const SUBSCRIPTION_TIERS: SubscriptionTier[] = [
     name: 'Free',
     price: 0,
     priceId: '',
-    evaluationsPerMonth: TIER_LIMITS.free + SIGNUP_BONUS_EVALUATIONS,
+    evaluationsPerMonth: 1,
+    imageEvaluationsPerMonth: 1,
+    videoEvaluationsPerMonth: 0,
     features: [
-      '3 evaluations/month (1 + 2 bonus on signup)',
+      '1 image evaluation/month',
       'Basic AI analysis',
       'Ad-to-page scoring',
-      'Essential recommendations'
+      'Essential recommendations',
+      '🔒 Video analysis (Pro+)'
     ]
   },
   {
@@ -40,9 +45,12 @@ export const SUBSCRIPTION_TIERS: SubscriptionTier[] = [
     name: 'Pro',
     price: 29,
     priceId: STRIPE_PRICE_IDS.pro_monthly,
-    evaluationsPerMonth: TIER_LIMITS.pro,
+    evaluationsPerMonth: 55,
+    imageEvaluationsPerMonth: 50,
+    videoEvaluationsPerMonth: 5,
     features: [
-      '25 evaluations/month',
+      '50 image evaluations/month',
+      '🎥 5 video evaluations/month',
       'Advanced AI insights',
       'Export PDF reports',
       'Email support',
@@ -54,10 +62,13 @@ export const SUBSCRIPTION_TIERS: SubscriptionTier[] = [
     name: 'Agency',
     price: 99,
     priceId: STRIPE_PRICE_IDS.agency_monthly,
-    evaluationsPerMonth: TIER_LIMITS.agency,
+    evaluationsPerMonth: 250,
+    imageEvaluationsPerMonth: 200,
+    videoEvaluationsPerMonth: 50,
     popular: true,
     features: [
-      '200 evaluations/month',
+      '200 image evaluations/month',
+      '🎥 50 video evaluations/month',
       'Team collaboration (5 users)',
       'Shared dashboards',
       'Complete audit history',
@@ -71,9 +82,12 @@ export const SUBSCRIPTION_TIERS: SubscriptionTier[] = [
     name: 'Enterprise',
     price: 299,
     priceId: STRIPE_PRICE_IDS.enterprise_monthly,
-    evaluationsPerMonth: TIER_LIMITS.enterprise,
+    evaluationsPerMonth: 1500,
+    imageEvaluationsPerMonth: 1000,
+    videoEvaluationsPerMonth: 500,
     features: [
-      'Up to 2,000 evaluations/month',
+      '1,000 image evaluations/month',
+      '🎥 500 video evaluations/month',
       'Custom branding',
       'API access',
       'Dedicated support',
@@ -89,9 +103,16 @@ export const ANNUAL_SUBSCRIPTION_TIERS: SubscriptionTier[] = [
     name: 'Pro (Annual)',
     price: 290, // $29 x 10 months (2 months free)
     priceId: STRIPE_PRICE_IDS.pro_yearly,
-    evaluationsPerMonth: TIER_LIMITS.pro,
+    evaluationsPerMonth: 55,
+    imageEvaluationsPerMonth: 50,
+    videoEvaluationsPerMonth: 5,
     features: [
-      ...SUBSCRIPTION_TIERS[1].features,
+      '50 image evaluations/month',
+      '🎥 5 video evaluations/month',
+      'Advanced AI insights',
+      'Export PDF reports',
+      'Email support',
+      'Performance tracking',
       '💰 Save $58/year (2 months free)'
     ]
   },
@@ -100,9 +121,18 @@ export const ANNUAL_SUBSCRIPTION_TIERS: SubscriptionTier[] = [
     name: 'Agency (Annual)',
     price: 990, // $99 x 10 months (2 months free)
     priceId: STRIPE_PRICE_IDS.agency_yearly,
-    evaluationsPerMonth: TIER_LIMITS.agency,
+    evaluationsPerMonth: 250,
+    imageEvaluationsPerMonth: 200,
+    videoEvaluationsPerMonth: 50,
     features: [
-      ...SUBSCRIPTION_TIERS[2].features,
+      '200 image evaluations/month',
+      '🎥 50 video evaluations/month',
+      'Team collaboration (5 users)',
+      'Shared dashboards',
+      'Complete audit history',
+      'White-label reports',
+      'Priority support',
+      'Industry benchmarks',
       '💰 Save $198/year (2 months free)'
     ]
   },
@@ -111,9 +141,17 @@ export const ANNUAL_SUBSCRIPTION_TIERS: SubscriptionTier[] = [
     name: 'Enterprise (Annual)',
     price: 2990, // $299 x 10 months (2 months free)
     priceId: STRIPE_PRICE_IDS.enterprise_yearly,
-    evaluationsPerMonth: TIER_LIMITS.enterprise,
+    evaluationsPerMonth: 1500,
+    imageEvaluationsPerMonth: 1000,
+    videoEvaluationsPerMonth: 500,
     features: [
-      ...SUBSCRIPTION_TIERS[3].features,
+      '1,000 image evaluations/month',
+      '🎥 500 video evaluations/month',
+      'Custom branding',
+      'API access',
+      'Dedicated support',
+      'Custom integrations',
+      'Advanced analytics',
       '💰 Save $598/year (2 months free)'
     ]
   }

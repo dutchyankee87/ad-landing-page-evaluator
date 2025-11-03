@@ -3,6 +3,7 @@ import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import { pgTable, uuid, text, integer, boolean, timestamp, index, decimal, jsonb } from 'drizzle-orm/pg-core';
 import { eq, sql } from 'drizzle-orm';
+import { processVideoForAnalysis, isVideoUrl } from './video-processing.js';
 // Remove Puppeteer - using screenshot service instead
 
 // Database schema (inline to avoid import issues)
@@ -50,6 +51,11 @@ const evaluations = pgTable('evaluations', {
   toneScore: decimal('tone_score'),
   adImageFileSize: integer('ad_image_file_size'),
   visualScore: decimal('visual_score'),
+  adUrl: text('ad_url'),
+  adSourceType: text('ad_source_type'), // 'upload', 'url', 'video'
+  mediaType: text('media_type'), // 'image', 'video', 'unknown'
+  videoFrameCount: integer('video_frame_count'),
+  videoProcessingMethod: text('video_processing_method'),
 });
 
 // IP rate limiting table
@@ -381,14 +387,39 @@ export default async function handler(req, res) {
       }
     }
 
-    // Handle ad asset - either uploaded image or URL screenshot
+    // Handle ad asset - uploaded image, URL screenshot, or video processing
     let adImageUrl = adData.imageUrl;
     let adSourceType = 'upload';
+    let videoFrameCount = null;
+    let videoProcessingMethod = null;
     
     if (adData.adUrl && !adData.imageUrl) {
-      console.log('🔗 Ad URL provided, taking screenshot:', adData.adUrl);
-      adImageUrl = await screenshotAdUrl(adData.adUrl);
-      adSourceType = 'url';
+      console.log('🔗 Ad URL provided:', adData.adUrl);
+      
+      // Check if this is a video URL that needs special processing
+      const isVideo = adData.mediaType === 'video' || isVideoUrl(adData.platform, adData.adUrl);
+      
+      if (isVideo) {
+        console.log('🎬 Video URL detected, using video processing');
+        try {
+          const videoResult = await processVideoForAnalysis(adData.platform, adData.adUrl);
+          adImageUrl = videoResult.primaryImageUrl;
+          adSourceType = 'video';
+          videoFrameCount = videoResult.additionalFrames?.length || 1;
+          videoProcessingMethod = videoResult.processingMethod;
+          
+          console.log(`✅ Video processed: ${videoFrameCount} frames via ${videoProcessingMethod}`);
+        } catch (videoError) {
+          console.warn('⚠️ Video processing failed, falling back to standard screenshot:', videoError.message);
+          // Fallback to standard screenshot
+          adImageUrl = await screenshotAdUrl(adData.adUrl);
+          adSourceType = 'url';
+        }
+      } else {
+        console.log('📸 Image URL detected, using standard screenshot');
+        adImageUrl = await screenshotAdUrl(adData.adUrl);
+        adSourceType = 'url';
+      }
       
       if (!adImageUrl) {
         return res.status(400).json({
@@ -413,7 +444,7 @@ export default async function handler(req, res) {
     const prompt = `You are an expert ${platformInfo} ads analyst with STRICT evaluation standards.
 
 You will analyze TWO images:
-1. AD SCREENSHOT: The user's ${adSourceType === 'url' ? 'ad library URL screenshot' : 'uploaded ad creative'}
+1. AD SCREENSHOT: The user's ${adSourceType === 'video' ? 'video ad captured frame' : adSourceType === 'url' ? 'ad library URL screenshot' : 'uploaded ad creative'}${adSourceType === 'video' ? ` (processed via ${videoProcessingMethod})` : ''}
 2. LANDING PAGE SCREENSHOT: The destination page (${landingPageData.url})
 
 Target Audience: ${audienceData.ageRange}, ${audienceData.gender}, interests: ${audienceData.interests}
@@ -557,6 +588,9 @@ Return ONLY valid JSON:
           adScreenshotUrl: adImageUrl,
           adUrl: adData.adUrl || null,
           adSourceType: adSourceType,
+          mediaType: adData.mediaType || (adSourceType === 'video' ? 'video' : 'image'),
+          videoFrameCount: videoFrameCount,
+          videoProcessingMethod: videoProcessingMethod,
           landingPageUrl: landingPageData.url,
           landingPageTitle: landingPageData.title || null,
           landingPageContent: landingPageData.mainContent || null,

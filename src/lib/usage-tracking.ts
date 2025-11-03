@@ -1,11 +1,38 @@
 // Usage tracking utilities for managing monthly evaluation limits
+export type EvaluationType = 'image' | 'video';
+
 export interface UsageData {
-  evaluationsUsed: number;
-  monthlyLimit: number;
+  evaluationsUsed: number; // Legacy - total evaluations
+  imageEvaluationsUsed: number;
+  videoEvaluationsUsed: number;
+  monthlyLimit: number; // Legacy - image limit
+  imageMonthlyLimit: number;
+  videoMonthlyLimit: number;
   currentMonth: string; // YYYY-MM format
   lastEvaluationDate: string;
-  userId?: string; // Add user ID for authenticated tracking
+  userId?: string;
+  tier: 'free' | 'pro' | 'agency' | 'enterprise';
 }
+
+// Tier configurations with video caps
+const TIER_LIMITS = {
+  free: {
+    image: 1,
+    video: 0 // No video for free tier
+  },
+  pro: {
+    image: 50,
+    video: 5
+  },
+  agency: {
+    image: 200,
+    video: 50
+  },
+  enterprise: {
+    image: 1000,
+    video: 500
+  }
+};
 
 const STORAGE_KEY = 'adalign_usage';
 const ANONYMOUS_STORAGE_KEY = 'adalign_anonymous_usage';
@@ -44,14 +71,31 @@ export function getUsageData(userId?: string): UsageData {
   }
 }
 
+// Get user tier (simplified for now - in production this would come from auth/database)
+function getUserTier(userId?: string): 'free' | 'pro' | 'agency' | 'enterprise' {
+  if (!userId) return 'free';
+  
+  // TODO: Integrate with actual user tier from database/auth
+  // For now, return free for all authenticated users
+  return 'free';
+}
+
 // Initialize fresh usage data
 function initializeUsageData(userId?: string): UsageData {
+  const tier = getUserTier(userId);
+  const limits = TIER_LIMITS[tier];
+  
   const data: UsageData = {
-    evaluationsUsed: 0,
-    monthlyLimit: userId ? AUTHENTICATED_LIMIT : ANONYMOUS_LIMIT,
+    evaluationsUsed: 0, // Legacy
+    imageEvaluationsUsed: 0,
+    videoEvaluationsUsed: 0,
+    monthlyLimit: userId ? AUTHENTICATED_LIMIT : ANONYMOUS_LIMIT, // Legacy
+    imageMonthlyLimit: limits.image,
+    videoMonthlyLimit: limits.video,
     currentMonth: getCurrentMonth(),
     lastEvaluationDate: '',
-    userId
+    userId,
+    tier
   };
   
   saveUsageData(data, userId);
@@ -78,30 +122,60 @@ function hasAdminBypass(): boolean {
   }
 }
 
-// Check if user can perform another evaluation
-export function canEvaluate(userId?: string): boolean {
+// Check if user can perform another evaluation (specific type)
+export function canEvaluate(userId?: string, evaluationType: EvaluationType = 'image'): boolean {
   // Admin bypass
   if (hasAdminBypass()) {
     return true;
   }
   
   const usage = getUsageData(userId);
-  return usage.evaluationsUsed < usage.monthlyLimit;
+  
+  if (evaluationType === 'video') {
+    return usage.videoEvaluationsUsed < usage.videoMonthlyLimit;
+  } else {
+    return usage.imageEvaluationsUsed < usage.imageMonthlyLimit;
+  }
 }
 
-// Get remaining evaluations
-export function getRemainingEvaluations(userId?: string): number {
+// Legacy function - checks image evaluations for backward compatibility
+export function canEvaluateImage(userId?: string): boolean {
+  return canEvaluate(userId, 'image');
+}
+
+// Check if user can evaluate videos
+export function canEvaluateVideo(userId?: string): boolean {
+  return canEvaluate(userId, 'video');
+}
+
+// Get remaining evaluations for specific type
+export function getRemainingEvaluations(userId?: string, evaluationType: EvaluationType = 'image'): number {
   // Admin bypass shows unlimited
   if (hasAdminBypass()) {
     return 999;
   }
   
   const usage = getUsageData(userId);
-  return Math.max(0, usage.monthlyLimit - usage.evaluationsUsed);
+  
+  if (evaluationType === 'video') {
+    return Math.max(0, usage.videoMonthlyLimit - usage.videoEvaluationsUsed);
+  } else {
+    return Math.max(0, usage.imageMonthlyLimit - usage.imageEvaluationsUsed);
+  }
 }
 
-// Record a new evaluation
-export function recordEvaluation(userId?: string): boolean {
+// Get remaining image evaluations
+export function getRemainingImageEvaluations(userId?: string): number {
+  return getRemainingEvaluations(userId, 'image');
+}
+
+// Get remaining video evaluations
+export function getRemainingVideoEvaluations(userId?: string): number {
+  return getRemainingEvaluations(userId, 'video');
+}
+
+// Record a new evaluation (specific type)
+export function recordEvaluation(userId?: string, evaluationType: EvaluationType = 'image'): boolean {
   // Admin bypass - don't record usage
   if (hasAdminBypass()) {
     return true;
@@ -109,16 +183,35 @@ export function recordEvaluation(userId?: string): boolean {
   
   const usage = getUsageData(userId);
   
-  if (!canEvaluate(userId)) {
+  if (!canEvaluate(userId, evaluationType)) {
     return false;
   }
 
-  usage.evaluationsUsed += 1;
+  // Update specific counter
+  if (evaluationType === 'video') {
+    usage.videoEvaluationsUsed += 1;
+  } else {
+    usage.imageEvaluationsUsed += 1;
+  }
+  
+  // Update legacy counter for backward compatibility
+  usage.evaluationsUsed = usage.imageEvaluationsUsed + usage.videoEvaluationsUsed;
+  
   usage.lastEvaluationDate = new Date().toISOString();
   usage.userId = userId; // Ensure userId is set
   
   saveUsageData(usage, userId);
   return true;
+}
+
+// Legacy function for backward compatibility
+export function recordImageEvaluation(userId?: string): boolean {
+  return recordEvaluation(userId, 'image');
+}
+
+// Record video evaluation
+export function recordVideoEvaluation(userId?: string): boolean {
+  return recordEvaluation(userId, 'video');
 }
 
 // Get days until reset (for display purposes)
@@ -141,7 +234,7 @@ export function hasUsedAnonymousCheck(): boolean {
   return anonymousUsage.evaluationsUsed >= ANONYMOUS_LIMIT;
 }
 
-// Get total evaluations available (anonymous + authenticated combined)
+// Get total evaluations available (anonymous + authenticated combined) - Legacy
 export function getTotalEvaluationsAvailable(userId?: string): number {
   if (hasAdminBypass()) return 999;
   
@@ -152,4 +245,49 @@ export function getTotalEvaluationsAvailable(userId?: string): number {
     // Anonymous user gets 1 check
     return ANONYMOUS_LIMIT;
   }
+}
+
+// Get comprehensive usage summary
+export function getUsageSummary(userId?: string) {
+  const usage = getUsageData(userId);
+  
+  return {
+    tier: usage.tier,
+    currentMonth: usage.currentMonth,
+    daysUntilReset: getDaysUntilReset(),
+    image: {
+      used: usage.imageEvaluationsUsed,
+      limit: usage.imageMonthlyLimit,
+      remaining: getRemainingImageEvaluations(userId),
+      canEvaluate: canEvaluateImage(userId)
+    },
+    video: {
+      used: usage.videoEvaluationsUsed,
+      limit: usage.videoMonthlyLimit,
+      remaining: getRemainingVideoEvaluations(userId),
+      canEvaluate: canEvaluateVideo(userId)
+    },
+    total: {
+      used: usage.evaluationsUsed,
+      imageAndVideo: usage.imageEvaluationsUsed + usage.videoEvaluationsUsed
+    }
+  };
+}
+
+// Get tier limits for display
+export function getTierLimits(tier: 'free' | 'pro' | 'agency' | 'enterprise') {
+  return TIER_LIMITS[tier];
+}
+
+// Check if evaluation type is allowed for user's tier
+export function isEvaluationTypeAllowed(userId?: string, evaluationType: EvaluationType): boolean {
+  if (hasAdminBypass()) return true;
+  
+  const usage = getUsageData(userId);
+  
+  if (evaluationType === 'video') {
+    return usage.videoMonthlyLimit > 0;
+  }
+  
+  return usage.imageMonthlyLimit > 0;
 }

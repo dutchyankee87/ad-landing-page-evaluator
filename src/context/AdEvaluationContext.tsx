@@ -6,7 +6,10 @@ import {
   recordEvaluation, 
   getUsageData,
   getDaysUntilReset,
-  type UsageData 
+  getUsageSummary,
+  isEvaluationTypeAllowed,
+  type UsageData,
+  type EvaluationType 
 } from '../lib/usage-tracking';
 
 // Types
@@ -16,6 +19,7 @@ interface AdData {
   imageFileSize?: number;
   adUrl?: string | null;
   imageStoragePath?: string;
+  mediaType?: 'image' | 'video' | 'unknown';
 }
 
 interface LandingPageData {
@@ -226,23 +230,23 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
   };
   
   const evaluateAd = async () => {
-    // For anonymous users, check if they've already used their free evaluation
-    if (!userId) {
-      const anonymousUsage = getUsageData(); // No userId = anonymous usage
-      if (anonymousUsage.evaluationsUsed >= 1) {
-        setShowLimitModal(true);
-        return;
-      }
-    } else {
-      // For authenticated users, check their limit (2 evaluations)
-      if (!canPerformEvaluation) {
-        setShowLimitModal(true);
-        return;
-      }
+    // Determine evaluation type based on ad data
+    const evaluationType: EvaluationType = adData.mediaType === 'video' ? 'video' : 'image';
+    
+    // Check if this evaluation type is allowed for user's tier
+    if (!isEvaluationTypeAllowed(userId, evaluationType)) {
+      setShowLimitModal(true);
+      return;
+    }
+    
+    // Check specific limits for this evaluation type
+    if (!canEvaluate(userId, evaluationType)) {
+      setShowLimitModal(true);
+      return;
     }
 
-    // Record the evaluation attempt
-    const success = recordEvaluation(userId);
+    // Record the evaluation attempt with specific type
+    const success = recordEvaluation(userId, evaluationType);
     if (!success) {
       setShowLimitModal(true);
       return;
@@ -259,7 +263,10 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
       const { evaluateAd: apiEvaluateAd } = await import('../lib/api');
       
       const response = await apiEvaluateAd({
-        adData,
+        adData: {
+          ...adData,
+          mediaType: adData.mediaType || 'image'
+        },
         landingPageData,
         audienceData,
         // TODO: Add user email when auth is implemented

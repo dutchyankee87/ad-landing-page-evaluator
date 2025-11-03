@@ -2,7 +2,8 @@ import React, { useState, useRef } from 'react';
 import { Image, Upload, X, Info, Loader2, Link, FileImage } from 'lucide-react';
 import { useAdEvaluation } from '../../context/AdEvaluationContext';
 import { uploadAdImageSmart, validateFileSize, validateFileType } from '../../lib/storage-dynamic';
-import { validateAdUrl, detectPlatform, getPlatformConfig, formatUrlForDisplay } from '../../lib/platform-detection';
+import { validateAdUrl, detectPlatform, getPlatformConfig, formatUrlForDisplay, type UrlValidationResult } from '../../lib/platform-detection';
+import VideoUsageBanner from '../VideoUsageBanner';
 
 const SUPPORTED_PLATFORMS = [
   { id: 'meta', name: 'Meta (Facebook/Instagram)', guidance: 'Screenshot your ad from Facebook Ads Manager or Instagram promotion. Include the full ad creative and any text overlay.' },
@@ -23,6 +24,7 @@ const AdAssetForm: React.FC = () => {
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [adUrl, setAdUrl] = useState('');
   const [urlError, setUrlError] = useState<string | null>(null);
+  const [urlValidation, setUrlValidation] = useState<UrlValidationResult | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
@@ -111,19 +113,24 @@ const AdAssetForm: React.FC = () => {
     const url = e.target.value;
     setAdUrl(url);
     setUrlError(null);
+    setUrlValidation(null);
     
     if (url.trim()) {
       const validation = validateAdUrl(url);
+      setUrlValidation(validation);
+      
       if (!validation.isValid) {
         setUrlError(validation.error || 'Invalid URL');
       } else {
         // Auto-detect and update platform if different
-        const detectedPlatform = validation.platform;
-        if (detectedPlatform && detectedPlatform !== adData.platform) {
-          updateAdData({ platform: detectedPlatform });
+        if (validation.platform && validation.platform !== adData.platform) {
+          updateAdData({ platform: validation.platform });
         }
-        // Store the URL in adData
-        updateAdData({ adUrl: url });
+        // Store the URL and media type in adData
+        updateAdData({ 
+          adUrl: url,
+          mediaType: validation.mediaType
+        });
       }
     } else {
       updateAdData({ adUrl: null });
@@ -194,6 +201,9 @@ const AdAssetForm: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Video Usage Banner - shown when video is detected */}
+      {urlValidation?.isVideoAd && <VideoUsageBanner />}
       
       {/* Input Mode Toggle */}
       <div className="space-y-2">
@@ -247,12 +257,34 @@ const AdAssetForm: React.FC = () => {
             <Link className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
           </div>
           
-          {selectedPlatform && !urlError && adUrl && (
+          {selectedPlatform && !urlError && adUrl && urlValidation?.isValid && (
             <div className="flex items-start gap-2 p-3 bg-green-50 rounded-lg border border-green-200">
               <Info className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
               <div className="text-sm text-green-800">
-                <p className="font-medium mb-1">✓ Valid {selectedPlatform.name} URL detected</p>
-                <p>{getPlatformConfig(selectedPlatform.id)?.screenshotTips}</p>
+                <div className="flex items-center gap-2 mb-1">
+                  <p className="font-medium">✓ Valid {selectedPlatform.name} URL detected</p>
+                  {urlValidation.isVideoAd && (
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 border border-purple-200">
+                      🎥 Video Ad
+                    </span>
+                  )}
+                  {urlValidation.mediaType === 'image' && (
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200">
+                      📸 Image Ad
+                    </span>
+                  )}
+                </div>
+                <p className="mb-2">
+                  {urlValidation.isVideoAd 
+                    ? getPlatformConfig(selectedPlatform.id)?.videoGuidance || 'Video content will be analyzed using representative frames.'
+                    : getPlatformConfig(selectedPlatform.id)?.screenshotTips
+                  }
+                </p>
+                {urlValidation.isVideoAd && (
+                  <div className="text-xs text-purple-700 bg-purple-50 px-2 py-1 rounded border border-purple-200">
+                    <strong>Note:</strong> Video analysis uses additional processing and counts toward video evaluation limits.
+                  </div>
+                )}
               </div>
             </div>
           )}

@@ -4,9 +4,11 @@
 // Types for API responses
 export interface EvaluationRequest {
   adData: {
-    imageUrl: string;
+    imageUrl?: string | null;
+    adUrl?: string | null;
     platform: string;
     imageFileSize?: number;
+    mediaType?: 'image' | 'video' | 'unknown';
   };
   landingPageData: {
     url: string;
