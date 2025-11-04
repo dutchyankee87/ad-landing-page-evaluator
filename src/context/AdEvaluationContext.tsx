@@ -233,6 +233,9 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
     // Determine evaluation type based on ad data
     const evaluationType: EvaluationType = adData.mediaType === 'video' ? 'video' : 'image';
     
+    // Get fresh usage data to ensure accuracy
+    const usage = getUsageData(userId);
+    
     // Check if this evaluation type is allowed for user's tier
     if (!isEvaluationTypeAllowed(userId, evaluationType)) {
       setShowLimitModal(true);
@@ -240,16 +243,12 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
     }
     
     // Check specific limits for this evaluation type
-    if (!canEvaluate(userId, evaluationType)) {
-      // Only show modal if user has reached their limit (not if limit is 0)
-      const usage = getUsageData(userId);
-      const isAtLimit = evaluationType === 'video' ? 
-        (usage.videoMonthlyLimit > 0 && usage.videoEvaluationsUsed >= usage.videoMonthlyLimit) : 
-        (usage.imageMonthlyLimit > 0 && usage.imageEvaluationsUsed >= usage.imageMonthlyLimit);
-      
-      if (isAtLimit) {
-        setShowLimitModal(true);
-      }
+    const hasReachedLimit = evaluationType === 'video' ? 
+      usage.videoEvaluationsUsed >= usage.videoMonthlyLimit : 
+      usage.imageEvaluationsUsed >= usage.imageMonthlyLimit;
+    
+    if (hasReachedLimit) {
+      setShowLimitModal(true);
       return;
     }
 
@@ -261,8 +260,8 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
     }
 
     // Update usage stats after recording
-    const usage = getUsageData(userId);
-    setUsageData(usage);
+    const updatedUsage = getUsageData(userId);
+    setUsageData(updatedUsage);
     setCanPerformEvaluation(canEvaluate(userId));
     setRemainingEvaluations(getRemainingEvaluations(userId));
 
