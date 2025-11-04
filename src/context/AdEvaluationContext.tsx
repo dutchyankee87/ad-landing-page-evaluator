@@ -393,9 +393,12 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
     // Import and use the micro-scoring engine
     const { MicroScoringEngine } = await import('../lib/scoring/MicroScoringEngine');
     
+    // Mock industry and benchmark data
+    const mockIndustry = 'ecommerce'; // In production, this would be detected from landing page
+    
     // Get detailed micro-scoring analysis
     const detailedScoring = await MicroScoringEngine.analyzeAd(
-      adData.imageUrl || 'https://example.com/ad.jpg',
+      adData.imageUrl || adData.adUrl || 'https://example.com/ad.jpg',
       landingPageData.url || 'https://example.com',
       adData.platform || 'meta',
       mockIndustry,
@@ -479,8 +482,6 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
       `The persuasion flow shows opportunities for stronger reciprocity and commitment triggers to reduce psychological friction.`
     ];
     
-    // Mock industry and benchmark data
-    const mockIndustry = 'ecommerce'; // In production, this would be detected from landing page
     const mockBenchmarkData = {
       percentile10: 4.2,
       percentile25: 5.1,
