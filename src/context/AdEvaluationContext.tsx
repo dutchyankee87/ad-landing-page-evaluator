@@ -66,6 +66,34 @@ interface Suggestions {
   tone?: string[]; // Legacy support
 }
 
+interface EnhancedSuggestion {
+  id: string;
+  suggestion: string;
+  source: 'ad' | 'landing_page' | 'both';
+  category: 'visual' | 'contextual' | 'tone' | 'conversion';
+  priority: 'HIGH' | 'MEDIUM' | 'LOW';
+  expectedImpact: string;
+  effort: 'LOW' | 'MEDIUM' | 'HIGH';
+  confidenceLevel?: number;
+}
+
+interface ElementComparison {
+  element: string;
+  adValue: string;
+  landingPageValue: string;
+  status: 'match' | 'mismatch' | 'partial_match' | 'missing';
+  severity: 'HIGH' | 'MEDIUM' | 'LOW';
+  recommendation?: string;
+}
+
+interface QuickWin {
+  title: string;
+  description: string;
+  expectedImpact: string;
+  effort: 'LOW' | 'MEDIUM' | 'HIGH';
+  source: 'ad' | 'landing_page' | 'both';
+}
+
 interface StrategicRecommendation {
   priority: 'HIGH' | 'MEDIUM' | 'LOW';
   recommendation: string;
@@ -132,6 +160,9 @@ interface EvaluationResults {
   persuasionScore?: number;
   psychologicalInsights?: string[];
   suggestions?: Suggestions; // Legacy support
+  enhancedSuggestions?: EnhancedSuggestion[];
+  elementComparisons?: ElementComparison[];
+  quickWins?: QuickWin[];
   insights?: Insights;
   strategicRecommendations?: StrategicRecommendation[];
   riskFactors?: string[];
@@ -496,6 +527,155 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
                      overallScore <= 8.1 ? 90 : 95
     };
     
+    // Generate enhanced suggestions with source attribution and impact
+    const generateEnhancedSuggestions = () => {
+      const suggestions = [
+        {
+          id: 'visual-1',
+          suggestion: 'Match the primary color scheme (#004c4c) from your ad in the landing page header',
+          source: 'landing_page' as const,
+          category: 'visual' as const,
+          priority: 'HIGH' as const,
+          expectedImpact: '+8-12% trust and brand recognition',
+          effort: 'LOW' as const,
+          confidenceLevel: 0.85
+        },
+        {
+          id: 'cta-1',
+          suggestion: 'Change landing page CTA from "Sign up now" to match ad\'s "Claim your bonus"',
+          source: 'landing_page' as const,
+          category: 'conversion' as const,
+          priority: 'HIGH' as const,
+          expectedImpact: '+15-25% conversion rate',
+          effort: 'LOW' as const,
+          confidenceLevel: 0.92
+        },
+        {
+          id: 'headline-1',
+          suggestion: 'Emphasize the €1,000 bonus prominently in landing page headline',
+          source: 'landing_page' as const,
+          category: 'contextual' as const,
+          priority: 'HIGH' as const,
+          expectedImpact: '+10-18% engagement rate',
+          effort: 'LOW' as const,
+          confidenceLevel: 0.88
+        },
+        {
+          id: 'tone-1',
+          suggestion: 'Adjust landing page tone to be more encouraging and motivational like the ad',
+          source: 'landing_page' as const,
+          category: 'tone' as const,
+          priority: 'MEDIUM' as const,
+          expectedImpact: '+5-10% user engagement',
+          effort: 'MEDIUM' as const,
+          confidenceLevel: 0.75
+        },
+        {
+          id: 'visual-2',
+          suggestion: 'Add paper plane or similar imagery to landing page to match ad creative',
+          source: 'landing_page' as const,
+          category: 'visual' as const,
+          priority: 'MEDIUM' as const,
+          expectedImpact: '+3-7% visual continuity',
+          effort: 'MEDIUM' as const,
+          confidenceLevel: 0.70
+        },
+        {
+          id: 'ad-1',
+          suggestion: 'Include "secure pension planning" language in ad to address long-term concerns',
+          source: 'ad' as const,
+          category: 'contextual' as const,
+          priority: 'LOW' as const,
+          expectedImpact: '+2-5% click quality',
+          effort: 'LOW' as const,
+          confidenceLevel: 0.65
+        }
+      ];
+      
+      return suggestions;
+    };
+
+    // Generate element comparisons
+    const generateElementComparisons = () => {
+      return [
+        {
+          element: 'Headline',
+          adValue: 'Build your pension & get €1,000 bonus',
+          landingPageValue: 'Plan your future pension',
+          status: 'mismatch' as const,
+          severity: 'HIGH' as const,
+          recommendation: 'Add the €1,000 bonus offer to the landing page headline'
+        },
+        {
+          element: 'Primary CTA',
+          adValue: 'Claim your bonus',
+          landingPageValue: 'Sign up now',
+          status: 'mismatch' as const,
+          severity: 'HIGH' as const,
+          recommendation: 'Change CTA button text to match ad: "Claim your bonus"'
+        },
+        {
+          element: 'Primary Color',
+          adValue: '#004c4c (Dark Teal)',
+          landingPageValue: '#005c6b (Slightly different teal)',
+          status: 'partial_match' as const,
+          severity: 'MEDIUM' as const,
+          recommendation: 'Use the exact same teal color (#004c4c) for brand consistency'
+        },
+        {
+          element: 'Imagery Style',
+          adValue: 'Paper plane (progress/growth)',
+          landingPageValue: 'None',
+          status: 'missing' as const,
+          severity: 'MEDIUM' as const,
+          recommendation: 'Add similar progress/growth imagery to reinforce the message'
+        },
+        {
+          element: 'Tone',
+          adValue: 'Encouraging & motivational',
+          landingPageValue: 'Formal & informational',
+          status: 'mismatch' as const,
+          severity: 'MEDIUM' as const,
+          recommendation: 'Make landing page copy more encouraging and action-oriented'
+        },
+        {
+          element: 'Value Proposition',
+          adValue: 'Build pension + Get bonus',
+          landingPageValue: 'Plan your future',
+          status: 'partial_match' as const,
+          severity: 'HIGH' as const,
+          recommendation: 'Emphasize both pension building AND the immediate bonus'
+        }
+      ];
+    };
+
+    // Generate quick wins
+    const generateQuickWins = () => {
+      return [
+        {
+          title: 'Match CTA wording to ad',
+          description: 'Change your landing page button from "Sign up now" to "Claim your bonus" to create perfect message continuity from ad click to conversion.',
+          expectedImpact: '+15-25% conversion rate',
+          effort: 'LOW' as const,
+          source: 'landing_page' as const
+        },
+        {
+          title: 'Highlight the €1,000 bonus prominently',
+          description: 'Add the €1,000 bonus offer to your landing page headline since this is the main hook from your ad that attracted visitors.',
+          expectedImpact: '+10-18% engagement rate',
+          effort: 'LOW' as const,
+          source: 'landing_page' as const
+        },
+        {
+          title: 'Unify brand colors',
+          description: 'Use the exact teal color (#004c4c) from your ad in the landing page header and CTA buttons for stronger brand recognition.',
+          expectedImpact: '+8-12% trust and brand recognition',
+          effort: 'LOW' as const,
+          source: 'landing_page' as const
+        }
+      ];
+    };
+
     const mockResults: EvaluationResults = {
       overallScore,
       overallAssessment: overallScore >= 7 ? 'STRONG' : overallScore >= 5 ? 'MODERATE' : 'WEAK',
@@ -509,6 +689,9 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
         conversionOptimization: toneScore
       },
       suggestions: platformSuggestions,
+      enhancedSuggestions: generateEnhancedSuggestions(),
+      elementComparisons: generateElementComparisons(),
+      quickWins: generateQuickWins(),
       insights: {
         brandCoherence: "Brand consistency shows promise but could benefit from stronger visual alignment between ad creative and landing page elements.",
         userJourneyAlignment: "The user journey demonstrates reasonable flow, though expectation setting could be enhanced for better conversion rates.",

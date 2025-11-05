@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Download, ChevronRight, MessageCircle } from 'lucide-react';
-import { useAuth } from '@clerk/clerk-react';
 import { useAdEvaluation } from '../context/AdEvaluationContext';
 import ScoreGauge from '../components/results/ScoreGauge';
 import ComponentScores from '../components/results/ComponentScores';
 import Suggestions from '../components/results/Suggestions';
+import EnhancedSuggestions from '../components/results/EnhancedSuggestions';
+import ComparisonGrid from '../components/results/ComparisonGrid';
+import QuickWins from '../components/results/QuickWins';
 import AdSummary from '../components/results/AdSummary';
 import { HeatmapOverlay } from '../components/heatmap/HeatmapOverlay';
 import { PerformanceFeedbackModal } from '../components/feedback/PerformanceFeedbackModal';
@@ -124,6 +126,16 @@ const Results: React.FC = () => {
             {/* Component Scores */}
             <ComponentScores componentScores={results.componentScores} />
             
+            {/* Quick Wins Section */}
+            {results.quickWins && (
+              <QuickWins quickWins={results.quickWins} />
+            )}
+            
+            {/* Ad vs Landing Page Comparison Grid */}
+            {results.elementComparisons && (
+              <ComparisonGrid comparisons={results.elementComparisons} />
+            )}
+            
             {/* Industry Benchmarks */}
             <section className="mb-12">
               <h2 className="text-2xl font-bold mb-6">📊 How You Stack Up</h2>
@@ -177,7 +189,7 @@ const Results: React.FC = () => {
             )}
             
             {/* Landing Page Heatmap - Hidden for now */}
-            {false && results && (
+            {false && (
               <section className="mb-12">
                 <h2 className="text-2xl font-bold mb-4">🔍 Landing Page Optimization Zones</h2>
                 <p className="text-gray-600 mb-6">
@@ -211,8 +223,12 @@ const Results: React.FC = () => {
               </section>
             )}
             
-            {/* Improvement Suggestions */}
-            <Suggestions suggestions={results.suggestions} />
+            {/* Enhanced Suggestions or Legacy Suggestions */}
+            {results.enhancedSuggestions ? (
+              <EnhancedSuggestions suggestions={results.enhancedSuggestions} />
+            ) : (
+              <Suggestions suggestions={results.suggestions} />
+            )}
           </div>
         </div>
         

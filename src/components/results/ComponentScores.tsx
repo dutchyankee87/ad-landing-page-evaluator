@@ -1,5 +1,4 @@
 import React from 'react';
-import { useAdEvaluation } from '../../context/AdEvaluationContext';
 
 interface ComponentScoresProps {
   componentScores: {
