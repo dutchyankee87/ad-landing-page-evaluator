@@ -40,7 +40,7 @@ const UsageBanner: React.FC<UsageBannerProps> = () => {
           <Zap className="h-5 w-5 text-green-600" />
           <div>
             <h3 className="font-medium text-green-900">Free Analysis Available</h3>
-            <p className="text-sm text-green-700">Get your first ad-to-page congruence score completely free</p>
+            <p className="text-sm text-green-700">Get your first 3 ad-to-page congruence scores completely free</p>
           </div>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import React from 'react';
-import { Zap, ArrowUp, Clock } from 'lucide-react';
+import { Zap, ArrowUp, Clock, TrendingUp } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 interface QuickWin {
   title: string;
@@ -42,66 +43,159 @@ const QuickWins: React.FC<QuickWinsProps> = ({ quickWins }) => {
     };
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        duration: 0.6,
+        staggerChildren: 0.15
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { y: 30, opacity: 0, scale: 0.95 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      scale: 1,
+      transition: {
+        duration: 0.5,
+        ease: "easeOut"
+      }
+    }
+  };
+
+  const iconVariants = {
+    hidden: { rotate: -180, scale: 0 },
+    visible: {
+      rotate: 0,
+      scale: 1,
+      transition: {
+        duration: 0.6,
+        ease: "easeOut"
+      }
+    }
+  };
+
   if (!quickWins || quickWins.length === 0) {
     return null;
   }
 
   return (
-    <section className="mb-12">
-      <div className="flex items-center gap-3 mb-6">
-        <Zap className="h-6 w-6 text-orange-500" />
-        <h2 className="text-2xl font-bold">🚀 Top 3 Quick Wins</h2>
-      </div>
-      <p className="text-gray-600 mb-6">
-        Start with these high-impact improvements to see immediate results. Prioritized by conversion impact.
-      </p>
+    <motion.section 
+      className="mb-16"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      <motion.div 
+        className="flex items-center gap-4 mb-8"
+        variants={itemVariants}
+      >
+        <motion.div
+          variants={iconVariants}
+          whileHover={{ rotate: 360, scale: 1.1 }}
+          transition={{ duration: 0.6 }}
+        >
+          <div className="p-3 bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl shadow-lg">
+            <Zap className="h-8 w-8 text-white" />
+          </div>
+        </motion.div>
+        <div>
+          <motion.h2 
+            className="text-4xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent"
+            variants={itemVariants}
+          >
+            🚀 Top 3 Quick Wins
+          </motion.h2>
+          <motion.p 
+            className="text-gray-600 text-lg mt-2"
+            variants={itemVariants}
+          >
+            Start with these high-impact improvements to see immediate results
+          </motion.p>
+        </div>
+      </motion.div>
       
-      <div className="grid gap-4">
+      <motion.div 
+        className="grid gap-6"
+        variants={containerVariants}
+      >
         {quickWins.slice(0, 3).map((win, index) => {
           const sourceBadge = getSourceBadge(win.source);
           
           return (
-            <div 
+            <motion.div 
               key={index}
-              className="bg-white border-l-4 border-orange-500 rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow"
+              className="bg-white/80 backdrop-blur-sm border-l-4 border-orange-500 rounded-2xl shadow-lg hover:shadow-2xl p-8 transition-all duration-300 group relative overflow-hidden"
+              variants={itemVariants}
+              whileHover={{ y: -4, scale: 1.02 }}
+              transition={{ duration: 0.2 }}
             >
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-orange-500 text-white rounded-full flex items-center justify-center font-bold text-sm">
-                    {index + 1}
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-r from-orange-50/50 to-red-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                initial={false}
+              />
+              
+              <div className="relative z-10">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center gap-4">
+                    <motion.div 
+                      className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-2xl flex items-center justify-center font-bold text-lg shadow-lg"
+                      whileHover={{ rotate: 360, scale: 1.1 }}
+                      transition={{ duration: 0.6 }}
+                    >
+                      {index + 1}
+                    </motion.div>
+                    <div>
+                      <h3 className="font-bold text-xl text-gray-900 group-hover:text-orange-600 transition-colors">{win.title}</h3>
+                    </div>
                   </div>
-                  <h3 className="font-semibold text-lg text-gray-900">{win.title}</h3>
+                  
+                  <div className="flex gap-3">
+                    <motion.span 
+                      className={`px-4 py-2 rounded-full text-sm font-semibold ${sourceBadge.style} shadow-sm`}
+                      whileHover={{ scale: 1.05 }}
+                    >
+                      {sourceBadge.label}
+                    </motion.span>
+                    <motion.span 
+                      className={`px-4 py-2 rounded-full text-sm font-semibold ${getEffortBadge(win.effort)} shadow-sm`}
+                      whileHover={{ scale: 1.05 }}
+                    >
+                      {win.effort} effort
+                    </motion.span>
+                  </div>
                 </div>
                 
-                <div className="flex gap-2">
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${sourceBadge.style}`}>
-                    {sourceBadge.label}
-                  </span>
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getEffortBadge(win.effort)}`}>
-                    {win.effort} effort
-                  </span>
+                <p className="text-gray-700 mb-6 text-lg leading-relaxed">{win.description}</p>
+                
+                <div className="flex items-center gap-6">
+                  <motion.div 
+                    className="flex items-center gap-2 text-green-600 bg-green-50 px-4 py-2 rounded-xl"
+                    whileHover={{ scale: 1.05 }}
+                  >
+                    <TrendingUp className="h-5 w-5" />
+                    <span className="font-semibold">Impact: {win.expectedImpact}</span>
+                  </motion.div>
+                  <motion.div 
+                    className="flex items-center gap-2 text-gray-600 bg-gray-50 px-4 py-2 rounded-xl"
+                    whileHover={{ scale: 1.05 }}
+                  >
+                    <Clock className="h-5 w-5" />
+                    <span className="font-medium">
+                      {win.effort === 'LOW' ? '< 1 day' : win.effort === 'MEDIUM' ? '1-3 days' : '1+ weeks'}
+                    </span>
+                  </motion.div>
                 </div>
               </div>
-              
-              <p className="text-gray-700 mb-4">{win.description}</p>
-              
-              <div className="flex items-center gap-4 text-sm">
-                <div className="flex items-center gap-1 text-green-600">
-                  <ArrowUp className="h-4 w-4" />
-                  <span className="font-medium">Impact: {win.expectedImpact}</span>
-                </div>
-                <div className="flex items-center gap-1 text-gray-500">
-                  <Clock className="h-4 w-4" />
-                  <span>
-                    {win.effort === 'LOW' ? '< 1 day' : win.effort === 'MEDIUM' ? '1-3 days' : '1+ weeks'}
-                  </span>
-                </div>
-              </div>
-            </div>
+            </motion.div>
           );
         })}
-      </div>
-    </section>
+      </motion.div>
+    </motion.section>
   );
 };
 

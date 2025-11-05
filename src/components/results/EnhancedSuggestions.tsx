@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, Check, Target, AlertTriangle, Settings } from 'lucide-react';
+import { ChevronDown, ChevronUp, Check, Target, AlertTriangle, Settings, Lightbulb } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface EnhancedSuggestion {
   id: string;
@@ -95,88 +96,205 @@ const EnhancedSuggestions: React.FC<EnhancedSuggestionsProps> = ({ suggestions }
   // Sort priorities
   const priorities = ['HIGH', 'MEDIUM', 'LOW'].filter(p => groupedSuggestions[p]?.length > 0);
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        duration: 0.6,
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        duration: 0.5,
+        ease: "easeOut"
+      }
+    }
+  };
+
+  const suggestionVariants = {
+    hidden: { x: -20, opacity: 0 },
+    visible: {
+      x: 0,
+      opacity: 1,
+      transition: {
+        duration: 0.4,
+        ease: "easeOut"
+      }
+    }
+  };
+
   if (!suggestions || suggestions.length === 0) {
     return null;
   }
 
   return (
-    <section className="mb-12">
-      <h2 className="text-2xl font-bold mb-6">💡 Prioritized Improvement Roadmap</h2>
-      <p className="text-gray-600 mb-6">
-        All recommendations organized by impact priority, with clear action items for your team.
-      </p>
-      
-      <div className="space-y-4">
-        {priorities.map((priority) => (
-          <div 
-            key={priority}
-            className={`border rounded-lg overflow-hidden shadow-sm ${getPriorityColor(priority)}`}
+    <motion.section 
+      className="mb-16"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      <motion.div 
+        className="flex items-center gap-4 mb-8"
+        variants={itemVariants}
+      >
+        <motion.div
+          whileHover={{ rotate: 360, scale: 1.1 }}
+          transition={{ duration: 0.6 }}
+        >
+          <div className="p-3 bg-gradient-to-r from-purple-500 to-pink-600 rounded-2xl shadow-lg">
+            <Lightbulb className="h-8 w-8 text-white" />
+          </div>
+        </motion.div>
+        <div>
+          <motion.h2 
+            className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent"
+            variants={itemVariants}
           >
-            <button
+            💡 Prioritized Improvement Roadmap
+          </motion.h2>
+          <motion.p 
+            className="text-gray-600 text-lg mt-2"
+            variants={itemVariants}
+          >
+            All recommendations organized by impact priority, with clear action items for your team
+          </motion.p>
+        </div>
+      </motion.div>
+      
+      <motion.div 
+        className="space-y-6"
+        variants={containerVariants}
+      >
+        {priorities.map((priority) => (
+          <motion.div 
+            key={priority}
+            className={`border rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 ${getPriorityColor(priority)}`}
+            variants={itemVariants}
+            whileHover={{ scale: 1.01 }}
+          >
+            <motion.button
               onClick={() => toggleCategory(priority)}
-              className={`w-full text-left px-6 py-4 flex items-center justify-between font-medium transition-colors hover:bg-opacity-80`}
+              className={`w-full text-left px-8 py-6 flex items-center justify-between font-semibold transition-all duration-300 hover:bg-opacity-80`}
+              whileHover={{ x: 4 }}
+              whileTap={{ scale: 0.98 }}
             >
-              <div className="flex items-center gap-3">
-                {getPriorityIcon(priority)}
-                <span className="text-lg">
+              <div className="flex items-center gap-4">
+                <motion.div
+                  whileHover={{ rotate: 360 }}
+                  transition={{ duration: 0.6 }}
+                >
+                  {getPriorityIcon(priority)}
+                </motion.div>
+                <span className="text-xl font-bold">
                   {priority} Priority ({groupedSuggestions[priority].length} {groupedSuggestions[priority].length === 1 ? 'item' : 'items'})
                 </span>
               </div>
-              {openCategory === priority ? (
-                <ChevronUp className="h-5 w-5" />
-              ) : (
-                <ChevronDown className="h-5 w-5" />
-              )}
-            </button>
+              <motion.div
+                animate={{ rotate: openCategory === priority ? 180 : 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                {openCategory === priority ? (
+                  <ChevronUp className="h-6 w-6" />
+                ) : (
+                  <ChevronDown className="h-6 w-6" />
+                )}
+              </motion.div>
+            </motion.button>
             
-            {openCategory === priority && (
-              <div className="px-6 pb-6 bg-white">
-                <div className="space-y-4">
-                  {groupedSuggestions[priority].map((suggestion) => {
+            <AnimatePresence>
+              {openCategory === priority && (
+                <motion.div 
+                  className="px-8 pb-8 bg-white/90 backdrop-blur-sm"
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                >
+                  <motion.div 
+                    className="space-y-6 pt-4"
+                    variants={containerVariants}
+                    initial="hidden"
+                    animate="visible"
+                  >
+                    {groupedSuggestions[priority].map((suggestion) => {
                     const sourceBadge = getSourceBadge(suggestion.source);
                     
                     return (
-                      <div key={suggestion.id} className="border border-gray-200 rounded-lg p-4 bg-white shadow-sm">
-                        <div className="flex justify-between items-start mb-3">
-                          <div className="flex items-center gap-2">
-                            <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                              <Check className="h-4 w-4 text-blue-600" />
-                            </div>
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${sourceBadge.style}`}>
+                      <motion.div 
+                        key={suggestion.id} 
+                        className="border border-gray-200/50 rounded-2xl p-6 bg-white/80 backdrop-blur-sm shadow-md hover:shadow-xl transition-all duration-300 group"
+                        variants={suggestionVariants}
+                        whileHover={{ scale: 1.02, y: -4 }}
+                      >
+                        <div className="flex justify-between items-start mb-4">
+                          <div className="flex items-center gap-3">
+                            <motion.div 
+                              className="w-8 h-8 rounded-2xl bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center flex-shrink-0 shadow-lg"
+                              whileHover={{ rotate: 360, scale: 1.1 }}
+                              transition={{ duration: 0.6 }}
+                            >
+                              <Check className="h-5 w-5 text-white" />
+                            </motion.div>
+                            <motion.span 
+                              className={`px-4 py-2 rounded-xl text-sm font-semibold ${sourceBadge.style} shadow-sm`}
+                              whileHover={{ scale: 1.05 }}
+                            >
                               {sourceBadge.label}
-                            </span>
-                            <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
+                            </motion.span>
+                            <motion.span 
+                              className="px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 shadow-sm"
+                              whileHover={{ scale: 1.05 }}
+                            >
                               {getCategoryLabel(suggestion.category)}
-                            </span>
+                            </motion.span>
                           </div>
                           
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${getEffortBadge(suggestion.effort)}`}>
+                          <motion.span 
+                            className={`px-4 py-2 rounded-xl text-sm font-semibold ${getEffortBadge(suggestion.effort)} shadow-sm`}
+                            whileHover={{ scale: 1.05 }}
+                          >
                             {suggestion.effort} effort
-                          </span>
+                          </motion.span>
                         </div>
                         
-                        <p className="text-gray-800 mb-3 leading-relaxed">{suggestion.suggestion}</p>
+                        <p className="text-gray-800 mb-4 leading-relaxed text-lg font-medium">{suggestion.suggestion}</p>
                         
-                        <div className="flex items-center justify-between text-sm">
-                          <div className="text-green-600 font-medium">
+                        <div className="flex items-center justify-between">
+                          <motion.div 
+                            className="text-green-600 font-semibold bg-green-50 px-4 py-2 rounded-xl"
+                            whileHover={{ scale: 1.05 }}
+                          >
                             💪 Impact: {suggestion.expectedImpact}
-                          </div>
+                          </motion.div>
                           {suggestion.confidenceLevel && (
-                            <div className="text-gray-500">
+                            <motion.div 
+                              className="text-gray-600 bg-gray-50 px-4 py-2 rounded-xl font-medium"
+                              whileHover={{ scale: 1.05 }}
+                            >
                               Confidence: {Math.round(suggestion.confidenceLevel * 100)}%
-                            </div>
+                            </motion.div>
                           )}
                         </div>
-                      </div>
+                      </motion.div>
                     );
                   })}
-                </div>
-              </div>
-            )}
-          </div>
+                  </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
         ))}
-      </div>
-    </section>
+      </motion.div>
+    </motion.section>
   );
 };
 
