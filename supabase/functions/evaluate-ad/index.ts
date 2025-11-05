@@ -74,12 +74,13 @@ Deno.serve(async (req) => {
 
     const platformInfo = getPlatformSpecificPrompt(adData.platform || 'meta');
     
-    const prompt = `You are a Senior Conversion Psychologist and Paid Media Strategist with 15+ years of experience optimizing ${platformInfo.name} campaigns using psychological persuasion principles.
+    const prompt = `You are a Senior Conversion Psychologist and Paid Media Strategist with 15+ years of experience optimizing ${platformInfo.name} campaigns using psychological persuasion principles and cultural localization.
 
 EXPERTISE AREAS:
 - ${platformInfo.name} algorithm optimization and best practices
 - Psychological persuasion and conversion psychology
 - Cialdini's 6 principles of influence implementation
+- Cultural adaptation and language-specific optimization
 - Creative-to-landing page performance correlation
 - Campaign ROI optimization and audience targeting
 
@@ -88,8 +89,15 @@ CONTEXT:
 - Landing Page: ${landingPageData.url}
 - Target Audience: ${audienceData.ageRange}, ${audienceData.gender}, interests: ${audienceData.interests}
 
+LANGUAGE & CULTURAL ANALYSIS:
+First, detect the language of the ad text and provide culturally-aware recommendations. Consider:
+- Language-specific CTA preferences and conversion patterns
+- Cultural values and communication styles
+- Regional trust signals and social proof elements
+- Local market competitive landscape
+
 ANALYSIS TASK:
-Analyze this ad screenshot and provide a strategic assessment of its psychological persuasion effectiveness and conversion potential. Apply Cialdini's 6 principles of influence and advanced conversion psychology.
+Analyze this ad screenshot and provide a strategic assessment of its psychological persuasion effectiveness and conversion potential. Apply Cialdini's 6 principles of influence, advanced conversion psychology, AND cultural/linguistic optimization.
 
 PROVIDE EXECUTIVE-LEVEL ANALYSIS FOR:
 1. **Brand Coherence**: How effectively does this ad create expectations that the landing page can fulfill?
@@ -107,14 +115,33 @@ Evaluate how well both the ad and landing page implement these psychological tri
 5. **Liking**: Similarity to target audience, attractiveness, familiarity, shared values
 6. **Scarcity**: Limited time/quantity, exclusivity, FOMO elements, urgency triggers
 
-ADDITIONALLY, identify 3-5 specific areas on the landing page that need optimization. For each area, provide:
-- Location description (header, hero-section, navigation, cta-button, footer, etc.)
+SPECIFIC RECOMMENDATIONS REQUIRED:
+For each recommendation, be EXTREMELY SPECIFIC and actionable:
+❌ Bad: "Improve the headline"
+✅ Good: "Change headline from 'Welcome to our service' to 'Get 50% more leads in 30 days' to create specific value expectation"
+
+❌ Bad: "Use better colors" 
+✅ Good: "Change CTA button from blue (#0066CC) to orange (#FF6B35) to create 23% higher contrast and match ad color scheme"
+
+❌ Bad: "Add social proof"
+✅ Good: "Add '2,847 customers this month' counter below headline and '★★★★★ 4.8/5 from 1,200+ reviews' near CTA button"
+
+LANGUAGE-SPECIFIC ANALYSIS:
+Include the detected language and provide culturally-appropriate recommendations for:
+- CTA button text in the detected language
+- Cultural trust signals relevant to the region
+- Communication style adjustments for the target culture
+
+Additionally, identify 3-5 specific areas on the landing page that need optimization. For each area, provide:
+- Exact location description (header, hero-section, navigation, cta-button, footer, etc.)
 - Severity level (HIGH/MEDIUM/LOW)
-- Specific improvement recommendation
-- Expected conversion impact
+- Specific, actionable improvement recommendation with exact text/color/size suggestions
+- Expected conversion impact with percentage estimates
 
 Return ONLY a JSON object in this exact format:
 {
+  "detectedLanguage": "Language code (en, es, fr, de, it, pt, nl, etc.)",
+  "culturalContext": "Brief description of cultural considerations for this language/region",
   "executiveSummary": "2-3 sentence strategic overview of the ad-to-page performance potential",
   "overallAssessment": "STRONG" | "MODERATE" | "WEAK",
   "brandCoherence": {

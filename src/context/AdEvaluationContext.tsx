@@ -11,6 +11,7 @@ import {
   type UsageData,
   type EvaluationType 
 } from '../lib/usage-tracking';
+import { detectLanguage, getLanguageConfig, generateCulturallyAwareRecommendation } from '../lib/language-detection';
 
 // Types
 interface AdData {
@@ -172,6 +173,9 @@ interface EvaluationResults {
   performancePrediction?: PerformancePrediction;
   industry?: string;
   audienceType?: string;
+  detectedLanguage?: string;
+  culturalContext?: string;
+  evaluationId?: string;
 }
 
 interface AdEvaluationContextType {
@@ -621,68 +625,95 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
                      overallScore <= 8.1 ? 90 : 95
     };
     
+    // Detect language from landing page URL and ad data
+    const detectContentLanguage = () => {
+      const urlText = landingPageData.url || '';
+      const titleText = landingPageData.title || '';
+      const contentText = landingPageData.mainContent || '';
+      const combinedText = `${urlText} ${titleText} ${contentText}`.toLowerCase();
+      
+      return detectLanguage(combinedText);
+    };
+
+    const detectedLang = detectContentLanguage();
+    const languageConfig = getLanguageConfig(detectedLang);
+
     // Generate enhanced suggestions with source attribution and impact
     const generateEnhancedSuggestions = () => {
       const suggestions = [
         {
           id: 'visual-1',
-          suggestion: 'Match the primary color scheme (#004c4c) from your ad in the landing page header',
+          suggestion: 'Change landing page header background from #005c6b to exact ad color #004c4c and update CTA button to use same teal (#004c4c) with white text at 18px bold',
           source: 'landing_page' as const,
           category: 'visual' as const,
           priority: 'HIGH' as const,
-          expectedImpact: '+8-12% trust and brand recognition',
-          effort: 'LOW' as const,
-          confidenceLevel: 0.85
-        },
-        {
-          id: 'cta-1',
-          suggestion: 'Change landing page CTA from "Sign up now" to match ad\'s "Claim your bonus"',
-          source: 'landing_page' as const,
-          category: 'conversion' as const,
-          priority: 'HIGH' as const,
-          expectedImpact: '+15-25% conversion rate',
+          expectedImpact: '+12-18% brand recognition and trust',
           effort: 'LOW' as const,
           confidenceLevel: 0.92
         },
         {
+          id: 'cta-1',
+          suggestion: generateCulturallyAwareRecommendation(
+            `Replace landing page CTA text "Sign up now" with "${languageConfig.ctaPreferences[0]}" and increase button size to 320px wide × 56px tall with 16px border radius`,
+            languageConfig,
+            'cta'
+          ),
+          source: 'landing_page' as const,
+          category: 'conversion' as const,
+          priority: 'HIGH' as const,
+          expectedImpact: '+22-35% conversion rate',
+          effort: 'LOW' as const,
+          confidenceLevel: 0.94
+        },
+        {
           id: 'headline-1',
-          suggestion: 'Emphasize the €1,000 bonus prominently in landing page headline',
+          suggestion: 'Change landing page H1 from "Plan your future pension" to "Build your pension & get €1,000 bonus" (exact ad headline) and make it 42px font size, bold, in dark teal #004c4c',
           source: 'landing_page' as const,
           category: 'contextual' as const,
           priority: 'HIGH' as const,
-          expectedImpact: '+10-18% engagement rate',
+          expectedImpact: '+15-25% engagement and click-through',
           effort: 'LOW' as const,
-          confidenceLevel: 0.88
+          confidenceLevel: 0.91
         },
         {
-          id: 'tone-1',
-          suggestion: 'Adjust landing page tone to be more encouraging and motivational like the ad',
+          id: 'social-proof-1',
+          suggestion: 'Add "★★★★★ 4.8/5 from 1,247+ customers" below the headline and "2,847 people started this month" counter above the CTA button to match ad\'s trust signals',
           source: 'landing_page' as const,
-          category: 'tone' as const,
-          priority: 'MEDIUM' as const,
-          expectedImpact: '+5-10% user engagement',
+          category: 'conversion' as const,
+          priority: 'HIGH' as const,
+          expectedImpact: '+18-28% conversion rate',
           effort: 'MEDIUM' as const,
-          confidenceLevel: 0.75
+          confidenceLevel: 0.89
         },
         {
           id: 'visual-2',
-          suggestion: 'Add paper plane or similar imagery to landing page to match ad creative',
+          suggestion: 'Add paper plane icon (24px size) next to the main headline and include progress arrow graphics in the hero section to match ad\'s growth/progression theme',
           source: 'landing_page' as const,
           category: 'visual' as const,
           priority: 'MEDIUM' as const,
-          expectedImpact: '+3-7% visual continuity',
+          expectedImpact: '+8-14% visual continuity and engagement',
           effort: 'MEDIUM' as const,
-          confidenceLevel: 0.70
+          confidenceLevel: 0.78
+        },
+        {
+          id: 'urgency-1',
+          suggestion: 'Add countdown timer showing "Bonus expires in 3 days, 14 hours" prominently below CTA and use orange accent color (#FF6B35) for urgency elements',
+          source: 'landing_page' as const,
+          category: 'conversion' as const,
+          priority: 'MEDIUM' as const,
+          expectedImpact: '+12-20% conversion rate through scarcity',
+          effort: 'MEDIUM' as const,
+          confidenceLevel: 0.85
         },
         {
           id: 'ad-1',
-          suggestion: 'Include "secure pension planning" language in ad to address long-term concerns',
+          suggestion: 'Add "Secure & regulated pension provider" text to ad (12px below main text) to address trust concerns and include security badge icon',
           source: 'ad' as const,
           category: 'contextual' as const,
           priority: 'LOW' as const,
-          expectedImpact: '+2-5% click quality',
+          expectedImpact: '+5-8% click quality and trust',
           effort: 'LOW' as const,
-          confidenceLevel: 0.65
+          confidenceLevel: 0.72
         }
       ];
       
@@ -693,52 +724,60 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
     const generateElementComparisons = () => {
       return [
         {
-          element: 'Headline',
+          element: 'Headline Text',
           adValue: 'Build your pension & get €1,000 bonus',
           landingPageValue: 'Plan your future pension',
           status: 'mismatch' as const,
           severity: 'HIGH' as const,
-          recommendation: 'Add the €1,000 bonus offer to the landing page headline'
+          recommendation: 'Change H1 to exact ad text: "Build your pension & get €1,000 bonus" at 42px font size, bold, color #004c4c'
         },
         {
-          element: 'Primary CTA',
-          adValue: 'Claim your bonus',
-          landingPageValue: 'Sign up now',
+          element: 'Primary CTA Button',
+          adValue: 'Claim your bonus (Orange #FF6B35, 14px text)',
+          landingPageValue: 'Sign up now (Blue #0066CC, 16px text)',
           status: 'mismatch' as const,
           severity: 'HIGH' as const,
-          recommendation: 'Change CTA button text to match ad: "Claim your bonus"'
+          recommendation: 'Replace with "Claim your €1,000 bonus" in teal button (#004c4c) 320×56px with white 18px bold text'
         },
         {
-          element: 'Primary Color',
-          adValue: '#004c4c (Dark Teal)',
-          landingPageValue: '#005c6b (Slightly different teal)',
+          element: 'Brand Color Scheme',
+          adValue: '#004c4c (Primary teal) + #FF6B35 (Accent orange)',
+          landingPageValue: '#005c6b (Different teal) + #0066CC (Blue accents)',
           status: 'partial_match' as const,
-          severity: 'MEDIUM' as const,
-          recommendation: 'Use the exact same teal color (#004c4c) for brand consistency'
+          severity: 'HIGH' as const,
+          recommendation: 'Update CSS: Primary #004c4c, CTA buttons #004c4c, urgency elements #FF6B35 for exact brand match'
         },
         {
-          element: 'Imagery Style',
-          adValue: 'Paper plane (progress/growth)',
-          landingPageValue: 'None',
+          element: 'Visual Elements',
+          adValue: 'Paper plane icon, upward arrow, progress theme',
+          landingPageValue: 'Generic financial imagery, no growth symbols',
           status: 'missing' as const,
           severity: 'MEDIUM' as const,
-          recommendation: 'Add similar progress/growth imagery to reinforce the message'
+          recommendation: 'Add 24px paper plane icon next to headline + progress arrows in hero section + upward trending graphics'
         },
         {
-          element: 'Tone',
-          adValue: 'Encouraging & motivational',
-          landingPageValue: 'Formal & informational',
-          status: 'mismatch' as const,
-          severity: 'MEDIUM' as const,
-          recommendation: 'Make landing page copy more encouraging and action-oriented'
-        },
-        {
-          element: 'Value Proposition',
-          adValue: 'Build pension + Get bonus',
-          landingPageValue: 'Plan your future',
-          status: 'partial_match' as const,
+          element: 'Social Proof',
+          adValue: 'Implied through professional design',
+          landingPageValue: 'No visible testimonials or trust indicators',
+          status: 'missing' as const,
           severity: 'HIGH' as const,
-          recommendation: 'Emphasize both pension building AND the immediate bonus'
+          recommendation: 'Add "★★★★★ 4.8/5 from 1,247+ customers" below headline + "2,847 started this month" counter above CTA'
+        },
+        {
+          element: 'Urgency/Scarcity',
+          adValue: 'Bonus offer implies limited availability',
+          landingPageValue: 'No time pressure or scarcity indicators',
+          status: 'missing' as const,
+          severity: 'MEDIUM' as const,
+          recommendation: 'Add countdown timer: "Bonus expires in 3 days, 14 hours" in orange #FF6B35 below CTA button'
+        },
+        {
+          element: 'Value Proposition Focus',
+          adValue: 'Dual benefit: Build pension + Get immediate €1,000',
+          landingPageValue: 'Single benefit: Plan your future (generic)',
+          status: 'mismatch' as const,
+          severity: 'HIGH' as const,
+          recommendation: 'Restructure hero copy to emphasize BOTH long-term pension building AND immediate €1,000 bonus with 50/50 visual weight'
         }
       ];
     };
@@ -747,23 +786,23 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
     const generateQuickWins = () => {
       return [
         {
-          title: 'Match CTA wording to ad',
-          description: 'Change your landing page button from "Sign up now" to "Claim your bonus" to create perfect message continuity from ad click to conversion.',
-          expectedImpact: '+15-25% conversion rate',
+          title: 'Fix CTA button text and styling',
+          description: 'Replace "Sign up now" with "Claim your €1,000 bonus" and resize button to 320×56px with teal background (#004c4c) and white 18px bold text. This creates perfect message continuity from ad to landing page.',
+          expectedImpact: '+22-35% conversion rate',
           effort: 'LOW' as const,
           source: 'landing_page' as const
         },
         {
-          title: 'Highlight the €1,000 bonus prominently',
-          description: 'Add the €1,000 bonus offer to your landing page headline since this is the main hook from your ad that attracted visitors.',
-          expectedImpact: '+10-18% engagement rate',
+          title: 'Update headline to match ad exactly',
+          description: 'Change H1 from "Plan your future pension" to "Build your pension & get €1,000 bonus" (exact ad headline) at 42px font size, bold, in dark teal #004c4c. This satisfies the visitor\'s exact expectation.',
+          expectedImpact: '+15-25% engagement and time on page',
           effort: 'LOW' as const,
           source: 'landing_page' as const
         },
         {
-          title: 'Unify brand colors',
-          description: 'Use the exact teal color (#004c4c) from your ad in the landing page header and CTA buttons for stronger brand recognition.',
-          expectedImpact: '+8-12% trust and brand recognition',
+          title: 'Add immediate social proof elements',
+          description: 'Insert "★★★★★ 4.8/5 from 1,247+ customers" below headline and "2,847 people started this month" counter above CTA button. Use specific numbers and star ratings for maximum credibility.',
+          expectedImpact: '+18-28% conversion through trust',
           effort: 'LOW' as const,
           source: 'landing_page' as const
         }
@@ -846,6 +885,8 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
       psychologicalInsights: mockPsychologicalInsights,
       industry: mockIndustry,
       audienceType: 'b2c',
+      detectedLanguage: detectedLang,
+      culturalContext: `${languageConfig.name} (${languageConfig.region}) - ${languageConfig.culturalContext.join(', ')}`,
       performancePrediction: {
         expectedCTR: detailedScoring.performancePrediction.expectedCTR,
         expectedCVR: detailedScoring.performancePrediction.expectedCVR,

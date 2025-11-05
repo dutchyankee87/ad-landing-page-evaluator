@@ -8,6 +8,7 @@ import Suggestions from '../components/results/Suggestions';
 import EnhancedSuggestions from '../components/results/EnhancedSuggestions';
 import ComparisonGrid from '../components/results/ComparisonGrid';
 import QuickWins from '../components/results/QuickWins';
+import LanguageAnalysis from '../components/results/LanguageAnalysis';
 import AdSummary from '../components/results/AdSummary';
 import { HeatmapOverlay } from '../components/heatmap/HeatmapOverlay';
 import { PerformanceFeedbackModal } from '../components/feedback/PerformanceFeedbackModal';
@@ -125,6 +126,14 @@ const Results: React.FC = () => {
             
             {/* Component Scores */}
             <ComponentScores componentScores={results.componentScores} />
+            
+            {/* Language & Cultural Analysis */}
+            {results.detectedLanguage && results.culturalContext && (
+              <LanguageAnalysis 
+                detectedLanguage={results.detectedLanguage}
+                culturalContext={results.culturalContext}
+              />
+            )}
             
             {/* Quick Wins Section */}
             {results.quickWins && (
