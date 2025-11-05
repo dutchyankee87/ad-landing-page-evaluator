@@ -53,8 +53,8 @@ Online advertising and SEO are converging. As AI transforms marketing and person
 
 AdAlign offers the automation and insight needed to achieve this coherence at scale. In a world where digital marketing spend exceeds $700 billion and AI adoption is nearly universal, leveraging tools like AdAlign isn't just smart — it's indispensable.`,
     author: {
-      name: 'AdAlign Team',
-      role: 'Marketing Intelligence'
+      name: 'Dillon Richardson',
+      role: 'Founder & CEO'
     },
     publishedDate: '2025-01-15',
     readTime: '8 min read',
@@ -106,8 +106,8 @@ Every day, marketers pour millions into paid advertising, only to watch their bu
 
 These five mistakes are costing marketers thousands in wasted ad spend. The solution? Regular auditing and alignment optimization. Tools like AdAlign can identify these issues in under 60 seconds, helping you fix problems before they drain your budget.`,
     author: {
-      name: 'Sarah Chen',
-      role: 'Performance Marketing Expert'
+      name: 'AdAlign Team',
+      role: 'Marketing Intelligence'
     },
     publishedDate: '2025-01-10',
     readTime: '6 min read',
@@ -192,8 +192,8 @@ While each platform requires specific optimizations, maintain core brand consist
 
 Successful multi-platform advertising requires understanding each platform's unique characteristics while maintaining brand consistency. Regular alignment audits help ensure your message resonates with each platform's audience while driving consistent conversions.`,
     author: {
-      name: 'Marcus Rodriguez',
-      role: 'Multi-Platform Strategy Lead'
+      name: 'AdAlign Team',
+      role: 'Strategy Research'
     },
     publishedDate: '2025-01-05',
     readTime: '7 min read',

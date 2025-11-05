@@ -6,7 +6,7 @@
   <!-- Homepage - Highest priority, updated weekly -->
   <url>
     <loc>https://adalign.io/</loc>
-    <lastmod>2025-08-26</lastmod>
+    <lastmod>2025-11-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
@@ -14,11 +14,41 @@
   <!-- Evaluation Form - High priority, updated monthly -->
   <url>
     <loc>https://adalign.io/evaluate</loc>
-    <lastmod>2025-08-26</lastmod>
+    <lastmod>2025-11-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
-  <!-- Results page is not included as it's user-specific and set to noindex -->
+  <!-- Pricing Page - High priority, updated monthly -->
+  <url>
+    <loc>https://adalign.io/pricing</loc>
+    <lastmod>2025-11-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Legal Pages - Low priority, updated yearly -->
+  <url>
+    <loc>https://adalign.io/privacy-policy</loc>
+    <lastmod>2025-11-05</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+  <url>
+    <loc>https://adalign.io/terms-of-service</loc>
+    <lastmod>2025-11-05</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+  <url>
+    <loc>https://adalign.io/disclaimer</loc>
+    <lastmod>2025-11-05</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+  <!-- Results page and subscription pages are not included as they're user-specific or transactional -->
 
 </urlset>
