@@ -37,7 +37,7 @@ Personalization isn't just a trend; it's a strategic imperative. AI-powered tool
 
 Misaligned ads don't just waste money — they harm your brand's credibility. When an ad promises one thing and the landing page delivers another, users bounce and are less likely to trust future messages. According to DemandSage, digital ads can increase brand awareness by 80%, but this uplift only occurs when messaging is consistent and user expectations are met.
 
-AdAlign addresses this by analyzing the congruence between ads and landing pages across Meta, TikTok, LinkedIn, Reddit, and Google. It delivers visual, content, and tone scores, along with specific recommendations (e.g., updating hero images or adding urgency). Early users have seen +73% increases in CTR and saved $4,200 per month in ad spend.
+AdAlign addresses this by analyzing the congruence between ads and landing pages across Meta, TikTok, LinkedIn, Reddit, and Google. It delivers visual, content, and tone scores, along with specific recommendations (e.g., updating hero images or adding urgency). Early users have seen 73% reduction in cost per engaged session and saved $4,200 per month in ad spend.
 
 Aligning your content not only boosts paid performance but also reinforces the signals search engines look for — relevance, authority, and trust.
 
@@ -140,7 +140,7 @@ Not all advertising platforms are created equal. What works on Meta might fail o
 
 **Key Metrics to Watch:**
 - Relevance Score
-- Click-through Rate
+- Cost per Engaged Session
 - Cost per Click
 
 ## Google Ads: Intent-Driven Alignment

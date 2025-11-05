@@ -1,14 +1,11 @@
 // Subscription and usage management with Stripe integration
-import { TIER_LIMITS, SIGNUP_BONUS_EVALUATIONS } from './constants';
+import { TIER_LIMITS } from './constants';
 
 export interface SubscriptionTier {
   id: string;
   name: string;
   price: number;
   priceId: string; // Stripe price ID
-  evaluationsPerMonth: number;
-  imageEvaluationsPerMonth: number;
-  videoEvaluationsPerMonth: number;
   features: string[];
   popular?: boolean;
 }
@@ -29,15 +26,12 @@ export const SUBSCRIPTION_TIERS: SubscriptionTier[] = [
     name: 'Free',
     price: 0,
     priceId: '',
-    evaluationsPerMonth: 1,
-    imageEvaluationsPerMonth: 1,
-    videoEvaluationsPerMonth: 0,
     features: [
-      '1 image ad evaluation/month',
+      '3 image ad evaluations/month',
+      '1 video ad evaluation/month',
       'Basic AI analysis',
       'Ad-to-page scoring',
-      'Essential recommendations',
-      '🔒 Video analysis (Pro+)'
+      'Essential recommendations'
     ]
   },
   {
@@ -45,9 +39,6 @@ export const SUBSCRIPTION_TIERS: SubscriptionTier[] = [
     name: 'Pro',
     price: 29,
     priceId: STRIPE_PRICE_IDS.pro_monthly,
-    evaluationsPerMonth: 55,
-    imageEvaluationsPerMonth: 50,
-    videoEvaluationsPerMonth: 5,
     features: [
       '50 image ad evaluations/month',
       '🎥 5 video ad evaluations/month',
@@ -62,9 +53,6 @@ export const SUBSCRIPTION_TIERS: SubscriptionTier[] = [
     name: 'Agency',
     price: 99,
     priceId: STRIPE_PRICE_IDS.agency_monthly,
-    evaluationsPerMonth: 250,
-    imageEvaluationsPerMonth: 200,
-    videoEvaluationsPerMonth: 50,
     popular: true,
     features: [
       '200 image ad evaluations/month',
@@ -82,9 +70,6 @@ export const SUBSCRIPTION_TIERS: SubscriptionTier[] = [
     name: 'Enterprise',
     price: 299,
     priceId: STRIPE_PRICE_IDS.enterprise_monthly,
-    evaluationsPerMonth: 1500,
-    imageEvaluationsPerMonth: 1000,
-    videoEvaluationsPerMonth: 500,
     features: [
       '1,000 image ad evaluations/month',
       '🎥 500 video ad evaluations/month',
@@ -103,9 +88,6 @@ export const ANNUAL_SUBSCRIPTION_TIERS: SubscriptionTier[] = [
     name: 'Pro (Annual)',
     price: 290, // $29 x 10 months (2 months free)
     priceId: STRIPE_PRICE_IDS.pro_yearly,
-    evaluationsPerMonth: 55,
-    imageEvaluationsPerMonth: 50,
-    videoEvaluationsPerMonth: 5,
     features: [
       '50 image ad evaluations/month',
       '🎥 5 video ad evaluations/month',
@@ -121,9 +103,6 @@ export const ANNUAL_SUBSCRIPTION_TIERS: SubscriptionTier[] = [
     name: 'Agency (Annual)',
     price: 990, // $99 x 10 months (2 months free)
     priceId: STRIPE_PRICE_IDS.agency_yearly,
-    evaluationsPerMonth: 250,
-    imageEvaluationsPerMonth: 200,
-    videoEvaluationsPerMonth: 50,
     features: [
       '200 image ad evaluations/month',
       '🎥 50 video ad evaluations/month',
@@ -141,9 +120,6 @@ export const ANNUAL_SUBSCRIPTION_TIERS: SubscriptionTier[] = [
     name: 'Enterprise (Annual)',
     price: 2990, // $299 x 10 months (2 months free)
     priceId: STRIPE_PRICE_IDS.enterprise_yearly,
-    evaluationsPerMonth: 1500,
-    imageEvaluationsPerMonth: 1000,
-    videoEvaluationsPerMonth: 500,
     features: [
       '1,000 image ad evaluations/month',
       '🎥 500 video ad evaluations/month',

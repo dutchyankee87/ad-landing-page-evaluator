@@ -3,10 +3,10 @@
 
 // Subscription tier limits (evaluations per month)
 export const TIER_LIMITS = {
-  free: 1, // 1 base evaluation + 2 bonus on signup = 3 total
-  pro: 25, // 25 evaluations per month ($29/month)
+  free: 3, // 3 evaluations per month (aligned with usage-tracking.ts)
+  pro: 50, // 50 evaluations per month ($29/month)
   agency: 200, // 200 evaluations per month ($99/month)  
-  enterprise: 2000, // 2000 evaluations per month ($299/month)
+  enterprise: 1000, // 1000 evaluations per month ($299/month)
 } as const;
 
 // Bonus evaluations given when signing up

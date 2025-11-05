@@ -4,7 +4,7 @@
 export interface User {
   id: string;
   email: string;
-  tier: 'free' | 'pro' | 'enterprise';
+  tier: 'free' | 'pro' | 'agency' | 'enterprise';
   monthlyEvaluations: number;
   createdAt: Date;
 }
@@ -25,8 +25,9 @@ export interface Evaluation {
 
 // Helper functions for database operations without importing Drizzle in client
 export const TIER_LIMITS = {
-  free: 1,
+  free: 3,
   pro: 50,
+  agency: 200,
   enterprise: 1000
 } as const;
 

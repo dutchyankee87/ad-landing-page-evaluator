@@ -330,7 +330,7 @@ Return ONLY a JSON object in this exact format:
           severity: "HIGH",
           issue: "Value proposition may not be immediately clear to visitors",
           suggestion: "Strengthen headline clarity and CTA prominence for better conversion",
-          expectedImpact: "15-25% improvement in engagement and click-through rates"
+          expectedImpact: "15-25% reduction in cost per engaged session and cost per conversion"
         },
         {
           location: "header",

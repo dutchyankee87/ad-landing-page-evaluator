@@ -15,13 +15,17 @@ console.log('- All VITE_ vars:', Object.keys(import.meta.env).filter(k => k.star
 
 if (!PUBLISHABLE_KEY) {
   console.error('❌ VITE_CLERK_PUBLISHABLE_KEY is missing or empty');
-  throw new Error("Missing Publishable Key")
+  console.warn('🔄 Running without Clerk authentication for testing');
 }
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
+    {PUBLISHABLE_KEY ? (
+      <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
+        <App />
+      </ClerkProvider>
+    ) : (
       <App />
-    </ClerkProvider>
+    )}
   </StrictMode>
 );

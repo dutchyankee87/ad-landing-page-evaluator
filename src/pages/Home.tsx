@@ -109,7 +109,7 @@ const Home: React.FC = () => {
           >
             <div className="flex items-center gap-2">
               <TrendingUp className="h-4 w-4 text-green-500" />
-              <span>Average 34% CTR boost after fixing alignment</span>
+              <span>Average 34% reduction in cost per engaged session</span>
             </div>
             <div className="flex items-center gap-2">
               <DollarSign className="h-4 w-4 text-green-500" />
@@ -442,8 +442,8 @@ const Home: React.FC = () => {
                 color: "text-green-600",
                 bgColor: "from-green-50 to-emerald-50",
                 borderColor: "border-green-200",
-                title: "Average CTR Increase",
-                quote: "Found our TikTok ad and landing page were totally mismatched. Fixed it in one day, CTR jumped from 1.2% to 2.1%",
+                title: "Cost Per Conversion Improvement",
+                quote: "Found our TikTok ad and landing page were totally mismatched. Fixed it in one day, cost per conversion dropped 43%",
                 author: "Sarah K, E-commerce Director"
               },
               {

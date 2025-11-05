@@ -190,7 +190,7 @@ const Pricing: React.FC = () => {
                   Is there a free trial?
                 </h3>
                 <p className="text-gray-600">
-                  Better than a trial — you get <strong>3 free evaluations</strong> forever. No credit card required, no time limits.
+                  Better than a trial — you get <strong>3 free evaluations per month</strong>. No credit card required, no time limits.
                 </p>
               </div>
               

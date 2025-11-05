@@ -19,7 +19,7 @@ export interface UsageData {
 const TIER_LIMITS = {
   free: {
     image: 3,
-    video: 0 // No video for free tier
+    video: 1 // 1 video evaluation for free tier to test ad URLs
   },
   pro: {
     image: 50,
@@ -39,7 +39,7 @@ const STORAGE_KEY = 'adalign_usage';
 const ANONYMOUS_STORAGE_KEY = 'adalign_anonymous_usage';
 const ANONYMOUS_LIMIT = 1; // 1 free check for anonymous users
 const AUTHENTICATED_LIMIT = 3; // 3 total checks for authenticated users (was 2 additional)
-const USAGE_DATA_VERSION = 2; // Increment when limits change to force reset
+const USAGE_DATA_VERSION = 5; // Increment when limits change to force reset
 
 // Get current month in YYYY-MM format
 function getCurrentMonth(): string {
@@ -236,10 +236,11 @@ export function getNextResetDate(): Date {
   return new Date(now.getFullYear(), now.getMonth() + 1, 1);
 }
 
-// Check if anonymous user has used their free check
+// Check if anonymous user has used their free evaluations
 export function hasUsedAnonymousCheck(): boolean {
   const anonymousUsage = getUsageData(); // No userId = anonymous
-  return anonymousUsage.evaluationsUsed >= ANONYMOUS_LIMIT;
+  // Check if they've used all their image evaluations (since most evaluations are image-based)
+  return anonymousUsage.imageEvaluationsUsed >= anonymousUsage.imageMonthlyLimit;
 }
 
 // Get total evaluations available (anonymous + authenticated combined) - Legacy

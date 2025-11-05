@@ -543,7 +543,7 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
           severity: "HIGH",
           issue: "Value proposition may not be immediately clear to visitors from the ad",
           suggestion: "Strengthen headline clarity and CTA prominence to match ad expectations",
-          expectedImpact: "15-25% improvement in engagement and click-through rates"
+          expectedImpact: "15-25% reduction in cost per engaged session and cost per conversion"
         },
         {
           location: "header",
