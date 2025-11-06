@@ -1,6 +1,5 @@
 import React from 'react';
 import { Globe, Users, MessageSquare, Languages } from 'lucide-react';
-import { motion } from 'framer-motion';
 
 interface LanguageAnalysisProps {
   detectedLanguage: string;
@@ -37,151 +36,54 @@ const LanguageAnalysis: React.FC<LanguageAnalysisProps> = ({
     return names[langCode as keyof typeof names] || 'Unknown';
   };
 
-  const containerVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.6,
-        staggerChildren: 0.1
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, x: -20 },
-    visible: {
-      opacity: 1,
-      x: 0,
-      transition: {
-        duration: 0.5,
-        ease: "easeOut"
-      }
-    }
-  };
-
   return (
-    <motion.section 
-      className="mb-16"
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-    >
-      <motion.div 
-        className="bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 rounded-2xl p-8 border border-blue-200/50 shadow-lg relative overflow-hidden"
-        variants={itemVariants}
-      >
-        <motion.div
-          className="absolute top-4 right-4 w-20 h-20 bg-blue-200/30 rounded-full"
-          animate={{
-            scale: [1, 1.2, 1],
-            rotate: [0, 180, 360],
-          }}
-          transition={{
-            duration: 8,
-            ease: "easeInOut",
-            repeat: Infinity,
-          }}
-        />
-        
-        <motion.div 
-          className="flex items-center gap-4 mb-8"
-          variants={itemVariants}
-        >
-          <motion.div
-            whileHover={{ rotate: 360, scale: 1.1 }}
-            transition={{ duration: 0.6 }}
-          >
-            <div className="p-3 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl shadow-lg">
-              <Languages className="h-8 w-8 text-white" />
-            </div>
-          </motion.div>
-          <div>
-            <motion.h3 
-              className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent"
-              variants={itemVariants}
-            >
-              🌍 Language & Cultural Analysis
-            </motion.h3>
+    <section className="mb-12">
+      <div className="bg-blue-50 rounded-lg p-6 border border-blue-200">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="p-2 bg-blue-100 rounded-lg">
+            <Languages className="h-5 w-5 text-blue-600" />
           </div>
-        </motion.div>
+          <div>
+            <h3 className="text-xl font-semibold text-gray-800">
+              Language & Cultural Analysis
+            </h3>
+          </div>
+        </div>
         
-        <div className="grid md:grid-cols-2 gap-8 relative z-10">
-          <motion.div 
-            className="flex items-center gap-4 bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-md"
-            variants={itemVariants}
-            whileHover={{ scale: 1.02, y: -4 }}
-            transition={{ duration: 0.2 }}
-          >
-            <motion.div 
-              className="text-5xl"
-              animate={{
-                scale: [1, 1.1, 1],
-              }}
-              transition={{
-                duration: 2,
-                ease: "easeInOut",
-                repeat: Infinity,
-              }}
-            >
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="flex items-center gap-3 bg-white rounded-lg p-4 border border-blue-200">
+            <div className="text-3xl">
               {getLanguageFlag(detectedLanguage)}
-            </motion.div>
+            </div>
             <div>
-              <div className="font-semibold text-gray-700 text-sm uppercase tracking-wide mb-1">Detected Language</div>
-              <div className="text-2xl text-blue-600 font-bold">
+              <div className="font-medium text-gray-700 text-xs uppercase tracking-wide mb-1">Detected Language</div>
+              <div className="text-lg text-blue-600 font-semibold">
                 {getLanguageName(detectedLanguage)} ({detectedLanguage.toUpperCase()})
               </div>
             </div>
-          </motion.div>
+          </div>
           
-          <motion.div 
-            className="flex items-start gap-4 bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-md"
-            variants={itemVariants}
-            whileHover={{ scale: 1.02, y: -4 }}
-            transition={{ duration: 0.2 }}
-          >
-            <motion.div
-              whileHover={{ rotate: 360 }}
-              transition={{ duration: 0.6 }}
-            >
-              <Users className="h-6 w-6 text-indigo-600 mt-1 flex-shrink-0" />
-            </motion.div>
+          <div className="flex items-start gap-3 bg-white rounded-lg p-4 border border-blue-200">
+            <Users className="h-5 w-5 text-blue-600 mt-1 flex-shrink-0" />
             <div>
-              <div className="font-semibold text-gray-700 text-sm uppercase tracking-wide mb-2">Cultural Context</div>
-              <div className="text-gray-800 font-medium leading-relaxed">{culturalContext}</div>
+              <div className="font-medium text-gray-700 text-xs uppercase tracking-wide mb-2">Cultural Context</div>
+              <div className="text-gray-800 text-sm leading-relaxed">{culturalContext}</div>
             </div>
-          </motion.div>
+          </div>
         </div>
         
-        <motion.div 
-          className="mt-8 p-6 bg-white/90 backdrop-blur-sm rounded-2xl border border-blue-200/50 shadow-md relative z-10"
-          variants={itemVariants}
-          whileHover={{ scale: 1.01 }}
-          transition={{ duration: 0.2 }}
-        >
-          <motion.div 
-            className="flex items-center gap-3 mb-3"
-            variants={itemVariants}
-          >
-            <motion.div
-              whileHover={{ rotate: 360 }}
-              transition={{ duration: 0.6 }}
-            >
-              <MessageSquare className="h-5 w-5 text-indigo-600" />
-            </motion.div>
-            <span className="font-bold text-gray-900 text-lg">Culturally-Optimized Recommendations</span>
-          </motion.div>
-          <motion.p 
-            className="text-gray-700 leading-relaxed"
-            variants={itemVariants}
-          >
+        <div className="mt-6 p-4 bg-white rounded-lg border border-blue-200">
+          <div className="flex items-center gap-3 mb-2">
+            <MessageSquare className="h-4 w-4 text-blue-600" />
+            <span className="font-semibold text-gray-800">Culturally-Optimized Recommendations</span>
+          </div>
+          <p className="text-gray-700 text-sm leading-relaxed">
             Our analysis includes language-specific CTA preferences, cultural trust signals, and 
             region-appropriate communication styles to maximize conversion rates for your target audience.
-          </motion.p>
-        </motion.div>
-      </motion.div>
-    </motion.section>
+          </p>
+        </div>
+      </div>
+    </section>
   );
 };
 

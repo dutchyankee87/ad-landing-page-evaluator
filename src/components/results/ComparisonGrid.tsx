@@ -1,6 +1,5 @@
 import React from 'react';
 import { CheckCircle, XCircle, AlertCircle, MinusCircle, Target } from 'lucide-react';
-import { motion } from 'framer-motion';
 
 interface ElementComparison {
   element: string;
@@ -19,26 +18,26 @@ const ComparisonGrid: React.FC<ComparisonGridProps> = ({ comparisons }) => {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'match':
-        return <CheckCircle className="h-5 w-5 text-green-500" />;
+        return <CheckCircle className="h-4 w-4 text-green-500" />;
       case 'mismatch':
-        return <XCircle className="h-5 w-5 text-red-500" />;
+        return <XCircle className="h-4 w-4 text-red-500" />;
       case 'partial_match':
-        return <AlertCircle className="h-5 w-5 text-yellow-500" />;
+        return <AlertCircle className="h-4 w-4 text-yellow-500" />;
       case 'missing':
-        return <MinusCircle className="h-5 w-5 text-gray-400" />;
+        return <MinusCircle className="h-4 w-4 text-gray-400" />;
       default:
-        return <MinusCircle className="h-5 w-5 text-gray-400" />;
+        return <MinusCircle className="h-4 w-4 text-gray-400" />;
     }
   };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'match':
-        return { style: 'bg-green-100 text-green-800', label: '✅ Perfect Match' };
+        return { style: 'bg-green-100 text-green-700', label: '✅ Perfect Match' };
       case 'mismatch':
-        return { style: 'bg-red-100 text-red-800', label: '❌ Mismatch' };
+        return { style: 'bg-red-100 text-red-700', label: '❌ Mismatch' };
       case 'partial_match':
-        return { style: 'bg-yellow-100 text-yellow-800', label: '⚠️ Partial Match' };
+        return { style: 'bg-yellow-100 text-yellow-700', label: '⚠️ Partial Match' };
       case 'missing':
         return { style: 'bg-gray-100 text-gray-600', label: '➖ Missing' };
       default:
@@ -55,223 +54,113 @@ const ComparisonGrid: React.FC<ComparisonGridProps> = ({ comparisons }) => {
     }
   };
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        duration: 0.6,
-        staggerChildren: 0.1
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { x: -20, opacity: 0 },
-    visible: {
-      x: 0,
-      opacity: 1,
-      transition: {
-        duration: 0.5,
-        ease: "easeOut"
-      }
-    }
-  };
-
-  const headerVariants = {
-    hidden: { y: -20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        duration: 0.6,
-        ease: "easeOut"
-      }
-    }
-  };
-
   if (!comparisons || comparisons.length === 0) {
     return null;
   }
 
   return (
-    <motion.section 
-      className="mb-16"
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-    >
-      <motion.div 
-        className="flex items-center gap-4 mb-8"
-        variants={headerVariants}
-      >
-        <motion.div
-          whileHover={{ rotate: 360, scale: 1.1 }}
-          transition={{ duration: 0.6 }}
-        >
-          <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl shadow-lg">
-            <Target className="h-8 w-8 text-white" />
-          </div>
-        </motion.div>
-        <div>
-          <motion.h2 
-            className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
-            variants={headerVariants}
-          >
-            🔍 Ad vs Landing Page Comparison
-          </motion.h2>
-          <motion.p 
-            className="text-gray-600 text-lg mt-2"
-            variants={headerVariants}
-          >
-            Side-by-side analysis of key elements to identify exact discrepancies and alignment opportunities
-          </motion.p>
+    <section className="mb-12">
+      <div className="flex items-center gap-3 mb-6">
+        <div className="p-2 bg-blue-100 rounded-lg">
+          <Target className="h-5 w-5 text-blue-600" />
         </div>
-      </motion.div>
+        <div>
+          <h2 className="text-xl font-semibold text-gray-800">
+            Ad vs Landing Page Comparison
+          </h2>
+          <p className="text-gray-600 text-sm mt-1">
+            Side-by-side analysis of key elements to identify exact discrepancies and alignment opportunities
+          </p>
+        </div>
+      </div>
       
-      <motion.div 
-        className="bg-white/90 backdrop-blur-lg rounded-2xl shadow-2xl overflow-hidden border border-white/20"
-        variants={itemVariants}
-      >
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
         {/* Header */}
-        <motion.div 
-          className="grid grid-cols-5 gap-6 p-6 bg-gradient-to-r from-gray-50 to-blue-50 border-b border-gray-200/50 font-semibold text-gray-800"
-          variants={headerVariants}
-        >
-          <div className="text-lg">Element</div>
-          <div className="text-lg text-blue-600">Your Ad</div>
-          <div className="text-lg text-purple-600">Your Landing Page</div>
-          <div className="text-lg">Status</div>
-          <div className="text-lg">Action Needed</div>
-        </motion.div>
+        <div className="grid grid-cols-5 gap-4 p-4 bg-gray-50 border-b border-gray-200 font-medium text-gray-700 text-sm">
+          <div>Element</div>
+          <div className="text-blue-600">Your Ad</div>
+          <div className="text-purple-600">Your Landing Page</div>
+          <div>Status</div>
+          <div>Action Needed</div>
+        </div>
         
         {/* Rows */}
-        <motion.div 
-          className="divide-y divide-gray-100"
-          variants={containerVariants}
-        >
+        <div className="divide-y divide-gray-100">
           {comparisons.map((comparison, index) => {
             const statusBadge = getStatusBadge(comparison.status);
             
             return (
-              <motion.div 
+              <div 
                 key={index} 
-                className={`grid grid-cols-5 gap-6 p-6 hover:bg-gradient-to-r hover:from-gray-50/50 hover:to-blue-50/30 transition-all duration-300 border-l-4 ${getSeverityColor(comparison.severity)} group`}
-                variants={itemVariants}
-                whileHover={{ x: 4 }}
-                transition={{ duration: 0.2 }}
+                className={`grid grid-cols-5 gap-4 p-4 hover:bg-gray-50 transition-colors border-l-4 ${getSeverityColor(comparison.severity)}`}
               >
                 {/* Element */}
-                <motion.div 
-                  className="font-bold text-lg text-gray-900 group-hover:text-blue-600 transition-colors"
-                  whileHover={{ scale: 1.02 }}
-                >
+                <div className="font-medium text-gray-900 text-sm">
                   {comparison.element}
-                </motion.div>
+                </div>
                 
                 {/* Ad Value */}
-                <motion.div className="text-sm">
-                  <motion.div 
-                    className="bg-gradient-to-r from-blue-50 to-blue-100 p-4 rounded-xl border border-blue-200/50 shadow-sm"
-                    whileHover={{ scale: 1.02, y: -2 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <div className="text-blue-800 font-semibold text-xs mb-2 uppercase tracking-wide">AD</div>
-                    <div className="text-gray-800 font-medium leading-relaxed">{comparison.adValue || '—'}</div>
-                  </motion.div>
-                </motion.div>
+                <div className="text-sm">
+                  <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                    <div className="text-blue-700 font-medium text-xs mb-1 uppercase tracking-wide">AD</div>
+                    <div className="text-gray-800 text-xs leading-relaxed">{comparison.adValue || '—'}</div>
+                  </div>
+                </div>
                 
                 {/* Landing Page Value */}
-                <motion.div className="text-sm">
-                  <motion.div 
-                    className="bg-gradient-to-r from-purple-50 to-purple-100 p-4 rounded-xl border border-purple-200/50 shadow-sm"
-                    whileHover={{ scale: 1.02, y: -2 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <div className="text-purple-800 font-semibold text-xs mb-2 uppercase tracking-wide">LANDING PAGE</div>
-                    <div className="text-gray-800 font-medium leading-relaxed">{comparison.landingPageValue || '—'}</div>
-                  </motion.div>
-                </motion.div>
+                <div className="text-sm">
+                  <div className="bg-purple-50 p-3 rounded-lg border border-purple-200">
+                    <div className="text-purple-700 font-medium text-xs mb-1 uppercase tracking-wide">LANDING PAGE</div>
+                    <div className="text-gray-800 text-xs leading-relaxed">{comparison.landingPageValue || '—'}</div>
+                  </div>
+                </div>
                 
                 {/* Status */}
-                <motion.div 
-                  className="flex items-center gap-3"
-                  whileHover={{ scale: 1.02 }}
-                >
-                  <motion.div
-                    whileHover={{ rotate: 360 }}
-                    transition={{ duration: 0.6 }}
-                  >
-                    {getStatusIcon(comparison.status)}
-                  </motion.div>
-                  <motion.span 
-                    className={`px-4 py-2 rounded-xl text-sm font-semibold ${statusBadge.style} shadow-sm`}
-                    whileHover={{ scale: 1.05 }}
-                  >
+                <div className="flex items-center gap-2">
+                  {getStatusIcon(comparison.status)}
+                  <span className={`px-2 py-1 rounded text-xs font-medium ${statusBadge.style}`}>
                     {statusBadge.label}
-                  </motion.span>
-                </motion.div>
+                  </span>
+                </div>
                 
                 {/* Recommendation */}
-                <motion.div 
-                  className="text-sm"
-                  whileHover={{ scale: 1.02 }}
-                >
+                <div className="text-sm">
                   {comparison.recommendation ? (
-                    <motion.div 
-                      className="bg-gradient-to-r from-orange-50 to-red-50 p-4 rounded-xl border border-orange-200/50 shadow-sm"
-                      whileHover={{ y: -2 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <div className="text-orange-800 font-semibold text-xs mb-2 uppercase tracking-wide">RECOMMENDATION</div>
-                      <div className="text-gray-800 font-medium leading-relaxed">{comparison.recommendation}</div>
-                    </motion.div>
+                    <div className="bg-orange-50 p-3 rounded-lg border border-orange-200">
+                      <div className="text-orange-700 font-medium text-xs mb-1 uppercase tracking-wide">RECOMMENDATION</div>
+                      <div className="text-gray-800 text-xs leading-relaxed">{comparison.recommendation}</div>
+                    </div>
                   ) : (
-                    <div className="text-green-600 font-semibold bg-green-50 p-4 rounded-xl">✅ No action needed</div>
+                    <div className="text-green-600 font-medium bg-green-50 p-3 rounded-lg text-xs">✅ No action needed</div>
                   )}
-                </motion.div>
-              </motion.div>
+                </div>
+              </div>
             );
           })}
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
       
       {/* Legend */}
-      <motion.div 
-        className="mt-6 p-6 bg-gradient-to-r from-gray-50 to-blue-50 rounded-2xl border border-gray-200/50"
-        variants={itemVariants}
-      >
-        <motion.h4 
-          className="font-bold text-gray-900 mb-4 text-lg"
-          variants={itemVariants}
-        >
+      <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+        <h4 className="font-medium text-gray-900 mb-3 text-sm">
           Priority Legend:
-        </motion.h4>
-        <div className="flex flex-wrap gap-6">
-          <motion.div 
-            className="flex items-center gap-3"
-            whileHover={{ scale: 1.05 }}
-          >
-            <div className="w-4 h-4 bg-red-500 rounded-full shadow-sm"></div>
-            <span className="font-semibold text-gray-700">High Priority Fix</span>
-          </motion.div>
-          <motion.div 
-            className="flex items-center gap-3"
-            whileHover={{ scale: 1.05 }}
-          >
-            <div className="w-4 h-4 bg-yellow-500 rounded-full shadow-sm"></div>
-            <span className="font-semibold text-gray-700">Medium Priority</span>
-          </motion.div>
-          <motion.div 
-            className="flex items-center gap-3"
-            whileHover={{ scale: 1.05 }}
-          >
-            <div className="w-4 h-4 bg-blue-500 rounded-full shadow-sm"></div>
-            <span className="font-semibold text-gray-700">Low Priority</span>
-          </motion.div>
+        </h4>
+        <div className="flex flex-wrap gap-4">
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+            <span className="font-medium text-gray-700 text-sm">High Priority Fix</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+            <span className="font-medium text-gray-700 text-sm">Medium Priority</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+            <span className="font-medium text-gray-700 text-sm">Low Priority</span>
+          </div>
         </div>
-      </motion.div>
-    </motion.section>
+      </div>
+    </section>
   );
 };
 

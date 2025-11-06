@@ -109,176 +109,104 @@ const Results: React.FC = () => {
         url="/results"
         noindex={true}
       />
-      <motion.div 
-        className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50"
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-      >
-        <div className="container mx-auto px-4 py-8">
-          <div className="max-w-6xl mx-auto">
-            <motion.div 
-              className="flex justify-between items-center mb-8"
-              variants={headerVariants}
-            >
-              <motion.div
-                whileHover={{ x: -4 }}
-                transition={{ duration: 0.2 }}
+      <div className="min-h-screen bg-gray-50">
+        <div className="container mx-auto px-4 py-6">
+          <div className="max-w-5xl mx-auto">
+            <div className="flex justify-between items-center mb-6">
+              <Link
+                to="/evaluate"
+                className="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors"
               >
-                <Link
-                  to="/evaluate"
-                  className="flex items-center gap-2 text-gray-600 hover:text-orange-500 transition-all duration-300 group"
-                >
-                  <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-                  <span className="font-medium">Back to Evaluation</span>
-                </Link>
-              </motion.div>
+                <ArrowLeft className="h-4 w-4" />
+                <span className="font-medium">Back to Evaluation</span>
+              </Link>
               
-              <div className="flex gap-3">
-                <motion.button
-                  className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl font-medium"
+              <div className="flex gap-2">
+                <button
+                  className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium"
                   onClick={openFeedbackModal}
-                  whileHover={{ y: -2, scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
                 >
                   <MessageCircle className="h-4 w-4" />
-                  <span>Share Feedback</span>
-                </motion.button>
+                  <span>Feedback</span>
+                </button>
                 
-                <motion.button 
-                  className="flex items-center gap-2 px-6 py-3 bg-white/80 backdrop-blur-sm border border-gray-200/50 rounded-xl text-gray-700 hover:bg-white hover:shadow-lg transition-all duration-300 font-medium"
+                <button 
+                  className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors text-sm font-medium"
                   onClick={() => window.print()}
-                  whileHover={{ y: -2, scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
                 >
                   <Download className="h-4 w-4" />
-                  <span>Export Results</span>
-                </motion.button>
+                  <span>Export</span>
+                </button>
               </div>
-            </motion.div>
+            </div>
         
-            <motion.div 
-              className="bg-white/95 backdrop-blur-lg rounded-2xl shadow-2xl overflow-hidden mb-8 border border-white/20"
-              variants={itemVariants}
-            >
-              <div className="bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 px-8 py-10 text-white relative overflow-hidden">
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-orange-400/20 to-red-500/20"
-                  animate={{
-                    backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
-                  }}
-                  transition={{
-                    duration: 8,
-                    ease: "easeInOut",
-                    repeat: Infinity,
-                  }}
-                />
-                <motion.h1 
-                  className="text-4xl md:text-5xl font-bold mb-4 relative z-10"
-                  variants={itemVariants}
-                >
-                  🎯 Your ADalign.io Report
-                </motion.h1>
-                <motion.p 
-                  className="text-xl md:text-2xl font-medium opacity-95 relative z-10"
-                  variants={itemVariants}
-                >
-                  Here's exactly what's killing (or boosting) your conversions
-                  {adData.platform ? ` on ${PLATFORM_NAMES[adData.platform as keyof typeof PLATFORM_NAMES]}` : ''}
-                </motion.p>
-                <motion.div
-                  className="absolute top-4 right-4 w-24 h-24 bg-white/10 rounded-full"
-                  animate={{
-                    scale: [1, 1.2, 1],
-                    rotate: [0, 180, 360],
-                  }}
-                  transition={{
-                    duration: 6,
-                    ease: "easeInOut",
-                    repeat: Infinity,
-                  }}
-                />
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+              <div className="px-6 py-4 border-b border-gray-100">
+                <h1 className="text-xl font-semibold text-gray-800 mb-1">
+                  Ad Analysis Report
+                </h1>
+                <p className="text-gray-600 text-sm">
+                  Optimization recommendations for your {adData.platform ? PLATFORM_NAMES[adData.platform as keyof typeof PLATFORM_NAMES] : ''} campaign
+                </p>
               </div>
           
-              <div className="p-8">
+              <div className="p-6">
                 {/* Overall Score */}
-                <motion.section 
-                  className="mb-16"
-                  variants={itemVariants}
-                >
-                  <div className="grid md:grid-cols-2 gap-12 items-center">
-                    <motion.div variants={itemVariants}>
-                      <motion.h2 
-                        className="text-3xl font-bold mb-6 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent"
-                        variants={itemVariants}
-                      >
+                <section className="mb-12">
+                  <div className="grid md:grid-cols-2 gap-8 items-center">
+                    <div>
+                      <h2 className="text-2xl font-semibold mb-4 text-gray-800">
                         Congruence Score
-                      </motion.h2>
-                      <motion.p 
-                        className="text-gray-600 mb-6 text-lg leading-relaxed"
-                        variants={itemVariants}
-                      >
+                      </h2>
+                      <p className="text-gray-600 mb-4 leading-relaxed">
                         This score reveals how well your ad and landing page work together to convert visitors.
                         Higher scores = higher conversion rates.
-                      </motion.p>
-                      <motion.div 
-                        className="flex items-center gap-6"
-                        variants={itemVariants}
-                      >
-                        <motion.div 
-                          className="text-6xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent"
-                          variants={scoreVariants}
-                          whileHover={{ scale: 1.05 }}
-                        >
+                      </p>
+                      <div className="flex items-center gap-4">
+                        <div className="text-4xl font-bold text-blue-600">
                           {results.overallScore}
-                        </motion.div>
-                        <div className="text-sm text-gray-500">
-                          <div className="font-medium text-lg">out of 10</div>
-                          <motion.div 
-                            className="font-semibold text-xl text-gray-700"
-                            variants={itemVariants}
-                          >
-                            {getScoreDescription(results.overallScore)}
-                          </motion.div>
                         </div>
-                      </motion.div>
-                    </motion.div>
-                    <motion.div 
-                      className="flex justify-center"
-                      variants={scoreVariants}
-                    >
+                        <div className="text-sm text-gray-500">
+                          <div className="font-medium">out of 10</div>
+                          <div className="font-semibold text-gray-700">
+                            {getScoreDescription(results.overallScore)}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex justify-center">
                       <ScoreGauge score={results.overallScore} />
-                    </motion.div>
+                    </div>
                   </div>
-                </motion.section>
+                </section>
             
                 {/* Component Scores */}
-                <motion.div variants={itemVariants}>
+                <div>
                   <ComponentScores componentScores={results.componentScores} />
-                </motion.div>
+                </div>
                 
                 {/* Language & Cultural Analysis */}
                 {results.detectedLanguage && results.culturalContext && (
-                  <motion.div variants={itemVariants}>
+                  <div>
                     <LanguageAnalysis 
                       detectedLanguage={results.detectedLanguage}
                       culturalContext={results.culturalContext}
                     />
-                  </motion.div>
+                  </div>
                 )}
                 
                 {/* Quick Wins Section */}
                 {results.quickWins && (
-                  <motion.div variants={itemVariants}>
+                  <div>
                     <QuickWins quickWins={results.quickWins} />
-                  </motion.div>
+                  </div>
                 )}
                 
                 {/* Ad vs Landing Page Comparison Grid */}
                 {results.elementComparisons && (
-                  <motion.div variants={itemVariants}>
+                  <div>
                     <ComparisonGrid comparisons={results.elementComparisons} />
-                  </motion.div>
+                  </div>
                 )}
             
                 {/* Industry Benchmarks */}
@@ -344,9 +272,9 @@ const Results: React.FC = () => {
                 )}
             
                 {/* Ad Summary */}
-                <motion.div variants={itemVariants}>
+                <div>
                   <AdSummary />
-                </motion.div>
+                </div>
                 
                 {/* Detailed Micro-Scoring Analysis */}
                 {results.detailedScoring && (
@@ -403,37 +331,28 @@ const Results: React.FC = () => {
             )}
             
                 {/* Enhanced Suggestions or Legacy Suggestions */}
-                <motion.div variants={itemVariants}>
+                <div>
                   {results.enhancedSuggestions ? (
                     <EnhancedSuggestions suggestions={results.enhancedSuggestions} />
                   ) : (
                     <Suggestions suggestions={results.suggestions} />
                   )}
-                </motion.div>
+                </div>
               </div>
-            </motion.div>
+            </div>
             
-            <motion.div 
-              className="text-center"
-              variants={itemVariants}
-            >
-              <motion.div
-                whileHover={{ y: -4, scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                transition={{ duration: 0.2 }}
-              >
+            <div className="text-center">
                 <Link
                   to="/evaluate"
-                  className="inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-orange-500 via-orange-600 to-red-500 text-white rounded-2xl hover:from-orange-600 hover:via-orange-700 hover:to-red-600 transition-all duration-300 font-semibold shadow-2xl hover:shadow-3xl text-lg group"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
                 >
                   Analyze Another Ad
-                  <ChevronRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                  <ChevronRight className="h-4 w-4" />
                 </Link>
-              </motion.div>
-            </motion.div>
+            </div>
           </div>
         </div>
-      </motion.div>
+      </div>
 
       {/* Performance Feedback Modal */}
       <PerformanceFeedbackModal

@@ -1,6 +1,5 @@
 import React from 'react';
 import { Zap, ArrowUp, Clock, TrendingUp } from 'lucide-react';
-import { motion } from 'framer-motion';
 
 interface QuickWin {
   title: string;
@@ -17,18 +16,18 @@ interface QuickWinsProps {
 const QuickWins: React.FC<QuickWinsProps> = ({ quickWins }) => {
   const getEffortBadge = (effort: string) => {
     const styles = {
-      LOW: 'bg-green-100 text-green-800',
-      MEDIUM: 'bg-yellow-100 text-yellow-800',
-      HIGH: 'bg-red-100 text-red-800'
+      LOW: 'bg-green-100 text-green-700',
+      MEDIUM: 'bg-yellow-100 text-yellow-700',
+      HIGH: 'bg-red-100 text-red-700'
     };
     return styles[effort as keyof typeof styles] || styles.MEDIUM;
   };
 
   const getSourceBadge = (source: string) => {
     const styles = {
-      ad: 'bg-blue-100 text-blue-800',
-      landing_page: 'bg-purple-100 text-purple-800',
-      both: 'bg-gray-100 text-gray-800'
+      ad: 'bg-blue-100 text-blue-700',
+      landing_page: 'bg-purple-100 text-purple-700',
+      both: 'bg-gray-100 text-gray-700'
     };
     
     const labels = {
@@ -43,159 +42,69 @@ const QuickWins: React.FC<QuickWinsProps> = ({ quickWins }) => {
     };
   };
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        duration: 0.6,
-        staggerChildren: 0.15
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { y: 30, opacity: 0, scale: 0.95 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      scale: 1,
-      transition: {
-        duration: 0.5,
-        ease: "easeOut"
-      }
-    }
-  };
-
-  const iconVariants = {
-    hidden: { rotate: -180, scale: 0 },
-    visible: {
-      rotate: 0,
-      scale: 1,
-      transition: {
-        duration: 0.6,
-        ease: "easeOut"
-      }
-    }
-  };
-
   if (!quickWins || quickWins.length === 0) {
     return null;
   }
 
   return (
-    <motion.section 
-      className="mb-16"
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-    >
-      <motion.div 
-        className="flex items-center gap-4 mb-8"
-        variants={itemVariants}
-      >
-        <motion.div
-          variants={iconVariants}
-          whileHover={{ rotate: 360, scale: 1.1 }}
-          transition={{ duration: 0.6 }}
-        >
-          <div className="p-3 bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl shadow-lg">
-            <Zap className="h-8 w-8 text-white" />
-          </div>
-        </motion.div>
-        <div>
-          <motion.h2 
-            className="text-4xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent"
-            variants={itemVariants}
-          >
-            🚀 Top 3 Quick Wins
-          </motion.h2>
-          <motion.p 
-            className="text-gray-600 text-lg mt-2"
-            variants={itemVariants}
-          >
-            Start with these high-impact improvements to see immediate results
-          </motion.p>
+    <section className="mb-12">
+      <div className="flex items-center gap-3 mb-6">
+        <div className="p-2 bg-green-100 rounded-lg">
+          <Zap className="h-5 w-5 text-green-600" />
         </div>
-      </motion.div>
+        <div>
+          <h2 className="text-xl font-semibold text-gray-800">
+            Top 3 Quick Wins
+          </h2>
+          <p className="text-gray-600 text-sm mt-1">
+            High-impact optimizations you can implement immediately to boost conversions
+          </p>
+        </div>
+      </div>
       
-      <motion.div 
-        className="grid gap-6"
-        variants={containerVariants}
-      >
-        {quickWins.slice(0, 3).map((win, index) => {
-          const sourceBadge = getSourceBadge(win.source);
+      <div className="grid gap-4">
+        {quickWins.slice(0, 3).map((quickWin, index) => {
+          const sourceBadge = getSourceBadge(quickWin.source);
           
           return (
-            <motion.div 
-              key={index}
-              className="bg-white/80 backdrop-blur-sm border-l-4 border-orange-500 rounded-2xl shadow-lg hover:shadow-2xl p-8 transition-all duration-300 group relative overflow-hidden"
-              variants={itemVariants}
-              whileHover={{ y: -4, scale: 1.02 }}
-              transition={{ duration: 0.2 }}
+            <div 
+              key={index} 
+              className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow"
             >
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-orange-50/50 to-red-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                initial={false}
-              />
-              
-              <div className="relative z-10">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center gap-4">
-                    <motion.div 
-                      className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-2xl flex items-center justify-center font-bold text-lg shadow-lg"
-                      whileHover={{ rotate: 360, scale: 1.1 }}
-                      transition={{ duration: 0.6 }}
-                    >
-                      {index + 1}
-                    </motion.div>
-                    <div>
-                      <h3 className="font-bold text-xl text-gray-900 group-hover:text-orange-600 transition-colors">{win.title}</h3>
-                    </div>
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                    <span className="text-green-600 font-bold text-sm">{index + 1}</span>
                   </div>
-                  
-                  <div className="flex gap-3">
-                    <motion.span 
-                      className={`px-4 py-2 rounded-full text-sm font-semibold ${sourceBadge.style} shadow-sm`}
-                      whileHover={{ scale: 1.05 }}
-                    >
-                      {sourceBadge.label}
-                    </motion.span>
-                    <motion.span 
-                      className={`px-4 py-2 rounded-full text-sm font-semibold ${getEffortBadge(win.effort)} shadow-sm`}
-                      whileHover={{ scale: 1.05 }}
-                    >
-                      {win.effort} effort
-                    </motion.span>
-                  </div>
+                  <span className={`px-3 py-1 rounded-md text-sm font-medium ${sourceBadge.style}`}>
+                    {sourceBadge.label}
+                  </span>
                 </div>
                 
-                <p className="text-gray-700 mb-6 text-lg leading-relaxed">{win.description}</p>
+                <span className={`px-3 py-1 rounded-md text-sm font-medium ${getEffortBadge(quickWin.effort)}`}>
+                  {quickWin.effort} effort
+                </span>
+              </div>
+              
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">{quickWin.title}</h3>
+              <p className="text-gray-700 mb-4 leading-relaxed">{quickWin.description}</p>
+              
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-green-600 bg-green-50 px-3 py-2 rounded-lg">
+                  <TrendingUp className="h-4 w-4" />
+                  <span className="font-medium text-sm">Impact: {quickWin.expectedImpact}</span>
+                </div>
                 
-                <div className="flex items-center gap-6">
-                  <motion.div 
-                    className="flex items-center gap-2 text-green-600 bg-green-50 px-4 py-2 rounded-xl"
-                    whileHover={{ scale: 1.05 }}
-                  >
-                    <TrendingUp className="h-5 w-5" />
-                    <span className="font-semibold">Impact: {win.expectedImpact}</span>
-                  </motion.div>
-                  <motion.div 
-                    className="flex items-center gap-2 text-gray-600 bg-gray-50 px-4 py-2 rounded-xl"
-                    whileHover={{ scale: 1.05 }}
-                  >
-                    <Clock className="h-5 w-5" />
-                    <span className="font-medium">
-                      {win.effort === 'LOW' ? '< 1 day' : win.effort === 'MEDIUM' ? '1-3 days' : '1+ weeks'}
-                    </span>
-                  </motion.div>
+                <div className="flex items-center gap-2 text-blue-600">
+                  <Clock className="h-4 w-4" />
+                  <span className="text-sm font-medium">Quick implementation</span>
                 </div>
               </div>
-            </motion.div>
+            </div>
           );
         })}
-      </motion.div>
-    </motion.section>
+      </div>
+    </section>
   );
 };
 
