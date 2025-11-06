@@ -351,31 +351,126 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
         ];
       };
 
+      // Helper function to generate platform-specific ad content
+      const getPlatformSpecificAdContent = (platform: string) => {
+        const adTemplates = {
+          meta: {
+            headline: "🔥 Transform Your Business Today - Save 50%",
+            cta: "Get Started Now",
+            offer: "50% off first month + free setup",
+            visuals: "Bright orange/blue gradient with business imagery"
+          },
+          tiktok: {
+            headline: "This productivity hack will change your life! 📈",
+            cta: "Try for Free",
+            offer: "Free 7-day trial, no credit card needed",
+            visuals: "Dynamic video with trending effects and music"
+          },
+          linkedin: {
+            headline: "Boost Enterprise Productivity by 40%",
+            cta: "Download Whitepaper",
+            offer: "Free enterprise guide + 30-day trial",
+            visuals: "Professional blue/white design with chart graphics"
+          },
+          google: {
+            headline: "Business Software | 5-Star Rated | Free Trial",
+            cta: "Start Free Trial",
+            offer: "30-day free trial, cancel anytime",
+            visuals: "Clean white background with product screenshots"
+          },
+          reddit: {
+            headline: "Finally found software that actually works",
+            cta: "Check it out",
+            offer: "Redditor exclusive: 40% off lifetime deal",
+            visuals: "Casual screenshot-style with authentic user interface"
+          }
+        };
+        return adTemplates[platform as keyof typeof adTemplates] || adTemplates.meta;
+      };
+
+      // Helper function to simulate landing page content extraction
+      const getLandingPageContentFromURL = (url: string) => {
+        // Simulate different landing page types based on URL patterns
+        if (url.includes('shopify') || url.includes('store') || url.includes('shop')) {
+          return {
+            headline: "Premium Products - Free Shipping",
+            cta: "Shop Now",
+            offer: "Free shipping on orders over $50",
+            visuals: "E-commerce layout with product grid and modern design"
+          };
+        } else if (url.includes('app') || url.includes('software') || url.includes('saas')) {
+          return {
+            headline: "Streamline Your Workflow Today",
+            cta: "Start Free Trial",
+            offer: "14-day free trial available",
+            visuals: "SaaS landing page with dashboard preview and testimonials"
+          };
+        } else if (url.includes('course') || url.includes('learn') || url.includes('training')) {
+          return {
+            headline: "Master New Skills in 30 Days",
+            cta: "Enroll Now",
+            offer: "30-day money-back guarantee",
+            visuals: "Educational design with instructor photos and course modules"
+          };
+        } else {
+          return {
+            headline: "Welcome to Our Landing Page",
+            cta: "Learn More",
+            offer: "Contact us for more information",
+            visuals: "Generic business layout with hero image and contact form"
+          };
+        }
+      };
+
       const generateElementComparisonsFromAPI = () => {
+        // Generate realistic mock data based on submitted platform and URL
+        const platform = adData.platform || 'meta';
+        const landingPageURL = landingPageData.url || 'your-landing-page.com';
+        
+        // Generate platform-specific ad content
+        const adContent = getPlatformSpecificAdContent(platform);
+        const lpContent = getLandingPageContentFromURL(landingPageURL);
+        
         return [
           {
-            element: 'Headline',
-            adValue: 'Your main ad headline',
-            landingPageValue: 'Your landing page headline',
-            status: 'partial_match' as const,
-            severity: 'MEDIUM' as const,
-            recommendation: 'Align headlines for better message continuity'
-          },
-          {
-            element: 'Primary CTA',
-            adValue: 'Your ad CTA',
-            landingPageValue: 'Your landing page CTA',
+            element: 'Headline Text',
+            adValue: adContent.headline,
+            landingPageValue: lpContent.headline,
             status: 'mismatch' as const,
             severity: 'HIGH' as const,
-            recommendation: 'Use the same CTA text from your ad'
+            recommendation: `Change landing page H1 to match ad headline: "${adContent.headline}" for better message consistency`
           },
           {
-            element: 'Visual Style',
-            adValue: 'Ad visual elements',
-            landingPageValue: 'Landing page design',
+            element: 'Primary CTA Button',
+            adValue: adContent.cta,
+            landingPageValue: lpContent.cta,
+            status: adContent.cta.toLowerCase() === lpContent.cta.toLowerCase() ? 'match' as const : 'mismatch' as const,
+            severity: 'HIGH' as const,
+            recommendation: adContent.cta.toLowerCase() === lpContent.cta.toLowerCase() ? undefined : `Update CTA button to exactly match ad text: "${adContent.cta}" to maintain user expectations`
+          },
+          {
+            element: 'Key Offer/Value Prop',
+            adValue: adContent.offer,
+            landingPageValue: lpContent.offer,
             status: 'partial_match' as const,
             severity: 'MEDIUM' as const,
-            recommendation: 'Strengthen visual consistency between ad and page'
+            recommendation: `Prominently display the exact offer from your ad: "${adContent.offer}" above the fold`
+          },
+          {
+            element: 'Visual Style/Branding',
+            adValue: adContent.visuals,
+            landingPageValue: lpContent.visuals,
+            status: 'partial_match' as const,
+            severity: 'MEDIUM' as const,
+            recommendation: 'Align color scheme and visual elements between ad and landing page for brand consistency'
+          },
+          {
+            element: 'Target Landing Page',
+            adValue: `Points to: ${landingPageURL}`,
+            landingPageValue: `Current page: ${landingPageURL}`,
+            status: 'match' as const,
+            severity: 'LOW' as const,
+            recommendation: undefined
           }
         ];
       };
