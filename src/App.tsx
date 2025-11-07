@@ -8,6 +8,7 @@ import EvaluationForm from './pages/EvaluationForm';
 import Results from './pages/Results';
 import Article from './pages/Article';
 import Pricing from './pages/Pricing';
+import Partners from './pages/Partners';
 import SubscriptionSuccess from './pages/SubscriptionSuccess';
 import SubscriptionCanceled from './pages/SubscriptionCanceled';
 import PrivacyPolicy from './pages/PrivacyPolicy';
@@ -30,6 +31,7 @@ function App() {
                 <Route path="/evaluate" element={<EvaluationForm />} />
                 <Route path="/results" element={<Results />} />
                 <Route path="/pricing" element={<Pricing />} />
+                <Route path="/partners" element={<Partners />} />
                 <Route path="/subscription/success" element={<SubscriptionSuccess />} />
                 <Route path="/subscription/canceled" element={<SubscriptionCanceled />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicy />} />

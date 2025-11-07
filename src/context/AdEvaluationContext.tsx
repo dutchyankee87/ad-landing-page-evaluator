@@ -817,22 +817,49 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
 
     // Generate element comparisons
     const generateElementComparisons = () => {
+      // Generate dynamic content based on user inputs
+      const platform = adData.platform || 'meta';
+      const landingPageURL = landingPageData.url || 'your-landing-page.com';
+      
+      // Platform-specific ad content generation
+      const getAdContent = (platform: string) => {
+        const templates = {
+          meta: { headline: "🔥 Transform Your Business Today - Save 50%", cta: "Get Started Now" },
+          tiktok: { headline: "This productivity hack will change your life! 📈", cta: "Try for Free" },
+          linkedin: { headline: "Boost Enterprise Productivity by 40%", cta: "Download Whitepaper" },
+          google: { headline: "Business Software | 5-Star Rated | Free Trial", cta: "Start Free Trial" },
+          reddit: { headline: "Finally found software that actually works", cta: "Check it out" }
+        };
+        return templates[platform as keyof typeof templates] || templates.meta;
+      };
+      
+      // Landing page content based on URL type
+      const getLpContent = (url: string) => {
+        if (url.includes('shop')) return { headline: "Premium Products - Free Shipping", cta: "Shop Now" };
+        if (url.includes('app') || url.includes('software')) return { headline: "Streamline Your Workflow Today", cta: "Start Free Trial" };
+        if (url.includes('course')) return { headline: "Master New Skills in 30 Days", cta: "Enroll Now" };
+        return { headline: "Welcome to Our Landing Page", cta: "Learn More" };
+      };
+      
+      const adContent = getAdContent(platform);
+      const lpContent = getLpContent(landingPageURL);
+      
       return [
         {
           element: 'Headline Text',
-          adValue: 'Build your pension & get €1,000 bonus',
-          landingPageValue: 'Plan your future pension',
+          adValue: adContent.headline,
+          landingPageValue: lpContent.headline,
           status: 'mismatch' as const,
           severity: 'HIGH' as const,
-          recommendation: 'Change H1 to exact ad text: "Build your pension & get €1,000 bonus" at 42px font size, bold, color #004c4c'
+          recommendation: `Change H1 to match ad headline: "${adContent.headline}" for better message consistency`
         },
         {
           element: 'Primary CTA Button',
-          adValue: 'Claim your bonus (Orange #FF6B35, 14px text)',
-          landingPageValue: 'Sign up now (Blue #0066CC, 16px text)',
-          status: 'mismatch' as const,
+          adValue: adContent.cta,
+          landingPageValue: lpContent.cta,
+          status: adContent.cta.toLowerCase() === lpContent.cta.toLowerCase() ? 'match' as const : 'mismatch' as const,
           severity: 'HIGH' as const,
-          recommendation: 'Replace with "Claim your €1,000 bonus" in teal button (#004c4c) 320×56px with white 18px bold text'
+          recommendation: adContent.cta.toLowerCase() === lpContent.cta.toLowerCase() ? undefined : `Update CTA button to match ad text: "${adContent.cta}"`
         },
         {
           element: 'Brand Color Scheme',

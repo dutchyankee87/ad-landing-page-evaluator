@@ -11,6 +11,7 @@ import ComparisonGrid from '../components/results/ComparisonGrid';
 import QuickWins from '../components/results/QuickWins';
 import LanguageAnalysis from '../components/results/LanguageAnalysis';
 import AdSummary from '../components/results/AdSummary';
+import PartnerRecommendations from '../components/results/PartnerRecommendations';
 import { HeatmapOverlay } from '../components/heatmap/HeatmapOverlay';
 import { PerformanceFeedbackModal } from '../components/feedback/PerformanceFeedbackModal';
 import { IndustryBenchmarks } from '../components/benchmarks/IndustryBenchmarks';
@@ -338,6 +339,9 @@ const Results: React.FC = () => {
                     <Suggestions suggestions={results.suggestions} />
                   )}
                 </div>
+
+                {/* Partner Recommendations */}
+                <PartnerRecommendations overallScore={results.overallScore} />
               </div>
             </div>
             

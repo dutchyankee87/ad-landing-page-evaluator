@@ -1,9 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, TrendingUp, AlertTriangle, CheckCircle, DollarSign, Zap, Target, Clock, BarChart3 } from 'lucide-react';
+import { ArrowRight, TrendingUp, AlertTriangle, CheckCircle, DollarSign, Zap, Target, Clock, BarChart3, Users } from 'lucide-react';
 import SEOHead from '../components/SEOHead';
 import ArticleSection from '../components/ArticleSection';
+import PartnerSection from '../components/partners/PartnerSection';
 
 const Home: React.FC = () => {
   const containerVariants = {
@@ -494,6 +495,78 @@ const Home: React.FC = () => {
 
       {/* Articles Section */}
       <ArticleSection />
+
+      {/* Partners Trust Section */}
+      <motion.section 
+        className="mb-16"
+        initial={{ opacity: 0, y: 60 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        viewport={{ once: true, margin: "-100px" }}
+      >
+        <div className="max-w-5xl mx-auto">
+          <motion.div 
+            className="text-center mb-12"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+          >
+            <motion.div
+              initial={{ scale: 0 }}
+              whileInView={{ scale: 1 }}
+              transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+              viewport={{ once: true }}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-full text-sm font-medium mb-6"
+            >
+              <Users className="h-4 w-4" />
+              Complete Your Marketing Stack
+            </motion.div>
+            
+            <motion.h2 
+              className="text-3xl md:text-4xl font-bold text-gray-900 mb-4"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.6 }}
+              viewport={{ once: true }}
+            >
+              Trusted by Leading Marketers
+            </motion.h2>
+            
+            <motion.p 
+              className="text-lg text-gray-600 max-w-2xl mx-auto"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4, duration: 0.6 }}
+              viewport={{ once: true }}
+            >
+              Discover powerful tools that extend your ad optimization success across your entire marketing funnel
+            </motion.p>
+          </motion.div>
+          
+          <PartnerSection
+            showHeader={false}
+            compact={true}
+            className="max-w-4xl mx-auto"
+          />
+          
+          <motion.div 
+            className="text-center mt-8"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ delay: 0.8 }}
+            viewport={{ once: true }}
+          >
+            <Link 
+              to="/partners" 
+              className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors font-medium"
+            >
+              View All Partners
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </motion.div>
+        </div>
+      </motion.section>
 
       {/* Final CTA */}
       <motion.section
