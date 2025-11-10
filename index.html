@@ -20,7 +20,17 @@
     
     <!-- Preconnect to external domains -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://api.openai.com">
+    <link rel="preconnect" href="https://www.googletagmanager.com">
+    
+    <!-- DNS prefetch for performance -->
+    <link rel="dns-prefetch" href="https://adalign.io">
+    
+    <!-- Preload critical resources -->
+    <link rel="modulepreload" href="/src/main.tsx">
+    <link rel="modulepreload" href="/src/App.tsx">
+    <link rel="modulepreload" href="/src/pages/Home.tsx">
     
     <!-- Base Open Graph tags (will be overridden by page-specific tags) -->
     <meta property="og:site_name" content="ADalign.io" />
@@ -46,7 +56,41 @@
       "creator": {
         "@type": "Organization",
         "name": "ADalign.io"
-      }
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "ratingCount": "500",
+        "bestRating": "5"
+      },
+      "featureList": [
+        "AI-powered ad analysis",
+        "Landing page optimization",
+        "Visual alignment scoring",
+        "Content congruence analysis",
+        "Multi-platform support (Meta, Google, TikTok, LinkedIn)"
+      ]
+    }
+    </script>
+    
+    <!-- Organization Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "ADalign.io",
+      "url": "https://adalign.io",
+      "logo": "https://adalign.io/og-image.jpg",
+      "description": "AI-powered ad optimization platform helping marketers improve ad-to-landing page alignment",
+      "foundingDate": "2025",
+      "sameAs": [],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "customer service",
+        "availableLanguage": "English"
+      },
+      "areaServed": "Worldwide",
+      "serviceType": "Digital Marketing Tools"
     }
     </script>
   </head>

@@ -36,15 +36,19 @@ const Header: React.FC = () => {
           
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-2">
-            <motion.a 
-              href="/#articles" 
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100/80 transition-all duration-300 backdrop-blur-sm"
-              whileHover={{ scale: 1.02, y: -1 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <BookOpen className="h-4 w-4" />
-              <span className="font-medium">Articles</span>
-            </motion.a>
+            <motion.div whileHover={{ scale: 1.02, y: -1 }} whileTap={{ scale: 0.98 }}>
+              <Link 
+                to="/blog" 
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 backdrop-blur-sm ${
+                  location.pathname === '/blog' || location.pathname.startsWith('/blog/')
+                    ? 'bg-green-100 text-green-700 border border-green-200'
+                    : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100/80'
+                }`}
+              >
+                <BookOpen className="h-4 w-4" />
+                <span className="font-medium">Blog</span>
+              </Link>
+            </motion.div>
             
             <motion.div whileHover={{ scale: 1.02, y: -1 }} whileTap={{ scale: 0.98 }}>
               <Link 
@@ -135,17 +139,24 @@ const Header: React.FC = () => {
               className="md:hidden border-t border-gray-200 bg-white/95 backdrop-blur-md"
             >
               <div className="py-4 space-y-2">
-                <motion.a 
-                  href="/#articles" 
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition-all duration-200"
-                  onClick={() => setIsMobileMenuOpen(false)}
+                <motion.div
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.1 }}
                 >
-                  <BookOpen className="h-4 w-4" />
-                  <span>Articles</span>
-                </motion.a>
+                  <Link 
+                    to="/blog" 
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+                      location.pathname === '/blog' || location.pathname.startsWith('/blog/')
+                        ? 'bg-green-100 text-green-700'
+                        : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
+                    }`}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <BookOpen className="h-4 w-4" />
+                    <span>Blog</span>
+                  </Link>
+                </motion.div>
                 
                 <motion.div
                   initial={{ opacity: 0, x: -20 }}

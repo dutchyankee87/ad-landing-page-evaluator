@@ -76,7 +76,7 @@ const Home: React.FC = () => {
             variants={itemVariants}
             className="text-xl md:text-2xl text-gray-600 mb-8 leading-relaxed max-w-3xl mx-auto"
           >
-            Find out if your ads and landing pages are working together or working against each other. Our AI compares your Meta, TikTok, LinkedIn, Reddit & Google ads to your landing pages and shows you exactly where they don't align.
+            Find out if your ads and landing pages are working together or working against each other. Our AI compares your <Link to="/evaluate" className="text-orange-600 hover:text-orange-700 underline">Meta, TikTok, LinkedIn, Reddit & Google ads</Link> to your landing pages and shows you exactly where they don't align.
           </motion.p>
           
           <motion.div 

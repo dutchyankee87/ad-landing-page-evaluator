@@ -43,6 +43,48 @@ const Pricing: React.FC = () => {
         url="/pricing"
       />
       
+      {/* FAQ Structured Data */}
+      <script type="application/ld+json">
+        {JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "Is there a free trial?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Better than a trial — you get 3 free evaluations per month. No credit card required, no time limits."
+              }
+            },
+            {
+              "@type": "Question", 
+              "name": "How accurate is the AI?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Our AI achieves 94% accuracy vs manual expert analysis, but delivers results in 60 seconds instead of days."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Can I cancel anytime?",
+              "acceptedAnswer": {
+                "@type": "Answer", 
+                "text": "Absolutely. Cancel with one click, no questions asked. No contracts, no hidden fees."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "What if I exceed my limit?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "No overage fees! We'll simply suggest upgrading to a plan that fits your usage. Limits reset monthly."
+              }
+            }
+          ]
+        })}
+      </script>
+      
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50/30 to-blue-50/20 py-16">
         <div className="container mx-auto px-4">
           
