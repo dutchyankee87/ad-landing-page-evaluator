@@ -568,6 +568,96 @@ const Home: React.FC = () => {
         </div>
       </motion.section>
 
+      {/* FAQ Section */}
+      <motion.section 
+        className="mb-16"
+        id="faq"
+        initial={{ opacity: 0, y: 60 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        viewport={{ once: true, margin: "-100px" }}
+      >
+        <div className="max-w-4xl mx-auto">
+          <motion.div 
+            className="text-center mb-12"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Frequently Asked Questions
+            </h2>
+            <p className="text-lg text-gray-600">
+              Everything you need to know about ADalign.io
+            </p>
+          </motion.div>
+
+          <div className="space-y-6">
+            {[
+              {
+                question: "How does the AI analysis work?",
+                answer: "Our AI compares your ad creative, copy, and landing page content across three key dimensions: visual alignment (colors, images, design), message consistency (headlines, promises, offers), and tone matching (urgency, formality, emotion). The analysis takes 60 seconds and provides specific recommendations."
+              },
+              {
+                question: "Which ad platforms are supported?",
+                answer: "We support all major advertising platforms including Meta (Facebook & Instagram), Google Ads, TikTok, LinkedIn, and Reddit. Simply upload your ad creative and provide your landing page URL for instant analysis."
+              },
+              {
+                question: "Is my ad data secure and private?",
+                answer: "Yes, absolutely. We process your ads temporarily for analysis only. No data is stored permanently, and we never share your ad content or landing page information with third parties. See our <a href='/privacy-policy' class='text-orange-600 hover:text-orange-700 underline'>Privacy Policy</a> for full details."
+              },
+              {
+                question: "How accurate is the analysis?",
+                answer: "Our AI achieves 94% accuracy compared to manual expert analysis, based on testing with over 10,000 ad-to-page comparisons. The tool has been trained on successful campaigns across 50+ industries."
+              },
+              {
+                question: "Can I use this for multiple ad accounts?",
+                answer: "Yes! Our <a href='/pricing' class='text-orange-600 hover:text-orange-700 underline'>paid plans</a> support unlimited ad accounts and team collaboration. The free plan allows 3 analyses per month from any accounts."
+              },
+              {
+                question: "What if I don't agree with the recommendations?",
+                answer: "Our recommendations are data-driven suggestions based on conversion optimization best practices. You can always choose which suggestions to implement. We also provide explanations for why each recommendation matters for performance."
+              }
+            ].map((faq, index) => (
+              <motion.div
+                key={index}
+                className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                viewport={{ once: true }}
+              >
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                  {faq.question}
+                </h3>
+                <div 
+                  className="text-gray-600 leading-relaxed"
+                  dangerouslySetInnerHTML={{ __html: faq.answer }}
+                />
+              </motion.div>
+            ))}
+          </div>
+
+          <motion.div 
+            className="text-center mt-8"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ delay: 0.8 }}
+            viewport={{ once: true }}
+          >
+            <p className="text-gray-600 mb-4">Still have questions?</p>
+            <Link 
+              to="/pricing"
+              className="inline-flex items-center gap-2 text-orange-600 hover:text-orange-700 font-medium"
+            >
+              View detailed pricing & features
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </motion.div>
+        </div>
+      </motion.section>
+
       {/* Final CTA */}
       <motion.section
         initial={{ opacity: 0, y: 60 }}
