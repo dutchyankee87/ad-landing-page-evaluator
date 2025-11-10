@@ -14,6 +14,7 @@ const Results = React.lazy(() => import('./pages/Results'));
 const Article = React.lazy(() => import('./pages/Article'));
 const Blog = React.lazy(() => import('./pages/Blog'));
 const BlogPost = React.lazy(() => import('./pages/BlogPost'));
+const FAQ = React.lazy(() => import('./pages/FAQ'));
 const EcommerceLanding = React.lazy(() => import('./pages/EcommerceLanding'));
 const Pricing = React.lazy(() => import('./pages/Pricing'));
 const Partners = React.lazy(() => import('./pages/Partners'));
@@ -49,6 +50,7 @@ function App() {
                   <Route path="/results" element={<Results />} />
                   <Route path="/blog" element={<Blog />} />
                   <Route path="/blog/:slug" element={<BlogPost />} />
+                  <Route path="/faq" element={<FAQ />} />
                   <Route path="/ecommerce" element={<EcommerceLanding />} />
                   <Route path="/pricing" element={<Pricing />} />
                   <Route path="/partners" element={<Partners />} />
