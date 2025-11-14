@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
+import { ElementComparison } from '../lib/api';
 import { 
   canEvaluate, 
   getRemainingEvaluations, 
@@ -76,15 +77,6 @@ interface EnhancedSuggestion {
   expectedImpact: string;
   effort: 'LOW' | 'MEDIUM' | 'HIGH';
   confidenceLevel?: number;
-}
-
-interface ElementComparison {
-  element: string;
-  adValue: string;
-  landingPageValue: string;
-  status: 'match' | 'mismatch' | 'partial_match' | 'missing';
-  severity: 'HIGH' | 'MEDIUM' | 'LOW';
-  recommendation?: string;
 }
 
 interface QuickWin {
@@ -506,8 +498,14 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
         componentScores: response.componentScores,
         suggestions: response.suggestions,
         enhancedSuggestions: generateEnhancedSuggestionsFromAPI(),
-        elementComparisons: generateElementComparisonsFromAPI(),
-        quickWins: generateQuickWinsFromAPI()
+        elementComparisons: response.elementComparisons || generateElementComparisonsFromAPI(),
+        quickWins: generateQuickWinsFromAPI(),
+        // Pass through additional API response fields  
+        strategicRecommendations: response.strategicRecommendations,
+        riskFactors: response.riskFactors,
+        missedOpportunities: response.missedOpportunities,
+        heatmapZones: response.heatmapZones,
+        insights: response.insights
       });
       setHasEvaluated(true);
       

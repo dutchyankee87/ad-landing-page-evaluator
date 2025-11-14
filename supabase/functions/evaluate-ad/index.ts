@@ -99,6 +99,24 @@ First, detect the language of the ad text and provide culturally-aware recommend
 ANALYSIS TASK:
 Analyze this ad screenshot and provide a strategic assessment of its psychological persuasion effectiveness and conversion potential. Apply Cialdini's 6 principles of influence, advanced conversion psychology, AND cultural/linguistic optimization.
 
+ELEMENT EXTRACTION FOR COMPARISON:
+Extract specific elements from the ad image for direct comparison with the landing page. Look carefully at the visual content and identify:
+
+1. **Headline/Main Text**: The primary headline or main text visible in the ad
+2. **Subheadline**: Any secondary or supporting text
+3. **Call-to-Action (CTA)**: The specific CTA button text or action text
+4. **Value Proposition**: The main benefit or offer mentioned
+5. **Price/Discount**: Any pricing, discount, or promotional information
+6. **Product/Service Name**: The specific product, service, or brand name
+7. **Social Proof Elements**: Reviews, testimonials, user counts, ratings
+8. **Urgency/Scarcity**: Any time-sensitive or limited availability messaging
+9. **Visual Style**: Dominant colors, design style, imagery type
+10. **Contact/Brand Info**: Company name, contact information, website
+
+For each element you can identify in the ad, compare it to what you would expect to find on the landing page based on the provided URL: ${landingPageData.url}
+
+CRITICAL: Read the ad image carefully and extract the EXACT text as it appears. Do not paraphrase or summarize - provide word-for-word transcription of visible text elements. For elements not visible in the ad, mark them as "Not visible in ad" or "N/A".
+
 PROVIDE EXECUTIVE-LEVEL ANALYSIS FOR:
 1. **Brand Coherence**: How effectively does this ad create expectations that the landing page can fulfill?
 2. **User Journey Assessment**: Will users who click this ad find what they expect on the landing page?
@@ -214,6 +232,32 @@ Return ONLY a JSON object in this exact format:
       "principle": "reciprocity" | "commitment" | "socialProof" | "authority" | "liking" | "scarcity" | "general"
     }
   ],
+  "elementComparisons": [
+    {
+      "element": "Headline Text",
+      "adValue": "Exact headline text transcribed word-for-word from the ad image",
+      "landingPageValue": "Expected/predicted headline text on landing page based on URL analysis",
+      "status": "match" | "mismatch" | "partial_match" | "missing",
+      "severity": "HIGH" | "MEDIUM" | "LOW",
+      "recommendation": "Specific action to improve alignment between ad and landing page"
+    },
+    {
+      "element": "Call-to-Action Button",
+      "adValue": "Exact CTA text transcribed from the ad",
+      "landingPageValue": "Expected CTA text on landing page",
+      "status": "match" | "mismatch" | "partial_match" | "missing",
+      "severity": "HIGH" | "MEDIUM" | "LOW",
+      "recommendation": "Specific recommendation to align CTA messaging"
+    },
+    {
+      "element": "Value Proposition",
+      "adValue": "Main benefit/offer text from the ad",
+      "landingPageValue": "Expected value proposition on landing page",
+      "status": "match" | "mismatch" | "partial_match" | "missing",
+      "severity": "HIGH" | "MEDIUM" | "LOW",
+      "recommendation": "Specific action to improve value proposition alignment"
+    }
+  ],
   "riskFactors": ["Primary risk factor that could hurt campaign performance", "Secondary risk factor"],
   "missedOpportunities": ["Key opportunity being overlooked", "Secondary missed opportunity"],
   "heatmapZones": [
@@ -295,7 +339,8 @@ Return ONLY a JSON object in this exact format:
       strategicRecommendations: analysis.strategicRecommendations || [],
       riskFactors: analysis.riskFactors || [],
       missedOpportunities: analysis.missedOpportunities || [],
-      heatmapZones: analysis.heatmapZones || []
+      heatmapZones: analysis.heatmapZones || [],
+      elementComparisons: analysis.elementComparisons || []
     };
 
     console.log('🎉 GPT-4o analysis complete!', { overallScore });

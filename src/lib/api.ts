@@ -25,17 +25,55 @@ export interface EvaluationRequest {
   userEmail?: string;
 }
 
+export interface ElementComparison {
+  element: string;
+  adValue: string;
+  landingPageValue: string;
+  status: 'match' | 'mismatch' | 'partial_match' | 'missing';
+  severity: 'HIGH' | 'MEDIUM' | 'LOW';
+  recommendation?: string;
+}
+
+export interface StrategicRecommendation {
+  priority: 'HIGH' | 'MEDIUM' | 'LOW';
+  recommendation: string;
+  expectedImpact: string;
+  effort: 'LOW' | 'MEDIUM' | 'HIGH';
+}
+
+export interface HeatmapZone {
+  location: string;
+  description: string;
+  severity: 'HIGH' | 'MEDIUM' | 'LOW';
+  issue: string;
+  suggestion: string;
+  expectedImpact: string;
+}
+
 export interface EvaluationResponse {
   overallScore: number;
   componentScores: {
-    visualMatch: number;
-    contextualMatch: number;
-    toneAlignment: number;
+    visualMatch?: number;
+    contextualMatch?: number;
+    toneAlignment?: number;
+    brandCoherence?: number;
+    userJourneyAlignment?: number;
+    conversionOptimization?: number;
   };
-  suggestions: {
+  suggestions?: {
     visual: string[];
     contextual: string[];
     tone: string[];
+  };
+  elementComparisons?: ElementComparison[];
+  strategicRecommendations?: StrategicRecommendation[];
+  riskFactors?: string[];
+  missedOpportunities?: string[];
+  heatmapZones?: HeatmapZone[];
+  insights?: {
+    brandCoherence?: string;
+    userJourneyAlignment?: string;
+    conversionOptimization?: string;
   };
 }
 
