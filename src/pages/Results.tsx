@@ -186,6 +186,13 @@ const Results: React.FC = () => {
                   <ComponentScores componentScores={results.componentScores} />
                 </div>
                 
+                {/* Ad vs Landing Page Comparison Grid */}
+                {results.elementComparisons && (
+                  <div>
+                    <ComparisonGrid comparisons={results.elementComparisons} />
+                  </div>
+                )}
+                
                 {/* Language & Cultural Analysis */}
                 {results.detectedLanguage && results.culturalContext && (
                   <div>
@@ -200,13 +207,6 @@ const Results: React.FC = () => {
                 {results.quickWins && (
                   <div>
                     <QuickWins quickWins={results.quickWins} />
-                  </div>
-                )}
-                
-                {/* Ad vs Landing Page Comparison Grid */}
-                {results.elementComparisons && (
-                  <div>
-                    <ComparisonGrid comparisons={results.elementComparisons} />
                   </div>
                 )}
             
