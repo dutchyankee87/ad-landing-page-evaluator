@@ -238,7 +238,11 @@ const screenshotAdUrl = async (adUrl) => {
         user_agent: previewSettings.user_agent,
         block_ads: true, // Block other ads to focus on target ad
         block_trackers: true,
-        block_cookie_banners: true
+        block_cookie_banners: true,
+        hide_cookie_banners: true,
+        click_accept: true,
+        press_escape: true,
+        js_code: "document.querySelectorAll('[class*=\"cookie\"], [class*=\"consent\"], [class*=\"gdpr\"], [id*=\"cookie\"], [id*=\"consent\"], [id*=\"gdpr\"]').forEach(el => el.remove());"
       }),
       timeout: isPreview ? 35000 : 25000 // Longer timeout for preview pages
     });
@@ -289,7 +293,16 @@ const screenshotLandingPage = async (url) => {
         height: 800,
         output: 'json',
         file_type: 'png',
-        wait_for_event: 'load'
+        wait_for_event: 'load',
+        delay: 3000,
+        block_cookie_banners: true,
+        block_ads: true,
+        block_trackers: true,
+        hide_cookie_banners: true,
+        click_accept: true,
+        press_escape: true,
+        wait_for_selector: '[role="main"], main, .content',
+        js_code: "document.querySelectorAll('[class*=\"cookie\"], [class*=\"consent\"], [class*=\"gdpr\"], [id*=\"cookie\"], [id*=\"consent\"], [id*=\"gdpr\"]').forEach(el => el.remove());"
       }),
       timeout: 20000
     });
