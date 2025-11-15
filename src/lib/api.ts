@@ -32,6 +32,27 @@ export interface ElementComparison {
   status: 'match' | 'mismatch' | 'partial_match' | 'missing';
   severity: 'HIGH' | 'MEDIUM' | 'LOW';
   recommendation?: string;
+  category?: 'content' | 'visual' | 'emotional' | 'trust' | 'mobile';
+  colorAnalysis?: {
+    adColors: string[];
+    pageColors: string[];
+    matchScore: number;
+  };
+  emotionalTone?: {
+    adTone: string;
+    pageTone: string;
+    alignment: number;
+  };
+  trustSignals?: {
+    adSignals: string[];
+    pageSignals: string[];
+    credibilityGap: string;
+  };
+  mobileOptimization?: {
+    adMobileFriendly: boolean;
+    pageMobileFriendly: boolean;
+    consistencyScore: number;
+  };
 }
 
 export interface StrategicRecommendation {
@@ -245,6 +266,80 @@ function generateFallbackEvaluation(platform: string): EvaluationResponse {
   const toneScore = Math.floor(Math.random() * 3) + 6; // 6-8
   const overallScore = Math.round(((visualScore + contextualScore + toneScore) / 3) * 10) / 10;
 
+  // Generate enhanced element comparisons with new analysis types
+  const elementComparisons: ElementComparison[] = [
+    {
+      element: 'Primary Headline',
+      adValue: 'Get 50% Off Premium Software',
+      landingPageValue: 'Save Big on Professional Tools',
+      status: 'partial_match',
+      severity: 'HIGH',
+      category: 'content',
+      recommendation: 'Match the exact offer from your ad (50% off) in the landing page headline',
+      emotionalTone: {
+        adTone: 'Urgent, Deal-focused',
+        pageTone: 'Professional, Conservative',
+        alignment: 6
+      }
+    },
+    {
+      element: 'Color Scheme',
+      adValue: 'Blue and Orange accent',
+      landingPageValue: 'Blue and White theme',
+      status: 'partial_match',
+      severity: 'MEDIUM',
+      category: 'visual',
+      recommendation: 'Add orange accents to landing page CTA and headers to match ad',
+      colorAnalysis: {
+        adColors: ['#1E40AF', '#F97316'],
+        pageColors: ['#1E40AF', '#FFFFFF'],
+        matchScore: 7
+      }
+    },
+    {
+      element: 'Trust Signals',
+      adValue: '5-star reviews, award badge',
+      landingPageValue: 'Customer testimonials only',
+      status: 'mismatch',
+      severity: 'HIGH',
+      category: 'trust',
+      recommendation: 'Add award badges and star ratings prominently near the CTA',
+      trustSignals: {
+        adSignals: ['5-star reviews', 'Award badge'],
+        pageSignals: ['Testimonials'],
+        credibilityGap: 'Missing social proof elements shown in ad'
+      }
+    },
+    {
+      element: 'Call-to-Action',
+      adValue: 'Start Free Trial',
+      landingPageValue: 'Get Started Now',
+      status: 'mismatch',
+      severity: 'HIGH',
+      category: 'content',
+      recommendation: 'Change CTA button text to match ad exactly: "Start Free Trial"',
+      emotionalTone: {
+        adTone: 'Risk-free, trial-focused',
+        pageTone: 'Generic, action-focused', 
+        alignment: 5
+      }
+    },
+    {
+      element: 'Mobile Experience',
+      adValue: 'Mobile-optimized ad format',
+      landingPageValue: 'Desktop-first design',
+      status: 'mismatch',
+      severity: 'MEDIUM',
+      category: 'mobile',
+      recommendation: 'Optimize landing page for mobile users who clicked from mobile ads',
+      mobileOptimization: {
+        adMobileFriendly: true,
+        pageMobileFriendly: false,
+        consistencyScore: 4
+      }
+    }
+  ];
+
   return {
     overallScore,
     componentScores: {
@@ -252,6 +347,7 @@ function generateFallbackEvaluation(platform: string): EvaluationResponse {
       contextualMatch: contextualScore,
       toneAlignment: toneScore
     },
-    suggestions
+    suggestions,
+    elementComparisons
   };
 }

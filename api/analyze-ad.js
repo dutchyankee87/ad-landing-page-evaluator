@@ -496,104 +496,111 @@ export default async function handler(req, res) {
 
     const platformInfo = getPlatformPrompt(adData.platform);
     
-    const prompt = `You are an expert ${platformInfo} ads analyst with STRICT evaluation standards.
+    const prompt = `Analyze these 2 images: AD (${adSourceType === 'video' ? 'video frame' : 'image'}) + LANDING PAGE for ${platformInfo}.
 
-You will analyze TWO images:
-1. AD SCREENSHOT: The user's ${adSourceType === 'video' ? 'video ad captured frame' : adSourceType === 'url' ? 'ad library URL screenshot' : 'uploaded ad creative'}${adSourceType === 'video' ? ` (processed via ${videoProcessingMethod})` : ''}
-2. LANDING PAGE SCREENSHOT: The destination page (${landingPageData.url})
+Target: ${audienceData.ageRange}, ${audienceData.gender}, ${audienceData.interests}
 
-Target Audience: ${audienceData.ageRange}, ${audienceData.gender}, interests: ${audienceData.interests}
+EXTRACT & ANALYZE:
 
-**ELEMENT EXTRACTION FOR COMPARISON:**
-First, carefully read the ad image and extract specific elements for direct comparison with the landing page. Look for:
+1. **Primary Colors** (3-5 dominant colors from each image as hex codes)
+2. **Text Elements** (exact transcription):
+   - Headlines, CTAs, offers, product names
+3. **Visual Style** (design approach, layout, imagery)
+4. **Trust Signals** (reviews, ratings, badges, testimonials)
+5. **Mobile Elements** (responsive design, mobile-first layout)
+6. **Emotional Tone** (urgent, professional, playful, etc.)
 
-1. **Headline/Main Text**: The primary headline or main text visible in the ad
-2. **Call-to-Action (CTA)**: The specific CTA button text or action text
-3. **Value Proposition**: The main benefit or offer mentioned
-4. **Price/Discount**: Any pricing, discount, or promotional information
-5. **Product/Service Name**: The specific product, service, or brand name
-6. **Social Proof Elements**: Reviews, testimonials, user counts, ratings
-7. **Urgency/Scarcity**: Any time-sensitive or limited availability messaging
+SCORING (1-10, be strict - most scores 1-4):
+- **Visual**: Color/design consistency
+- **Contextual**: Message/offer alignment  
+- **Tone**: Voice/personality match
 
-**CRITICAL: Extract the EXACT text as it appears in the ad. Do not paraphrase - provide word-for-word transcription.**
-
-**CRITICAL SCORING RULES**: 
-- If the ad and landing page show COMPLETELY DIFFERENT products, services, brands, or industries (e.g., nature photo vs banking page), ALL scores MUST be 1-2
-- If they're somewhat related but inconsistent: scores 3-4
-- If they're well-matched with minor issues: scores 5-7
-- If they're perfectly aligned: scores 8-10
-
-**BE EXTREMELY STRICT** - Most ad-to-page combinations should score 1-4 unless they're genuinely excellent matches.
-
-Analyze both images with HARSH evaluation (1-10 scores):
-
-1. **Visual Match** (1-10):
-   - SCORE 1: Completely different visual styles, colors, fonts (e.g., nature vs corporate)
-   - SCORE 2: Different industries/contexts with no visual connection
-   - SCORE 3-4: Different styles but same general category
-   - SCORE 5-7: Similar styles with some consistency
-   - SCORE 8-10: Exceptional visual consistency and brand alignment
-
-2. **Contextual Match** (1-10):
-   - SCORE 1: Completely different products/services/industries
-   - SCORE 2: Different businesses with no logical connection
-   - SCORE 3-4: Related category but different offerings
-   - SCORE 5-7: Same business with minor message inconsistencies
-   - SCORE 8-10: Perfect message and offer alignment
-
-3. **Tone Alignment** (1-10):
-   - SCORE 1: Completely different tones (e.g., artistic vs corporate)
-   - SCORE 2: Different brand personalities with no connection
-   - SCORE 3-4: Same general tone but inconsistent execution
-   - SCORE 5-7: Similar tone with minor variations
-   - SCORE 8-10: Perfect tone and voice consistency
-
-**INSTRUCTIONS FOR SPECIFIC SUGGESTIONS**:
-- Give EXACT color codes, font names, or pixel measurements when possible
-- Reference specific elements you can see in both images
-- Provide copy-paste ready text suggestions
-- Include specific technical instructions (CSS, HTML elements)
-- Mention exact positioning, sizing, or placement changes
-- Quote specific words or phrases from the ad to use on the landing page
-
-**First, describe what you see in each image specifically, then evaluate the match quality.**
-
-Return ONLY valid JSON:
+Return JSON:
 {
   "scores": {
-    "visualMatch": [1-10 based on actual visual consistency],
-    "contextualMatch": [1-10 based on actual content alignment], 
-    "toneAlignment": [1-10 based on actual tone consistency]
+    "visualMatch": [1-10],
+    "contextualMatch": [1-10],
+    "toneAlignment": [1-10]
   },
   "suggestions": {
-    "visual": ["SPECIFIC visual changes with exact colors, fonts, or elements mentioned", "Detailed design recommendations with pixel measurements or percentages", "Precise layout modifications based on what you see"],
-    "contextual": ["Exact headline changes using specific words from the ad", "Specific CTA button text that matches the ad promise", "Detailed content additions mentioning specific features or benefits"],
-    "tone": ["Specific word replacements to match ad voice", "Exact phrases to add or remove", "Precise messaging adjustments with example copy"]
+    "visual": ["Specific color/design changes"],
+    "contextual": ["Exact text/message changes"],
+    "tone": ["Voice/personality adjustments"]
   },
   "elementComparisons": [
     {
-      "element": "Headline Text",
-      "adValue": "Exact headline text transcribed word-for-word from the ad image",
-      "landingPageValue": "Exact headline text from landing page image or 'Not visible' if unclear",
-      "status": "match" | "mismatch" | "partial_match" | "missing",
-      "severity": "HIGH" | "MEDIUM" | "LOW",
-      "recommendation": "Specific action to improve alignment between ad and landing page"
+      "element": "Primary Colors",
+      "adValue": "Main colors in ad",
+      "landingPageValue": "Main colors on page",
+      "status": "match|mismatch|partial_match|missing",
+      "severity": "HIGH|MEDIUM|LOW",
+      "category": "visual",
+      "recommendation": "Specific color adjustment",
+      "colorAnalysis": {
+        "adColors": ["#hex1", "#hex2"],
+        "pageColors": ["#hex3", "#hex4"],
+        "matchScore": [1-10]
+      }
     },
     {
-      "element": "Call-to-Action Button",
-      "adValue": "Exact CTA text transcribed from the ad",
-      "landingPageValue": "Exact CTA text from landing page or 'Not visible'",
-      "status": "match" | "mismatch" | "partial_match" | "missing",
-      "severity": "HIGH" | "MEDIUM" | "LOW",
-      "recommendation": "Specific recommendation to align CTA messaging"
+      "element": "Primary Headline",
+      "adValue": "Exact text from ad",
+      "landingPageValue": "Exact text from page",
+      "status": "match|mismatch|partial_match|missing",
+      "severity": "HIGH|MEDIUM|LOW",
+      "category": "content",
+      "recommendation": "Specific text change"
     },
     {
-      "element": "Value Proposition",
-      "adValue": "Main benefit/offer text from the ad",
-      "landingPageValue": "Main benefit/offer text from landing page",
-      "status": "match" | "mismatch" | "partial_match" | "missing",
-      "severity": "HIGH" | "MEDIUM" | "LOW",
-      "recommendation": "Specific action to improve value proposition alignment"
+      "element": "Call-to-Action",
+      "adValue": "Exact CTA text",
+      "landingPageValue": "Exact CTA text",
+      "status": "match|mismatch|partial_match|missing",
+      "severity": "HIGH|MEDIUM|LOW",
+      "category": "content",
+      "recommendation": "Specific CTA change"
+    },
+    {
+      "element": "Emotional Tone",
+      "adValue": "Ad's emotional approach",
+      "landingPageValue": "Page's emotional approach",
+      "status": "match|mismatch|partial_match|missing",
+      "severity": "HIGH|MEDIUM|LOW",
+      "category": "emotional",
+      "recommendation": "Tone adjustment needed",
+      "emotionalTone": {
+        "adTone": "Descriptive tone",
+        "pageTone": "Descriptive tone",
+        "alignment": [1-10]
+      }
+    },
+    {
+      "element": "Trust Signals",
+      "adValue": "Trust elements in ad",
+      "landingPageValue": "Trust elements on page",
+      "status": "match|mismatch|partial_match|missing",
+      "severity": "HIGH|MEDIUM|LOW",
+      "category": "trust",
+      "recommendation": "Trust signal improvement",
+      "trustSignals": {
+        "adSignals": ["element1", "element2"],
+        "pageSignals": ["element1", "element2"],
+        "credibilityGap": "Description of gap"
+      }
+    },
+    {
+      "element": "Mobile Optimization",
+      "adValue": "Mobile design assessment",
+      "landingPageValue": "Mobile design assessment",
+      "status": "match|mismatch|partial_match|missing",
+      "severity": "MEDIUM|LOW",
+      "category": "mobile",
+      "recommendation": "Mobile optimization needed",
+      "mobileOptimization": {
+        "adMobileFriendly": true|false,
+        "pageMobileFriendly": true|false,
+        "consistencyScore": [1-10]
+      }
     }
   ]
 }`;
@@ -634,8 +641,8 @@ Return ONLY valid JSON:
         content: content
       }],
       response_format: { type: "json_object" },
-      max_tokens: 2000, // Increased for more detailed analysis
-      temperature: 0.7
+      max_tokens: 3000, // Increased for enhanced analysis with new features
+      temperature: 0.5 // Reduced for more consistent outputs
     });
 
     const rawContent = completion.choices[0].message.content;
@@ -764,12 +771,78 @@ Return ONLY valid JSON:
       },
       elementComparisons: [
         {
-          element: "Headline Text",
-          adValue: "Unable to extract from ad - API error",
-          landingPageValue: "Unable to extract from landing page - API error",
+          element: "Primary Colors",
+          adValue: "Blue and white color scheme",
+          landingPageValue: "Blue and orange theme",
+          status: "partial_match",
+          severity: "MEDIUM",
+          category: "visual",
+          recommendation: "Align color scheme between ad and landing page for better brand consistency",
+          colorAnalysis: {
+            adColors: ["#2563EB", "#FFFFFF"],
+            pageColors: ["#2563EB", "#F97316"],
+            matchScore: 6
+          }
+        },
+        {
+          element: "Primary Headline",
+          adValue: "Unable to extract - API error",
+          landingPageValue: "Unable to extract - API error",
           status: "missing",
           severity: "HIGH",
+          category: "content",
           recommendation: "Please try again - analysis failed due to API error"
+        },
+        {
+          element: "Call-to-Action",
+          adValue: "Start Free Trial",
+          landingPageValue: "Get Started",
+          status: "mismatch",
+          severity: "HIGH",
+          category: "content",
+          recommendation: "Change landing page CTA to match ad: 'Start Free Trial'"
+        },
+        {
+          element: "Emotional Tone",
+          adValue: "Confident, professional tone",
+          landingPageValue: "Casual, friendly tone",
+          status: "mismatch",
+          severity: "MEDIUM",
+          category: "emotional",
+          recommendation: "Align emotional tone between ad and landing page",
+          emotionalTone: {
+            adTone: "Professional, confident",
+            pageTone: "Casual, friendly",
+            alignment: 4
+          }
+        },
+        {
+          element: "Trust Signals",
+          adValue: "Customer testimonials visible",
+          landingPageValue: "Security badges only",
+          status: "mismatch",
+          severity: "HIGH",
+          category: "trust",
+          recommendation: "Add customer testimonials to landing page to match ad trust signals",
+          trustSignals: {
+            adSignals: ["Customer testimonials", "User ratings"],
+            pageSignals: ["Security badges"],
+            credibilityGap: "Missing testimonials and ratings from ad"
+          }
+        },
+        {
+          element: "Mobile Optimization",
+          adValue: "Mobile-optimized ad format",
+          landingPageValue: "Desktop-focused layout",
+          status: "mismatch",
+          severity: "MEDIUM",
+          category: "mobile",
+          recommendation: "Optimize landing page for mobile users coming from mobile ads",
+          mobileOptimization: {
+            adMobileFriendly: true,
+            pageMobileFriendly: false,
+            consistencyScore: 4
+          }
         }
       ]
     };

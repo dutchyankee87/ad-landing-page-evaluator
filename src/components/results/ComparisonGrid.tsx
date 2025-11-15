@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckCircle, XCircle, AlertCircle, MinusCircle, Target } from 'lucide-react';
+import { CheckCircle, XCircle, AlertCircle, MinusCircle, Target, Palette, Heart, Shield, Smartphone } from 'lucide-react';
 
 interface ElementComparison {
   element: string;
@@ -8,6 +8,27 @@ interface ElementComparison {
   status: 'match' | 'mismatch' | 'partial_match' | 'missing';
   severity: 'HIGH' | 'MEDIUM' | 'LOW';
   recommendation?: string;
+  category?: 'content' | 'visual' | 'emotional' | 'trust' | 'mobile';
+  colorAnalysis?: {
+    adColors: string[];
+    pageColors: string[];
+    matchScore: number;
+  };
+  emotionalTone?: {
+    adTone: string;
+    pageTone: string;
+    alignment: number;
+  };
+  trustSignals?: {
+    adSignals: string[];
+    pageSignals: string[];
+    credibilityGap: string;
+  };
+  mobileOptimization?: {
+    adMobileFriendly: boolean;
+    pageMobileFriendly: boolean;
+    consistencyScore: number;
+  };
 }
 
 interface ComparisonGridProps {
@@ -15,6 +36,92 @@ interface ComparisonGridProps {
 }
 
 const ComparisonGrid: React.FC<ComparisonGridProps> = ({ comparisons }) => {
+  const getCategoryIcon = (category?: string) => {
+    switch (category) {
+      case 'visual':
+        return <Palette className="h-4 w-4 text-purple-500" />;
+      case 'emotional':
+        return <Heart className="h-4 w-4 text-pink-500" />;
+      case 'trust':
+        return <Shield className="h-4 w-4 text-green-500" />;
+      case 'mobile':
+        return <Smartphone className="h-4 w-4 text-blue-500" />;
+      default:
+        return <Target className="h-4 w-4 text-gray-500" />;
+    }
+  };
+
+  const renderColorAnalysis = (colorAnalysis?: ElementComparison['colorAnalysis']) => {
+    if (!colorAnalysis) return null;
+    
+    return (
+      <div className="mt-2 p-2 bg-gray-50 rounded">
+        <div className="text-xs font-medium text-gray-600 mb-1">Color Match: {colorAnalysis.matchScore}/10</div>
+        <div className="flex gap-2">
+          <div className="flex gap-1">
+            {colorAnalysis.adColors.map((color, i) => (
+              <div key={i} className="w-3 h-3 rounded-full border border-gray-300" style={{ backgroundColor: color }} title={color} />
+            ))}
+          </div>
+          <span className="text-xs text-gray-400">vs</span>
+          <div className="flex gap-1">
+            {colorAnalysis.pageColors.map((color, i) => (
+              <div key={i} className="w-3 h-3 rounded-full border border-gray-300" style={{ backgroundColor: color }} title={color} />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderEmotionalTone = (emotionalTone?: ElementComparison['emotionalTone']) => {
+    if (!emotionalTone) return null;
+    
+    return (
+      <div className="mt-2 p-2 bg-gray-50 rounded">
+        <div className="text-xs font-medium text-gray-600 mb-1">Emotional Alignment: {emotionalTone.alignment}/10</div>
+        <div className="text-xs">
+          <span className="text-blue-600">{emotionalTone.adTone}</span> ↔ <span className="text-purple-600">{emotionalTone.pageTone}</span>
+        </div>
+      </div>
+    );
+  };
+
+  const renderTrustSignals = (trustSignals?: ElementComparison['trustSignals']) => {
+    if (!trustSignals) return null;
+    
+    return (
+      <div className="mt-2 p-2 bg-gray-50 rounded">
+        <div className="text-xs font-medium text-gray-600 mb-1">Trust Signals</div>
+        <div className="text-xs text-gray-500">
+          Ad: {trustSignals.adSignals.join(', ') || 'None'}
+        </div>
+        <div className="text-xs text-gray-500">
+          Page: {trustSignals.pageSignals.join(', ') || 'None'}
+        </div>
+        {trustSignals.credibilityGap && (
+          <div className="text-xs text-orange-600 mt-1">{trustSignals.credibilityGap}</div>
+        )}
+      </div>
+    );
+  };
+
+  const renderMobileOptimization = (mobileOpt?: ElementComparison['mobileOptimization']) => {
+    if (!mobileOpt) return null;
+    
+    return (
+      <div className="mt-2 p-2 bg-gray-50 rounded">
+        <div className="text-xs font-medium text-gray-600 mb-1">Mobile Score: {mobileOpt.consistencyScore}/10</div>
+        <div className="text-xs">
+          Ad: {mobileOpt.adMobileFriendly ? '📱 Optimized' : '❌ Not optimized'}
+        </div>
+        <div className="text-xs">
+          Page: {mobileOpt.pageMobileFriendly ? '📱 Optimized' : '❌ Not optimized'}
+        </div>
+      </div>
+    );
+  };
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'match':
@@ -96,7 +203,10 @@ const ComparisonGrid: React.FC<ComparisonGridProps> = ({ comparisons }) => {
               >
                 {/* Element */}
                 <div className="font-medium text-gray-900 text-sm">
-                  {comparison.element}
+                  <div className="flex items-center gap-2">
+                    {getCategoryIcon(comparison.category)}
+                    {comparison.element}
+                  </div>
                 </div>
                 
                 {/* Ad Value */}
@@ -104,6 +214,10 @@ const ComparisonGrid: React.FC<ComparisonGridProps> = ({ comparisons }) => {
                   <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
                     <div className="text-blue-700 font-medium text-xs mb-1 uppercase tracking-wide">AD</div>
                     <div className="text-gray-800 text-xs leading-relaxed">{comparison.adValue || '—'}</div>
+                    {renderColorAnalysis(comparison.colorAnalysis)}
+                    {renderEmotionalTone(comparison.emotionalTone)}
+                    {renderTrustSignals(comparison.trustSignals)}
+                    {renderMobileOptimization(comparison.mobileOptimization)}
                   </div>
                 </div>
                 
