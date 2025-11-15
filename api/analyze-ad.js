@@ -491,6 +491,19 @@ You will analyze TWO images:
 
 Target Audience: ${audienceData.ageRange}, ${audienceData.gender}, interests: ${audienceData.interests}
 
+**ELEMENT EXTRACTION FOR COMPARISON:**
+First, carefully read the ad image and extract specific elements for direct comparison with the landing page. Look for:
+
+1. **Headline/Main Text**: The primary headline or main text visible in the ad
+2. **Call-to-Action (CTA)**: The specific CTA button text or action text
+3. **Value Proposition**: The main benefit or offer mentioned
+4. **Price/Discount**: Any pricing, discount, or promotional information
+5. **Product/Service Name**: The specific product, service, or brand name
+6. **Social Proof Elements**: Reviews, testimonials, user counts, ratings
+7. **Urgency/Scarcity**: Any time-sensitive or limited availability messaging
+
+**CRITICAL: Extract the EXACT text as it appears in the ad. Do not paraphrase - provide word-for-word transcription.**
+
 **CRITICAL SCORING RULES**: 
 - If the ad and landing page show COMPLETELY DIFFERENT products, services, brands, or industries (e.g., nature photo vs banking page), ALL scores MUST be 1-2
 - If they're somewhat related but inconsistent: scores 3-4
@@ -543,7 +556,33 @@ Return ONLY valid JSON:
     "visual": ["SPECIFIC visual changes with exact colors, fonts, or elements mentioned", "Detailed design recommendations with pixel measurements or percentages", "Precise layout modifications based on what you see"],
     "contextual": ["Exact headline changes using specific words from the ad", "Specific CTA button text that matches the ad promise", "Detailed content additions mentioning specific features or benefits"],
     "tone": ["Specific word replacements to match ad voice", "Exact phrases to add or remove", "Precise messaging adjustments with example copy"]
-  }
+  },
+  "elementComparisons": [
+    {
+      "element": "Headline Text",
+      "adValue": "Exact headline text transcribed word-for-word from the ad image",
+      "landingPageValue": "Exact headline text from landing page image or 'Not visible' if unclear",
+      "status": "match" | "mismatch" | "partial_match" | "missing",
+      "severity": "HIGH" | "MEDIUM" | "LOW",
+      "recommendation": "Specific action to improve alignment between ad and landing page"
+    },
+    {
+      "element": "Call-to-Action Button",
+      "adValue": "Exact CTA text transcribed from the ad",
+      "landingPageValue": "Exact CTA text from landing page or 'Not visible'",
+      "status": "match" | "mismatch" | "partial_match" | "missing",
+      "severity": "HIGH" | "MEDIUM" | "LOW",
+      "recommendation": "Specific recommendation to align CTA messaging"
+    },
+    {
+      "element": "Value Proposition",
+      "adValue": "Main benefit/offer text from the ad",
+      "landingPageValue": "Main benefit/offer text from landing page",
+      "status": "match" | "mismatch" | "partial_match" | "missing",
+      "severity": "HIGH" | "MEDIUM" | "LOW",
+      "recommendation": "Specific action to improve value proposition alignment"
+    }
+  ]
 }`;
 
     console.log('🤖 Calling GPT-4o Vision...');
@@ -616,7 +655,8 @@ Return ONLY valid JSON:
     const response = {
       overallScore,
       componentScores: analysis.scores,
-      suggestions: analysis.suggestions
+      suggestions: analysis.suggestions,
+      elementComparisons: analysis.elementComparisons || []
     };
 
     // Store evaluation in database
@@ -708,7 +748,17 @@ Return ONLY valid JSON:
           "Change 'Purchase now' to 'Grab yours' to maintain the playful voice from your ad",
           "Add urgency phrases like 'Limited time only' to match the FOMO tone in your ad creative"
         ]
-      }
+      },
+      elementComparisons: [
+        {
+          element: "Headline Text",
+          adValue: "Unable to extract from ad - API error",
+          landingPageValue: "Unable to extract from landing page - API error",
+          status: "missing",
+          severity: "HIGH",
+          recommendation: "Please try again - analysis failed due to API error"
+        }
+      ]
     };
 
     return res.status(200).json(fallbackResponse);
