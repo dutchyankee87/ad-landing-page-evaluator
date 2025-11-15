@@ -4,6 +4,7 @@ import { HelmetProvider } from 'react-helmet-async';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Breadcrumbs from './components/Breadcrumbs';
+import ProductHuntBanner from './components/ProductHuntBanner';
 import Home from './pages/Home';
 import UsageLimitModal from './components/UsageLimitModal';
 import { AdEvaluationProvider } from './context/AdEvaluationContext';
@@ -18,6 +19,7 @@ const FAQ = React.lazy(() => import('./pages/FAQ'));
 const EcommerceLanding = React.lazy(() => import('./pages/EcommerceLanding'));
 const Pricing = React.lazy(() => import('./pages/Pricing'));
 const Partners = React.lazy(() => import('./pages/Partners'));
+const ProductHunt = React.lazy(() => import('./pages/ProductHunt'));
 const SubscriptionSuccess = React.lazy(() => import('./pages/SubscriptionSuccess'));
 const SubscriptionCanceled = React.lazy(() => import('./pages/SubscriptionCanceled'));
 const PrivacyPolicy = React.lazy(() => import('./pages/PrivacyPolicy'));
@@ -38,6 +40,7 @@ function App() {
       <Router>
         <AdEvaluationProvider>
           <div className="min-h-screen bg-gray-50 flex flex-col">
+            <ProductHuntBanner enabled={import.meta.env.VITE_PRODUCT_HUNT_BANNER_ENABLED === 'true'} />
             <Header />
             <main className="flex-grow">
               <div className="container mx-auto px-4 pt-4">
@@ -54,6 +57,7 @@ function App() {
                   <Route path="/ecommerce" element={<EcommerceLanding />} />
                   <Route path="/pricing" element={<Pricing />} />
                   <Route path="/partners" element={<Partners />} />
+                  <Route path="/producthunt" element={<ProductHunt />} />
                   <Route path="/subscription/success" element={<SubscriptionSuccess />} />
                   <Route path="/subscription/canceled" element={<SubscriptionCanceled />} />
                   <Route path="/privacy-policy" element={<PrivacyPolicy />} />
