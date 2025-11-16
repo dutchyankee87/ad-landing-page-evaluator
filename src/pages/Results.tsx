@@ -5,14 +5,12 @@ import { motion } from 'framer-motion';
 import { useAdEvaluation } from '../context/AdEvaluationContext';
 import ScoreGauge from '../components/results/ScoreGauge';
 import ComponentScores from '../components/results/ComponentScores';
-import Suggestions from '../components/results/Suggestions';
-import EnhancedSuggestions from '../components/results/EnhancedSuggestions';
+import TopRecommendations from '../components/results/TopRecommendations';
 import ComparisonGrid from '../components/results/ComparisonGrid';
 import QuickWins from '../components/results/QuickWins';
 import LanguageAnalysis from '../components/results/LanguageAnalysis';
 import AdSummary from '../components/results/AdSummary';
 import PartnerRecommendations from '../components/results/PartnerRecommendations';
-import { HeatmapOverlay } from '../components/heatmap/HeatmapOverlay';
 import { PerformanceFeedbackModal } from '../components/feedback/PerformanceFeedbackModal';
 import { IndustryBenchmarks } from '../components/benchmarks/IndustryBenchmarks';
 import { DetailedScoring } from '../components/results/DetailedScoring';
@@ -296,49 +294,13 @@ const Results: React.FC = () => {
                   </motion.section>
                 )}
             
-            {/* Landing Page Heatmap - Hidden for now */}
-            {false && (
-              <section className="mb-12">
-                <h2 className="text-2xl font-bold mb-4">🔍 Landing Page Optimization Zones</h2>
-                <p className="text-gray-600 mb-6">
-                  Click on the colored zones below to see specific recommendations for each area of your landing page.
-                  Red = High Priority, Yellow = Medium Priority, Blue = Low Priority.
-                </p>
-                <div className="bg-gray-50 p-6 rounded-lg">
-                  <HeatmapOverlay 
-                    imageUrl="/api/placeholder/800/1200" // This should be the actual landing page screenshot
-                    zones={results.heatmapZones || [
-                      {
-                        location: "hero-section",
-                        description: "Main headline and primary call-to-action area",
-                        severity: "HIGH" as const,
-                        issue: "Value proposition clarity and CTA prominence need optimization",
-                        suggestion: "Strengthen headline clarity and CTA prominence for better conversion",
-                        expectedImpact: "15-25% improvement in engagement rates"
-                      },
-                      {
-                        location: "cta-button",
-                        description: "Primary conversion action button",
-                        severity: "HIGH" as const,
-                        issue: "Call-to-action button needs more visual prominence",
-                        suggestion: "Increase button size and contrast to improve conversions",
-                        expectedImpact: "12-20% conversion rate improvement"
-                      }
-                    ]}
-                    className="max-w-2xl mx-auto"
-                  />
-                </div>
-              </section>
-            )}
             
-                {/* Enhanced Suggestions or Legacy Suggestions */}
-                <div>
-                  {results.enhancedSuggestions ? (
-                    <EnhancedSuggestions suggestions={results.enhancedSuggestions} />
-                  ) : (
-                    <Suggestions suggestions={results.suggestions} />
-                  )}
-                </div>
+                {/* Top 3 Recommendations based on Comparison Grid */}
+                {results.elementComparisons && (
+                  <div>
+                    <TopRecommendations comparisons={results.elementComparisons} />
+                  </div>
+                )}
 
                 {/* Partner Recommendations */}
                 <PartnerRecommendations overallScore={results.overallScore} />

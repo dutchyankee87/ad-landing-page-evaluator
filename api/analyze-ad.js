@@ -515,6 +515,12 @@ SCORING (1-10, be strict - most scores 1-4):
 - **Contextual**: Message/offer alignment  
 - **Tone**: Voice/personality match
 
+PRIORITIZE RECOMMENDATIONS:
+- Use HIGH severity for major mismatches that hurt conversions (headlines, CTAs, core colors)
+- Use MEDIUM for important but secondary elements (tone, trust signals)
+- Use LOW for minor optimizations (mobile tweaks, minor visual elements)
+- Provide specific, actionable recommendations with exact text/color changes
+
 Return JSON:
 {
   "scores": {
@@ -535,7 +541,7 @@ Return JSON:
       "status": "match|mismatch|partial_match|missing",
       "severity": "HIGH|MEDIUM|LOW",
       "category": "visual",
-      "recommendation": "Specific color adjustment",
+      "recommendation": "Detailed color/visual recommendation (e.g., 'Change your button color from blue to orange to match your ad creative')",
       "colorAnalysis": {
         "adColors": ["#hex1", "#hex2"],
         "pageColors": ["#hex3", "#hex4"],
@@ -549,7 +555,7 @@ Return JSON:
       "status": "match|mismatch|partial_match|missing",
       "severity": "HIGH|MEDIUM|LOW",
       "category": "content",
-      "recommendation": "Specific text change"
+      "recommendation": "Detailed, actionable recommendation (e.g., 'Change your headline from X to Y to match your ad promise')"
     },
     {
       "element": "Call-to-Action",
@@ -558,7 +564,7 @@ Return JSON:
       "status": "match|mismatch|partial_match|missing",
       "severity": "HIGH|MEDIUM|LOW",
       "category": "content",
-      "recommendation": "Specific CTA change"
+      "recommendation": "Detailed, actionable CTA change (e.g., 'Change your CTA from \"Learn More\" to \"Get 50% Off\" to match your ad offer')"
     },
     {
       "element": "Emotional Tone",
