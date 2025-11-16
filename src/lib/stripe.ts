@@ -1,5 +1,6 @@
 // Stripe client configuration
 import { loadStripe, Stripe } from '@stripe/stripe-js';
+import { logger } from './logger';
 
 // Client-side Stripe instance
 let stripePromise: Promise<Stripe | null>;
@@ -9,7 +10,7 @@ export const getStripe = () => {
     const publishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
     
     if (!publishableKey) {
-      console.warn('Stripe publishable key not found');
+      logger.warn('Payment provider key not found');
       return Promise.resolve(null);
     }
     
@@ -46,7 +47,7 @@ export async function redirectToCheckout(priceId: string, userEmail?: string) {
       throw new Error('No checkout URL received');
     }
   } catch (error) {
-    console.error('Checkout redirect error:', error);
+    logger.error('Checkout redirect error:', error);
     throw error;
   }
 }
@@ -68,7 +69,7 @@ export async function redirectToCustomerPortal() {
     const { url } = await response.json();
     window.location.href = url;
   } catch (error) {
-    console.error('Portal redirect error:', error);
+    logger.error('Portal redirect error:', error);
     throw error;
   }
 }

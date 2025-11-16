@@ -2,6 +2,7 @@ import React from 'react';
 import { Check, Star } from 'lucide-react';
 import { SubscriptionTier } from '../../lib/subscription';
 import { redirectToCheckout } from '../../lib/stripe';
+import { logger } from '../../lib/logger';
 
 interface PricingCardProps {
   tier: SubscriptionTier;
@@ -28,7 +29,7 @@ export default function PricingCard({
       await redirectToCheckout(tier.priceId, userEmail);
       onUpgrade?.();
     } catch (error) {
-      console.error('Upgrade error:', error);
+      logger.error('Upgrade error:', error);
       alert('Failed to start upgrade process. Please try again.');
     }
   };

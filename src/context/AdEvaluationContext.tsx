@@ -1,6 +1,7 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { ElementComparison } from '../lib/api';
+import { logger } from '../lib/logger';
 import { 
   canEvaluate, 
   getRemainingEvaluations, 
@@ -510,7 +511,7 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
       setHasEvaluated(true);
       
     } catch (error) {
-      console.warn('Evaluation failed, using fallback:', error);
+      logger.warn('Evaluation failed, using fallback:', error);
       // Fallback to mock evaluation
       await mockEvaluateAd();
     }
@@ -1056,14 +1057,14 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
   const submitFeedback = async (feedback: any) => {
     try {
       // In a real implementation, this would call an API to store feedback
-      console.log('Feedback submitted:', feedback);
+      logger.debug('Feedback submitted:', feedback);
       
       // For now, just close the modal
       closeFeedbackModal();
       
       // Could show a success message here
     } catch (error) {
-      console.error('Failed to submit feedback:', error);
+      logger.error('Failed to submit feedback:', error);
     }
   };
   

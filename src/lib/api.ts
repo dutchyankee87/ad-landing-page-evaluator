@@ -1,6 +1,8 @@
 // Client-side API wrapper that works in both development and production
 // Using direct HTTP calls to avoid Supabase client import issues
 
+import { logger } from './logger';
+
 // Types for API responses
 export interface EvaluationRequest {
   adData: {
@@ -108,7 +110,7 @@ export interface UsageInfo {
 // Evaluate ad using Vercel Function
 export async function evaluateAd(request: EvaluationRequest): Promise<EvaluationResponse> {
   try {
-    console.log('🚀 Calling Vercel Function...');
+    logger.log('🚀 Calling backend service...');
     
     // Call Vercel Function (deployed at /api/analyze-ad)
     const response = await fetch('/api/analyze-ad', {
@@ -121,16 +123,16 @@ export async function evaluateAd(request: EvaluationRequest): Promise<Evaluation
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.warn('❌ Vercel Function error:', response.status, errorText);
+      logger.warn('❌ Backend service error:', response.status, errorText);
       throw new Error(`HTTP ${response.status}: ${errorText}`);
     }
 
     const data = await response.json();
-    console.log('✅ Vercel Function successful!');
+    logger.log('✅ Backend service successful!');
     return data;
     
   } catch (error) {
-    console.warn('🔄 API call failed, using fallback:', error);
+    logger.warn('🔄 API call failed, using fallback:', error);
     
     // Fallback to mock evaluation for demo/development
     return generateFallbackEvaluation(request.adData.platform);
@@ -158,7 +160,7 @@ export async function getUserUsage(userEmail?: string): Promise<UsageInfo> {
       canEvaluate: true
     };
   } catch (error) {
-    console.warn('Usage check failed:', error);
+    logger.warn('Usage check failed:', error);
     return {
       used: 0,
       limit: 1,

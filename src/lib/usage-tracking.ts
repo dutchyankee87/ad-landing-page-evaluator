@@ -1,4 +1,6 @@
 // Usage tracking utilities for managing monthly evaluation limits
+import { logger } from './logger';
+
 export type EvaluationType = 'image' | 'video';
 
 export interface UsageData {
@@ -73,7 +75,7 @@ export function getUsageData(userId?: string): UsageData {
 
     return parsed;
   } catch (error) {
-    console.warn('Failed to parse usage data:', error);
+    logger.warn('Failed to parse usage data:', error);
     return initializeUsageData(userId);
   }
 }
@@ -116,7 +118,7 @@ export function saveUsageData(data: UsageData, userId?: string): void {
     const storageKey = userId ? `${STORAGE_KEY}_${userId}` : ANONYMOUS_STORAGE_KEY;
     localStorage.setItem(storageKey, JSON.stringify(data));
   } catch (error) {
-    console.warn('Failed to save usage data:', error);
+    logger.warn('Failed to save usage data:', error);
   }
 }
 
@@ -317,8 +319,8 @@ export function resetAllUsageData(): void {
     }
     
     keysToRemove.forEach(key => localStorage.removeItem(key));
-    console.log('All usage data reset');
+    logger.debug('All usage data reset');
   } catch (error) {
-    console.warn('Failed to reset usage data:', error);
+    logger.warn('Failed to reset usage data:', error);
   }
 }

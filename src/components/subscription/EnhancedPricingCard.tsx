@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Check, Star, ArrowRight, Zap, Crown, Sparkles, Shield } from 'lucide-react';
 import { SubscriptionTier } from '../../lib/subscription';
 import { redirectToCheckout } from '../../lib/stripe';
+import { logger } from '../../lib/logger';
 
 interface EnhancedPricingCardProps {
   tier: SubscriptionTier;
@@ -32,7 +33,7 @@ export default function EnhancedPricingCard({
     try {
       await redirectToCheckout(tier.priceId, userEmail);
     } catch (error) {
-      console.error('Upgrade error:', error);
+      logger.error('Upgrade error:', error);
       alert('Failed to start upgrade process. Please try again.');
     } finally {
       setIsLoading(false);

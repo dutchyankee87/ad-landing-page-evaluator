@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { logger } from './logger';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -92,7 +93,7 @@ export const uploadAdImage = async (
       size: compressedFile.size
     };
   } catch (error) {
-    console.error('Image upload error:', error);
+    logger.error('Image upload error:', error);
     throw error;
   }
 };
@@ -144,7 +145,7 @@ export const uploadThumbnail = async (originalFile: File, originalPath: string):
       });
     
     if (error) {
-      console.warn('Thumbnail upload failed:', error);
+      logger.warn('Thumbnail upload failed:', error);
       return '';
     }
     
@@ -154,7 +155,7 @@ export const uploadThumbnail = async (originalFile: File, originalPath: string):
     
     return urlData.publicUrl;
   } catch (error) {
-    console.warn('Thumbnail generation failed:', error);
+    logger.warn('Thumbnail generation failed:', error);
     return '';
   }
 };
@@ -167,7 +168,7 @@ export const deleteAdImage = async (path: string): Promise<boolean> => {
       .remove([path]);
     
     if (error) {
-      console.error('Delete failed:', error);
+      logger.error('Delete failed:', error);
       return false;
     }
     
@@ -177,7 +178,7 @@ export const deleteAdImage = async (path: string): Promise<boolean> => {
     
     return true;
   } catch (error) {
-    console.error('Delete error:', error);
+    logger.error('Delete error:', error);
     return false;
   }
 };
@@ -206,7 +207,7 @@ export const getStorageUsage = async (): Promise<{
       totalSize
     };
   } catch (error) {
-    console.error('Storage usage check failed:', error);
+    logger.error('Storage usage check failed:', error);
     return { totalFiles: 0, totalSize: 0 };
   }
 };

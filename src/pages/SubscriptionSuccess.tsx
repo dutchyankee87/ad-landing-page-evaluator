@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { CheckCircle, ArrowRight } from 'lucide-react';
 import SEOHead from '../components/SEOHead';
+import { logger } from '../lib/logger';
 
 const SubscriptionSuccess: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -12,7 +13,7 @@ const SubscriptionSuccess: React.FC = () => {
     // Optionally verify the session with your backend
     if (sessionId) {
       // You could fetch session details here if needed
-      console.log('Checkout session completed:', sessionId);
+      logger.debug('Checkout session completed:', sessionId);
     }
   }, [sessionId]);
 

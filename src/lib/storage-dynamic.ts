@@ -1,6 +1,8 @@
 // Dynamic Supabase storage utility to avoid bundling issues
 // Uses dynamic imports to load Supabase only when needed
 
+import { logger } from './logger';
+
 let supabaseClient: any = null;
 
 // Initialize Supabase client dynamically
@@ -18,7 +20,7 @@ async function getSupabaseClient() {
         !supabaseAnonKey || 
         supabaseUrl === 'your_supabase_project_url' ||
         supabaseAnonKey === 'your_supabase_anon_key') {
-      console.warn('Supabase not configured - using fallback storage');
+      logger.warn('Storage service not configured - using fallback storage');
       throw new Error('Supabase environment variables not configured');
     }
     
@@ -31,13 +33,13 @@ async function getSupabaseClient() {
       .limit(1);
     
     if (testError && testError.code !== 'PGRST116') { // PGRST116 is "table not found" which is OK
-      console.warn('Supabase connection test failed:', testError);
+      logger.warn('Storage service connection test failed:', testError);
       throw new Error('Supabase connection failed');
     }
     
     return supabaseClient;
   } catch (error) {
-    console.warn('Supabase client initialization failed, will use fallback:', error);
+    logger.warn('Storage service initialization failed, will use fallback:', error);
     throw error;
   }
 }
@@ -146,7 +148,7 @@ export const uploadAdImageDynamic = async (
     };
     
   } catch (error) {
-    console.error('Supabase upload failed:', error);
+    logger.error('Storage service upload failed:', error);
     // Return fallback result
     return {
       url: '',
@@ -224,7 +226,7 @@ export const uploadAdImageSmart = async (
       };
     }
   } catch (error) {
-    console.warn('Supabase upload failed, using fallback:', error);
+    logger.warn('Storage service upload failed, using fallback:', error);
   }
   
   // Fallback to base64

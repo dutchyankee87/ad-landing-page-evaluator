@@ -8,6 +8,7 @@ import { hasUsedAnonymousCheck } from '../lib/usage-tracking';
 import AdAssetForm from '../components/forms/AdAssetForm';
 import LandingPageForm from '../components/forms/LandingPageForm';
 import UsageBanner from '../components/UsageBanner';
+import { logger } from '../lib/logger';
 import SEOHead from '../components/SEOHead';
 
 type Step = 'adAssets' | 'landingPage' | 'review';
@@ -60,7 +61,7 @@ const EvaluationForm: React.FC = () => {
       navigate('/results');
     } catch (err) {
       setError('An error occurred during evaluation. Please try again.');
-      console.error(err);
+      logger.error(err);
     } finally {
       setIsSubmitting(false);
     }

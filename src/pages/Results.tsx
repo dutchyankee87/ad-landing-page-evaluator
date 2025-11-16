@@ -7,7 +7,6 @@ import ScoreGauge from '../components/results/ScoreGauge';
 import ComponentScores from '../components/results/ComponentScores';
 import TopRecommendations from '../components/results/TopRecommendations';
 import ComparisonGrid from '../components/results/ComparisonGrid';
-import QuickWins from '../components/results/QuickWins';
 import LanguageAnalysis from '../components/results/LanguageAnalysis';
 import AdSummary from '../components/results/AdSummary';
 import PartnerRecommendations from '../components/results/PartnerRecommendations';
@@ -201,12 +200,6 @@ const Results: React.FC = () => {
                   </div>
                 )}
                 
-                {/* Quick Wins Section */}
-                {results.quickWins && (
-                  <div>
-                    <QuickWins quickWins={results.quickWins} />
-                  </div>
-                )}
             
                 {/* Industry Benchmarks */}
                 <motion.section 

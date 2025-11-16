@@ -4,6 +4,7 @@ import { useAdEvaluation } from '../../context/AdEvaluationContext';
 import { uploadAdImageSmart, validateFileSize, validateFileType } from '../../lib/storage-dynamic';
 import { validateAdUrl, detectPlatform, getPlatformConfig, formatUrlForDisplay, isPreviewUrl, type UrlValidationResult } from '../../lib/platform-detection';
 import VideoUsageBanner from '../VideoUsageBanner';
+import { logger } from '../../lib/logger';
 
 const SUPPORTED_PLATFORMS = [
   { id: 'meta', name: 'Meta (Facebook/Instagram)', guidance: 'Screenshot your ad from Facebook Ads Manager or Instagram promotion. Include the full ad creative and any text overlay.' },
@@ -85,13 +86,13 @@ const AdAssetForm: React.FC = () => {
       
       // Show success message if using Supabase
       if (result.isSupabase) {
-        console.log('✅ Image uploaded to Supabase storage');
+        logger.log('✅ Image uploaded to storage service');
       } else {
-        console.log('ℹ️ Using local storage (base64)');
+        logger.log('ℹ️ Using local storage (base64)');
       }
       
     } catch (error) {
-      console.error('Upload failed:', error);
+      logger.error('Upload failed:', error);
       setUploadError(error instanceof Error ? error.message : 'Upload failed. Please try again.');
     } finally {
       setIsUploading(false);

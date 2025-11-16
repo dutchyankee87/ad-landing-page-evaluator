@@ -4,6 +4,7 @@ import postgres from 'postgres';
 import { pgTable, uuid, text, integer, boolean, timestamp, index, decimal, jsonb } from 'drizzle-orm/pg-core';
 import { eq, sql } from 'drizzle-orm';
 import { processVideoForAnalysis, isVideoUrl } from './video-processing.js';
+import { logger } from './lib/logger.js';
 // Remove Puppeteer - using screenshot service instead
 
 // Database schema (inline to avoid import issues)
@@ -142,7 +143,7 @@ const checkIpRateLimit = async (db, ipAddress) => {
     
     return { allowed, remaining: Math.max(0, remaining) };
   } catch (error) {
-    console.warn('⚠️ IP rate limit check failed:', error);
+    logger.warn('⚠️ Rate limit check failed:', error);
     return { allowed: true, remaining: IP_MONTHLY_LIMIT };
   }
 };
@@ -161,7 +162,7 @@ const recordIpEvaluation = async (db, ipAddress) => {
       })
       .where(eq(ipRateLimit.ipAddress, ipAddress));
   } catch (error) {
-    console.warn('⚠️ Failed to record IP evaluation:', error);
+    logger.warn('⚠️ Failed to record evaluation:', error);
   }
 };
 
@@ -202,17 +203,17 @@ const screenshotAdUrl = async (adUrl) => {
   const screenshotApiToken = process.env.SCREENSHOT_API_TOKEN;
   
   if (!screenshotApiToken) {
-    console.warn('⚠️ No SCREENSHOT_API_TOKEN found - skipping ad screenshot');
+    logger.warn('⚠️ No screenshot API token found - skipping ad screenshot');
     return null;
   }
 
   try {
     const isPreview = isPreviewUrl(adUrl);
     if (isPreview) {
-      console.log('🔗 Preview URL detected, using enhanced screenshot settings');
+      logger.log('🔗 Preview URL detected, using enhanced settings');
     }
     
-    console.log('📸 Taking screenshot of ad URL:', adUrl);
+    logger.log('📸 Taking screenshot of ad URL:', adUrl);
     
     // Get preview-specific settings if needed
     const previewSettings = isPreview ? getPreviewScreenshotSettings(adUrl) : {};
@@ -254,14 +255,14 @@ const screenshotAdUrl = async (adUrl) => {
     const result = await response.json();
     
     if (result && result.screenshot) {
-      console.log('✅ Ad screenshot captured successfully');
+      logger.log('✅ Ad screenshot captured successfully');
       return result.screenshot;
     } else {
       throw new Error('No screenshot URL returned from API');
     }
     
   } catch (error) {
-    console.error('❌ Ad screenshot failed:', error);
+    logger.error('❌ Ad screenshot failed:', error);
     return null;
   }
 };
@@ -271,12 +272,12 @@ const screenshotLandingPage = async (url) => {
   const screenshotApiToken = process.env.SCREENSHOT_API_TOKEN;
   
   if (!screenshotApiToken) {
-    console.warn('⚠️ No SCREENSHOT_API_TOKEN found - skipping screenshot');
+    logger.warn('⚠️ No screenshot API token found - skipping screenshot');
     return null;
   }
 
   try {
-    console.log('📸 Taking screenshot of landing page:', url);
+    logger.log('📸 Taking screenshot of landing page:', url);
     
     // Use ScreenshotAPI.net - reliable paid service
     const screenshotApiUrl = `https://shot.screenshotapi.net/screenshot`;
@@ -314,20 +315,20 @@ const screenshotLandingPage = async (url) => {
     const result = await response.json();
     
     if (result.screenshot) {
-      console.log('✅ Screenshot captured successfully via ScreenshotAPI');
+      logger.log('✅ Screenshot captured successfully via service');
       return result.screenshot; // Already a data URL
     } else {
       throw new Error('No screenshot in API response');
     }
 
   } catch (error) {
-    console.warn('❌ ScreenshotAPI failed:', error.message);
+    logger.warn('❌ Screenshot service failed:', error.message);
     
     // Fallback to URLBox.io if available
     const urlboxKey = process.env.URLBOX_API_KEY;
     if (urlboxKey) {
       try {
-        console.log('🔄 Trying URLBox fallback...');
+        logger.log('🔄 Trying backup service...');
         
         const fallbackUrl = `https://api.urlbox.io/v1/${urlboxKey}/png?url=${encodeURIComponent(url)}&width=1200&height=800&delay=2000`;
         
@@ -337,11 +338,11 @@ const screenshotLandingPage = async (url) => {
           const imageBuffer = await fallbackResponse.arrayBuffer();
           const base64Image = Buffer.from(imageBuffer).toString('base64');
           
-          console.log('✅ URLBox fallback successful');
+          logger.log('✅ Backup service successful');
           return `data:image/png;base64,${base64Image}`;
         }
       } catch (fallbackError) {
-        console.warn('❌ URLBox fallback also failed:', fallbackError.message);
+        logger.warn('❌ Backup service also failed:', fallbackError.message);
       }
     }
     
@@ -378,20 +379,20 @@ export default async function handler(req, res) {
   try {
     const { adData, landingPageData, audienceData, userEmail } = req.body;
 
-    console.log('🚀 Vercel Function called for platform:', adData.platform);
+    logger.log('🚀 Function called for platform:', adData.platform);
 
     // Get client IP address
     const clientIp = getClientIp(req);
-    console.log('🌐 Client IP:', clientIp);
+    logger.debug('🌐 Client IP:', clientIp);
 
     // Initialize database connection
     let db = null;
     if (process.env.DATABASE_URL) {
       const client = postgres(process.env.DATABASE_URL, { prepare: false });
       db = drizzle(client);
-      console.log('✅ Database connected');
+      logger.log('✅ Database connected');
     } else {
-      console.log('⚠️ No database connection - proceeding without user tracking');
+      logger.log('⚠️ No database connection - proceeding without user tracking');
     }
 
     // Check IP-based rate limiting for unauthenticated users
@@ -399,7 +400,7 @@ export default async function handler(req, res) {
       const ipCheck = await checkIpRateLimit(db, clientIp);
       
       if (!ipCheck.allowed) {
-        console.log('🚫 IP rate limit exceeded for:', clientIp);
+        logger.log('🚫 Rate limit exceeded');
         return res.status(429).json({
           error: `Monthly limit reached (5/5). Please wait for next month or create an account.`,
           errorCode: 'IP_RATE_LIMIT_EXCEEDED',
@@ -408,7 +409,7 @@ export default async function handler(req, res) {
         });
       }
       
-      console.log('✅ IP rate limit check passed. Remaining:', ipCheck.remaining);
+      logger.log('✅ Rate limit check passed. Remaining:', ipCheck.remaining);
     }
 
     // Initialize OpenAI
@@ -437,7 +438,7 @@ export default async function handler(req, res) {
           userId = user.id;
         }
       } catch (dbError) {
-        console.warn('⚠️ Database query failed:', dbError);
+        logger.warn('⚠️ Database query failed:', dbError);
         // Continue without user tracking
       }
     }
@@ -449,13 +450,13 @@ export default async function handler(req, res) {
     let videoProcessingMethod = null;
     
     if (adData.adUrl && !adData.imageUrl) {
-      console.log('🔗 Ad URL provided:', adData.adUrl);
+      logger.log('🔗 Ad URL provided:', adData.adUrl);
       
       // Check if this is a video URL that needs special processing
       const isVideo = adData.mediaType === 'video' || isVideoUrl(adData.platform, adData.adUrl);
       
       if (isVideo) {
-        console.log('🎬 Video URL detected, using video processing');
+        logger.log('🎬 Video URL detected, using video processing');
         try {
           const videoResult = await processVideoForAnalysis(adData.platform, adData.adUrl);
           adImageUrl = videoResult.primaryImageUrl;
@@ -463,15 +464,15 @@ export default async function handler(req, res) {
           videoFrameCount = videoResult.additionalFrames?.length || 1;
           videoProcessingMethod = videoResult.processingMethod;
           
-          console.log(`✅ Video processed: ${videoFrameCount} frames via ${videoProcessingMethod}`);
+          logger.log(`✅ Video processed: ${videoFrameCount} frames via ${videoProcessingMethod}`);
         } catch (videoError) {
-          console.warn('⚠️ Video processing failed, falling back to standard screenshot:', videoError.message);
+          logger.warn('⚠️ Video processing failed, falling back to standard screenshot:', videoError.message);
           // Fallback to standard screenshot
           adImageUrl = await screenshotAdUrl(adData.adUrl);
           adSourceType = 'url';
         }
       } else {
-        console.log('📸 Image URL detected, using standard screenshot');
+        logger.log('📸 Image URL detected, using standard screenshot');
         adImageUrl = await screenshotAdUrl(adData.adUrl);
         adSourceType = 'url';
       }
@@ -611,7 +612,7 @@ Return JSON:
   ]
 }`;
 
-    console.log('🤖 Calling GPT-4o Vision...');
+    logger.log('🤖 Calling AI vision model...');
 
     // Prepare content array with both images
     const content = [
@@ -634,9 +635,9 @@ Return JSON:
           detail: "high" 
         } 
       });
-      console.log('📸 Both ad and landing page images sent to GPT-4o');
+      logger.log('📸 Both ad and landing page images sent to AI model');
     } else {
-      console.log('⚠️ Only ad image sent - landing page screenshot failed');
+      logger.log('⚠️ Only ad image sent - landing page screenshot failed');
     }
 
     // Call GPT-4o Vision with both images
@@ -652,24 +653,24 @@ Return JSON:
     });
 
     const rawContent = completion.choices[0].message.content;
-    console.log('📝 Raw GPT-4o response:', rawContent);
+    logger.debug('📝 Raw AI response:', rawContent);
 
     let analysis;
     try {
       analysis = JSON.parse(rawContent || '{}');
-      console.log('🔍 Parsed analysis:', analysis);
+      logger.debug('🔍 Parsed analysis:', analysis);
     } catch (jsonError) {
-      console.error('❌ JSON parsing failed:', jsonError.message);
-      console.error('📝 Raw content that failed to parse:', rawContent);
+      logger.error('❌ JSON parsing failed:', jsonError.message);
+      logger.debug('📝 Raw content that failed to parse:', rawContent);
       throw new Error(`Failed to parse GPT-4o response as JSON: ${jsonError.message}`);
     }
 
     if (!analysis.scores || !analysis.suggestions) {
-      console.error('❌ Invalid GPT-4o response format. Missing scores or suggestions:', analysis);
+      logger.error('❌ Invalid AI response format. Missing scores or suggestions:', analysis);
       throw new Error('Invalid GPT-4o response format');
     }
 
-    console.log('✅ GPT-4o analysis successful!');
+    logger.log('✅ AI analysis successful!');
 
     // Calculate overall score
     const overallScore = Math.round(
@@ -734,23 +735,23 @@ Return JSON:
           await recordIpEvaluation(db, clientIp);
         }
 
-        console.log('✅ Evaluation stored in database');
+        logger.log('✅ Evaluation stored in database');
       } catch (dbError) {
-        console.warn('⚠️ Database storage failed:', dbError);
-        console.error('Database error details:', dbError);
+        logger.warn('⚠️ Database storage failed:', dbError);
+        logger.error('Database error details:', dbError);
         // Don't fail the request if database logging fails
       }
     }
 
-    console.log('🎉 Analysis complete!', { overallScore });
+    logger.log('🎉 Analysis complete!', { overallScore });
     return res.status(200).json(response);
 
   } catch (error) {
-    console.error('💥 Vercel Function error:', error);
-    console.error('🔍 Error stack:', error.stack);
+    logger.error('💥 Function error:', error);
+    logger.error('🔍 Error stack:', error.stack);
     
     // Fallback response (THIS IS A FALLBACK - NOT REAL ANALYSIS)
-    console.warn('⚠️ RETURNING FALLBACK RESPONSE - NOT REAL AI ANALYSIS');
+    logger.warn('⚠️ RETURNING FALLBACK RESPONSE - NOT REAL ANALYSIS');
     const fallbackResponse = {
       overallScore: 7,
       componentScores: {
