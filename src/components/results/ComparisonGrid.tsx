@@ -182,75 +182,137 @@ const ComparisonGrid: React.FC<ComparisonGridProps> = ({ comparisons }) => {
       </div>
       
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        {/* Header */}
-        <div className="grid grid-cols-5 gap-4 p-4 bg-gray-50 border-b border-gray-200 font-medium text-gray-700 text-sm">
-          <div>Element</div>
-          <div className="text-blue-600">Your Ad</div>
-          <div className="text-purple-600">Your Landing Page</div>
-          <div>Status</div>
-          <div>Action Needed</div>
-        </div>
-        
-        {/* Rows */}
-        <div className="divide-y divide-gray-100">
-          {comparisons.map((comparison, index) => {
-            const statusBadge = getStatusBadge(comparison.status);
-            
-            return (
-              <div 
-                key={index} 
-                className={`grid grid-cols-5 gap-4 p-4 hover:bg-gray-50 transition-colors border-l-4 ${getSeverityColor(comparison.severity)}`}
-              >
-                {/* Element */}
-                <div className="font-medium text-gray-900 text-sm">
-                  <div className="flex items-center gap-2">
-                    {getCategoryIcon(comparison.category)}
-                    {comparison.element}
-                  </div>
-                </div>
-                
-                {/* Ad Value */}
-                <div className="text-sm">
-                  <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
-                    <div className="text-blue-700 font-medium text-xs mb-1 uppercase tracking-wide">AD</div>
-                    <div className="text-gray-800 text-xs leading-relaxed">{comparison.adValue || '—'}</div>
-                    {renderColorAnalysis(comparison.colorAnalysis)}
-                    {renderEmotionalTone(comparison.emotionalTone)}
-                    {renderTrustSignals(comparison.trustSignals)}
-                    {renderMobileOptimization(comparison.mobileOptimization)}
-                  </div>
-                </div>
-                
-                {/* Landing Page Value */}
-                <div className="text-sm">
-                  <div className="bg-purple-50 p-3 rounded-lg border border-purple-200">
-                    <div className="text-purple-700 font-medium text-xs mb-1 uppercase tracking-wide">LANDING PAGE</div>
-                    <div className="text-gray-800 text-xs leading-relaxed">{comparison.landingPageValue || '—'}</div>
-                  </div>
-                </div>
-                
-                {/* Status */}
-                <div className="flex items-center gap-2">
-                  {getStatusIcon(comparison.status)}
-                  <span className={`px-2 py-1 rounded text-xs font-medium ${statusBadge.style}`}>
-                    {statusBadge.label}
-                  </span>
-                </div>
-                
-                {/* Recommendation */}
-                <div className="text-sm">
-                  {comparison.recommendation ? (
-                    <div className="bg-orange-50 p-3 rounded-lg border border-orange-200">
-                      <div className="text-orange-700 font-medium text-xs mb-1 uppercase tracking-wide">RECOMMENDATION</div>
-                      <div className="text-gray-800 text-xs leading-relaxed">{comparison.recommendation}</div>
+        {/* Desktop View */}
+        <div className="hidden lg:block">
+          {/* Header */}
+          <div className="grid grid-cols-5 gap-4 p-4 bg-gray-50 border-b border-gray-200 font-medium text-gray-700 text-sm">
+            <div>Element</div>
+            <div className="text-blue-600">Your Ad</div>
+            <div className="text-purple-600">Your Landing Page</div>
+            <div>Status</div>
+            <div>Action Needed</div>
+          </div>
+          
+          {/* Rows */}
+          <div className="divide-y divide-gray-100">
+            {comparisons.map((comparison, index) => {
+              const statusBadge = getStatusBadge(comparison.status);
+              
+              return (
+                <div 
+                  key={index} 
+                  className={`grid grid-cols-5 gap-4 p-4 hover:bg-gray-50 transition-colors border-l-4 ${getSeverityColor(comparison.severity)}`}
+                >
+                  {/* Element */}
+                  <div className="font-medium text-gray-900 text-sm">
+                    <div className="flex items-center gap-2">
+                      {getCategoryIcon(comparison.category)}
+                      {comparison.element}
                     </div>
-                  ) : (
-                    <div className="text-green-600 font-medium bg-green-50 p-3 rounded-lg text-xs">✅ No action needed</div>
+                  </div>
+                  
+                  {/* Ad Value */}
+                  <div className="text-sm">
+                    <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                      <div className="text-blue-700 font-medium text-xs mb-1 uppercase tracking-wide">AD</div>
+                      <div className="text-gray-800 text-xs leading-relaxed">{comparison.adValue || '—'}</div>
+                      {renderColorAnalysis(comparison.colorAnalysis)}
+                      {renderEmotionalTone(comparison.emotionalTone)}
+                      {renderTrustSignals(comparison.trustSignals)}
+                      {renderMobileOptimization(comparison.mobileOptimization)}
+                    </div>
+                  </div>
+                  
+                  {/* Landing Page Value */}
+                  <div className="text-sm">
+                    <div className="bg-purple-50 p-3 rounded-lg border border-purple-200">
+                      <div className="text-purple-700 font-medium text-xs mb-1 uppercase tracking-wide">LANDING PAGE</div>
+                      <div className="text-gray-800 text-xs leading-relaxed">{comparison.landingPageValue || '—'}</div>
+                    </div>
+                  </div>
+                  
+                  {/* Status */}
+                  <div className="flex items-center gap-2">
+                    {getStatusIcon(comparison.status)}
+                    <span className={`px-2 py-1 rounded text-xs font-medium ${statusBadge.style}`}>
+                      {statusBadge.label}
+                    </span>
+                  </div>
+                  
+                  {/* Recommendation */}
+                  <div className="text-sm">
+                    {comparison.recommendation ? (
+                      <div className="bg-orange-50 p-3 rounded-lg border border-orange-200">
+                        <div className="text-orange-700 font-medium text-xs mb-1 uppercase tracking-wide">RECOMMENDATION</div>
+                        <div className="text-gray-800 text-xs leading-relaxed">{comparison.recommendation}</div>
+                      </div>
+                    ) : (
+                      <div className="text-green-600 font-medium bg-green-50 p-3 rounded-lg text-xs">✅ No action needed</div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Mobile View */}
+        <div className="lg:hidden">
+          <div className="divide-y divide-gray-100">
+            {comparisons.map((comparison, index) => {
+              const statusBadge = getStatusBadge(comparison.status);
+              
+              return (
+                <div 
+                  key={index} 
+                  className={`p-4 hover:bg-gray-50 transition-colors border-l-4 ${getSeverityColor(comparison.severity)}`}
+                >
+                  {/* Element Header */}
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="font-semibold text-gray-900 text-base">
+                      <div className="flex items-center gap-2">
+                        {getCategoryIcon(comparison.category)}
+                        {comparison.element}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {getStatusIcon(comparison.status)}
+                      <span className={`px-2 py-1 rounded text-xs font-medium ${statusBadge.style}`}>
+                        {statusBadge.label}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  {/* Content Comparison */}
+                  <div className="space-y-3 mb-4">
+                    {/* Ad Value */}
+                    <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                      <div className="text-blue-700 font-semibold text-sm mb-2 uppercase tracking-wide">YOUR AD</div>
+                      <div className="text-gray-800 text-sm leading-relaxed">{comparison.adValue || '—'}</div>
+                      {renderColorAnalysis(comparison.colorAnalysis)}
+                      {renderEmotionalTone(comparison.emotionalTone)}
+                      {renderTrustSignals(comparison.trustSignals)}
+                      {renderMobileOptimization(comparison.mobileOptimization)}
+                    </div>
+                    
+                    {/* Landing Page Value */}
+                    <div className="bg-purple-50 p-3 rounded-lg border border-purple-200">
+                      <div className="text-purple-700 font-semibold text-sm mb-2 uppercase tracking-wide">LANDING PAGE</div>
+                      <div className="text-gray-800 text-sm leading-relaxed">{comparison.landingPageValue || '—'}</div>
+                    </div>
+                  </div>
+                  
+                  {/* Recommendation */}
+                  {comparison.recommendation && (
+                    <div className="bg-orange-50 p-3 rounded-lg border border-orange-200">
+                      <div className="text-orange-700 font-semibold text-sm mb-2 uppercase tracking-wide">RECOMMENDATION</div>
+                      <div className="text-gray-800 text-sm leading-relaxed">{comparison.recommendation}</div>
+                    </div>
                   )}
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       </div>
       
