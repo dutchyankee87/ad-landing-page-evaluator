@@ -503,21 +503,47 @@ Target: ${audienceData.ageRange}, ${audienceData.gender}, ${audienceData.interes
 
 EXTRACT & ANALYZE:
 
-1. **Primary Colors** (3-5 dominant colors from each image as hex codes)
+1. **Visual Elements & Imagery**:
+   - Primary images, graphics, icons, and visual hierarchy
+   - Layout structure (grid, columns, positioning)
+   - Typography styles (fonts, sizes, weights)
+   - Visual elements like buttons, forms, cards
+   - Background patterns, textures, or imagery
+   - Overall visual density and whitespace usage
+   - Brand visual elements (logos, symbols, patterns)
+
+2. **Primary Colors** (3-5 dominant colors from each image as hex codes)
    - IMPORTANT: Consider colors as matching if they are similar within 20 hex units (e.g., #FF5733 and #FF6B47 are matches)
    - Account for different arrangements - same colors in different order should be considered partial matches
    - Calculate color similarity using HSL distance, not just hex comparison
-2. **Text Elements** (exact transcription):
+
+3. **Text Elements** (exact transcription):
    - Headlines, CTAs, offers, product names
-3. **Visual Style** (design approach, layout, imagery)
-4. **Trust Signals** (reviews, ratings, badges, testimonials)
-5. **Mobile Elements** (responsive design, mobile-first layout)
-6. **Emotional Tone** (urgent, professional, playful, etc.)
+
+4. **Visual Style** (design approach, layout, imagery)
+   - Modern/classic, minimal/busy, professional/casual
+   - Image style consistency (photography, illustrations, graphics)
+
+5. **Trust Signals** (reviews, ratings, badges, testimonials)
+
+6. **Mobile Elements** (responsive design, mobile-first layout)
+
+7. **Emotional Tone** (urgent, professional, playful, etc.)
 
 SCORING (1-10, calculate based on element matches):
-- **Visual**: Weight color matches heavily - identical=9-10, similar=7-8, different arrangement=6-7, different=1-4
+- **Visual**: Include ALL visual elements - imagery style, colors, typography, layout, brand elements
+  - Perfect visual alignment (colors + layout + imagery + typography match) = 9-10
+  - Strong alignment (3/4 elements match well) = 7-8  
+  - Moderate alignment (2/4 elements match) = 5-6
+  - Poor alignment (1 or no elements match) = 1-4
 - **Contextual**: Message/offer alignment - exact=9-10, similar meaning=6-8, different=1-4
 - **Tone**: Voice/personality match - consistent=8-10, somewhat aligned=5-7, mismatched=1-4
+
+VISUAL ANALYSIS PRIORITY:
+1. **Image/Graphics Consistency**: Do the main visual elements (photos, graphics, style) feel cohesive?
+2. **Color Palette Alignment**: Are the color schemes coordinated across ad and page?
+3. **Typography Harmony**: Do font choices and text styling feel unified?
+4. **Layout & Hierarchy**: Do visual priorities and layouts complement each other?
 
 SCORING FORMULA:
 - Count perfect matches, partial matches, and mismatches from element comparisons
@@ -545,9 +571,25 @@ Return JSON:
   },
   "elementComparisons": [
     {
+      "element": "Visual Imagery & Graphics",
+      "adValue": "Description of main visual elements in ad",
+      "landingPageValue": "Description of main visual elements on page",
+      "status": "match|mismatch|partial_match|missing",
+      "severity": "HIGH|MEDIUM|LOW", 
+      "category": "visual",
+      "recommendation": "Detailed visual recommendation (e.g., 'Add hero image similar to ad creative - use same product angle and lighting style')",
+      "visualAnalysis": {
+        "adImageStyle": "photography|illustration|graphic|mixed",
+        "pageImageStyle": "photography|illustration|graphic|mixed",
+        "styleConsistency": [1-10],
+        "layoutSimilarity": [1-10],
+        "brandElementAlignment": [1-10]
+      }
+    },
+    {
       "element": "Primary Colors",
       "adValue": "Main colors in ad",
-      "landingPageValue": "Main colors on page",
+      "landingPageValue": "Main colors on page", 
       "status": "match|mismatch|partial_match|missing",
       "severity": "HIGH|MEDIUM|LOW",
       "category": "visual",
@@ -562,6 +604,20 @@ Return JSON:
           "different": ["#hex_different"]
         },
         "arrangementScore": [1-10]
+      }
+    },
+    {
+      "element": "Typography & Visual Hierarchy",
+      "adValue": "Font styles and text layout in ad",
+      "landingPageValue": "Font styles and text layout on page",
+      "status": "match|mismatch|partial_match|missing",
+      "severity": "MEDIUM|LOW",
+      "category": "visual",
+      "recommendation": "Typography alignment recommendation",
+      "typographyAnalysis": {
+        "fontStyleMatch": [1-10],
+        "hierarchyAlignment": [1-10],
+        "visualWeightConsistency": [1-10]
       }
     },
     {

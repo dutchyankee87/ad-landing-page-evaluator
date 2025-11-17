@@ -29,6 +29,18 @@ interface ElementComparison {
     pageMobileFriendly: boolean;
     consistencyScore: number;
   };
+  visualAnalysis?: {
+    adImageStyle: string;
+    pageImageStyle: string;
+    styleConsistency: number;
+    layoutSimilarity: number;
+    brandElementAlignment: number;
+  };
+  typographyAnalysis?: {
+    fontStyleMatch: number;
+    hierarchyAlignment: number;
+    visualWeightConsistency: number;
+  };
 }
 
 interface ComparisonGridProps {
@@ -150,6 +162,42 @@ const ComparisonGrid: React.FC<ComparisonGridProps> = ({ comparisons, componentS
     );
   };
 
+  const renderVisualAnalysis = (visualAnalysis?: ElementComparison['visualAnalysis']) => {
+    if (!visualAnalysis) return null;
+    
+    return (
+      <div className="mt-2 p-2 bg-gray-50 rounded">
+        <div className="text-xs font-medium text-gray-600 mb-1">Visual Analysis</div>
+        <div className="text-xs">
+          <span className="text-blue-600">Ad Style:</span> {visualAnalysis.adImageStyle}
+        </div>
+        <div className="text-xs">
+          <span className="text-purple-600">Page Style:</span> {visualAnalysis.pageImageStyle}
+        </div>
+        <div className="text-xs mt-1">
+          <div>Style Consistency: <span className="font-medium">{visualAnalysis.styleConsistency}/10</span></div>
+          <div>Layout Similarity: <span className="font-medium">{visualAnalysis.layoutSimilarity}/10</span></div>
+          <div>Brand Alignment: <span className="font-medium">{visualAnalysis.brandElementAlignment}/10</span></div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderTypographyAnalysis = (typography?: ElementComparison['typographyAnalysis']) => {
+    if (!typography) return null;
+    
+    return (
+      <div className="mt-2 p-2 bg-gray-50 rounded">
+        <div className="text-xs font-medium text-gray-600 mb-1">Typography Analysis</div>
+        <div className="text-xs">
+          <div>Font Style Match: <span className="font-medium">{typography.fontStyleMatch}/10</span></div>
+          <div>Hierarchy Alignment: <span className="font-medium">{typography.hierarchyAlignment}/10</span></div>
+          <div>Visual Weight: <span className="font-medium">{typography.visualWeightConsistency}/10</span></div>
+        </div>
+      </div>
+    );
+  };
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'match':
@@ -252,6 +300,8 @@ const ComparisonGrid: React.FC<ComparisonGridProps> = ({ comparisons, componentS
                       <div className="text-blue-700 font-medium text-xs mb-1 uppercase tracking-wide">AD</div>
                       <div className="text-gray-800 text-xs leading-relaxed">{comparison.adValue || '—'}</div>
                       {renderColorAnalysis(comparison.colorAnalysis)}
+                      {renderVisualAnalysis(comparison.visualAnalysis)}
+                      {renderTypographyAnalysis(comparison.typographyAnalysis)}
                       {renderEmotionalTone(comparison.emotionalTone)}
                       {renderTrustSignals(comparison.trustSignals)}
                       {renderMobileOptimization(comparison.mobileOptimization)}
@@ -332,6 +382,8 @@ const ComparisonGrid: React.FC<ComparisonGridProps> = ({ comparisons, componentS
                       <div className="text-blue-700 font-semibold text-sm mb-2 uppercase tracking-wide">YOUR AD</div>
                       <div className="text-gray-800 text-sm leading-relaxed">{comparison.adValue || '—'}</div>
                       {renderColorAnalysis(comparison.colorAnalysis)}
+                      {renderVisualAnalysis(comparison.visualAnalysis)}
+                      {renderTypographyAnalysis(comparison.typographyAnalysis)}
                       {renderEmotionalTone(comparison.emotionalTone)}
                       {renderTrustSignals(comparison.trustSignals)}
                       {renderMobileOptimization(comparison.mobileOptimization)}

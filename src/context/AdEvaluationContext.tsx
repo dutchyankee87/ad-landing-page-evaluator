@@ -845,11 +845,42 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
       
       return [
         {
+          element: 'Visual Imagery & Graphics',
+          adValue: `${platform === 'tiktok' ? 'Dynamic video-style' : platform === 'linkedin' ? 'Professional photography' : 'Social media optimized'} imagery with ${platform === 'meta' ? 'lifestyle focus' : 'product-centric'} composition`,
+          landingPageValue: 'Standard web layout with generic hero image and corporate photography style',
+          status: 'partial_match' as const,
+          severity: 'HIGH' as const,
+          category: 'visual',
+          recommendation: `Update hero section imagery to match ${platform} ad style - use ${platform === 'tiktok' ? 'dynamic, video-style' : platform === 'linkedin' ? 'professional B2B' : 'lifestyle-focused'} visuals with similar composition and energy`,
+          visualAnalysis: {
+            adImageStyle: platform === 'tiktok' ? 'video/dynamic' : platform === 'linkedin' ? 'professional photography' : 'lifestyle photography',
+            pageImageStyle: 'corporate photography',
+            styleConsistency: platform === 'meta' ? 6 : platform === 'tiktok' ? 4 : 5,
+            layoutSimilarity: 5,
+            brandElementAlignment: platform === 'linkedin' ? 7 : 6
+          }
+        },
+        {
+          element: 'Typography & Visual Hierarchy',
+          adValue: `${platform === 'tiktok' ? 'Bold, casual' : platform === 'linkedin' ? 'Professional, clean' : 'Engaging, modern'} typography with ${platform}-optimized sizing`,
+          landingPageValue: 'Standard web fonts with conservative hierarchy and formal styling',
+          status: 'partial_match' as const,
+          severity: 'MEDIUM' as const,
+          category: 'visual',
+          recommendation: `Adjust typography to match ${platform} ad style - use ${platform === 'tiktok' ? 'bolder, more casual' : platform === 'linkedin' ? 'professional but modern' : 'social media optimized'} fonts and hierarchy`,
+          typographyAnalysis: {
+            fontStyleMatch: platform === 'linkedin' ? 7 : platform === 'tiktok' ? 4 : 5,
+            hierarchyAlignment: 6,
+            visualWeightConsistency: platform === 'meta' ? 6 : 5
+          }
+        },
+        {
           element: 'Headline Text',
           adValue: adContent.headline,
           landingPageValue: lpContent.headline,
           status: 'mismatch' as const,
           severity: 'HIGH' as const,
+          category: 'content',
           recommendation: `Change H1 to match ad headline: "${adContent.headline}" for better message consistency`
         },
         {
@@ -866,7 +897,19 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
           landingPageValue: '#005c6b (Different teal) + #0066CC (Blue accents)',
           status: 'partial_match' as const,
           severity: 'HIGH' as const,
-          recommendation: 'Update CSS: Primary #004c4c, CTA buttons #004c4c, urgency elements #FF6B35 for exact brand match'
+          category: 'visual',
+          recommendation: 'Update CSS: Primary #004c4c, CTA buttons #004c4c, urgency elements #FF6B35 for exact brand match',
+          colorAnalysis: {
+            adColors: ['#004c4c', '#FF6B35'],
+            pageColors: ['#005c6b', '#0066CC'],
+            matchScore: 6,
+            colorSimilarity: {
+              identical: [],
+              similar: ['#004c4c/#005c6b'],
+              different: ['#FF6B35/#0066CC']
+            },
+            arrangementScore: 7
+          }
         },
         {
           element: 'Visual Elements',

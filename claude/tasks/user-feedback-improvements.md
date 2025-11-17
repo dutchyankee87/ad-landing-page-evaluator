@@ -189,6 +189,36 @@ Addressing feedback from early user testing to improve scoring accuracy, consist
 
 **Impact:** Users can now easily rerun analysis with the same input data without re-entering information.
 
+### Additional Enhancement: Visual/Image Analysis ✅
+
+#### 5. Enhanced Visual Analysis in Comparison Table
+**Files Modified:**
+- `api/analyze-ad.js` - Enhanced GPT-4 Vision prompt with detailed visual analysis (lines 506-552)
+- `src/components/results/ComparisonGrid.tsx` - Added visual and typography analysis rendering (lines 32-199)
+- `src/context/AdEvaluationContext.tsx` - Updated mock data with visual analysis (lines 847-875)
+
+**Changes Made:**
+- **Enhanced GPT-4 Vision Prompt**: Added comprehensive visual analysis instructions covering:
+  - Visual Elements & Imagery (photos, graphics, icons, visual hierarchy)
+  - Layout structure and typography styles
+  - Visual density, whitespace, and brand elements
+  - Detailed visual scoring criteria (perfect=9-10, strong=7-8, moderate=5-6, poor=1-4)
+  - Visual analysis priority framework (Image/Graphics → Colors → Typography → Layout)
+
+- **New Comparison Elements**: Added above-the-line visual analysis:
+  - **Visual Imagery & Graphics**: Compares ad vs landing page imagery styles with detailed scoring
+  - **Typography & Visual Hierarchy**: Analyzes font consistency and visual weight alignment
+  - **Enhanced Color Analysis**: Now includes similarity detection and arrangement scoring
+
+- **Rich Analysis Display**: Added detailed visual breakdowns showing:
+  - Style consistency scores (1-10)
+  - Layout similarity metrics
+  - Brand element alignment
+  - Font style matching
+  - Visual weight consistency
+
+**Impact:** The comparison table now provides comprehensive visual analysis that directly corresponds to the Visual Match component score, giving users specific insights into imagery, typography, and layout alignment between their ad and landing page.
+
 ### Technical Implementation Notes
 
 1. **Color Analysis Enhancement:** The AI prompt now specifically instructs GPT-4 to consider color similarity using HSL distance rather than just hex comparison, which should resolve issues where similar colors in different arrangements were marked as mismatches.
@@ -210,7 +240,18 @@ Addressing feedback from early user testing to improve scoring accuracy, consist
 ✅ **Scoring consistency** - Fixed scoring algorithm to align individual scores with overall rating  
 ✅ **Color score accuracy** - Enhanced to detect similar colors regardless of order  
 ✅ **New test functionality** - Added "Run New Test with Same Data" button  
+✅ **Visual/image analysis** - Added comprehensive visual analysis above-the-line in comparison table  
 ⏸️ **Team sharing** - Deferred to low priority  
 ⏸️ **Brand examples** - Deferred to low priority  
 
-The core high and medium priority issues identified in the user feedback have been successfully resolved. The application now provides more accurate scoring, better color matching, clearer component score relationships, and improved user workflow.
+### Summary
+
+The core high and medium priority issues identified in the user feedback have been successfully resolved, plus an additional enhancement for comprehensive visual analysis:
+
+1. **Enhanced Scoring Accuracy**: Fixed the scoring inconsistency where partial/perfect matches didn't align with overall ratings
+2. **Improved Color Detection**: Similar colors in different arrangements now properly match
+3. **Visual Component Mapping**: Clear connection between component scores and specific comparison elements  
+4. **Streamlined User Experience**: Quick re-testing with preserved data
+5. **Comprehensive Visual Analysis**: Detailed imagery, typography, and layout analysis with GPT-4 Vision
+
+The application now provides significantly more accurate analysis, better visual insights, clearer scoring relationships, and improved user workflow. Users will see exactly how their ad and landing page visuals align, with actionable recommendations for improvement.
