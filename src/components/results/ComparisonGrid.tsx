@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckCircle, XCircle, AlertCircle, MinusCircle, Target, Palette, Heart, Shield, Smartphone } from 'lucide-react';
+import { CheckCircle, XCircle, AlertCircle, MinusCircle, Target, Palette, Heart, Shield, Smartphone, Image, Settings, Sparkles } from 'lucide-react';
 
 interface ElementComparison {
   element: string;
@@ -8,6 +8,9 @@ interface ElementComparison {
   status: 'match' | 'mismatch' | 'partial_match' | 'missing';
   severity: 'HIGH' | 'MEDIUM' | 'LOW';
   recommendation?: string;
+  adOptimizationRecommendation?: string;
+  landingPageOptimizationRecommendation?: string;
+  aiPreferredPath?: 'ad' | 'landing';
   category?: 'content' | 'visual' | 'emotional' | 'trust' | 'mobile';
   colorAnalysis?: {
     adColors: string[];
@@ -53,6 +56,68 @@ interface ComparisonGridProps {
 }
 
 const ComparisonGrid: React.FC<ComparisonGridProps> = ({ comparisons, componentScores }) => {
+  // Render bidirectional recommendations
+  const renderBidirectionalRecommendations = (comparison: ElementComparison) => {
+    const hasAdRec = comparison.adOptimizationRecommendation && comparison.adOptimizationRecommendation !== comparison.recommendation;
+    const hasLandingRec = comparison.landingPageOptimizationRecommendation && comparison.landingPageOptimizationRecommendation !== comparison.recommendation;
+    
+    // If no specific bidirectional recommendations, show legacy recommendation
+    if (!hasAdRec && !hasLandingRec && comparison.recommendation) {
+      return (
+        <div className="bg-orange-50 p-3 rounded-lg border border-orange-200">
+          <div className="text-orange-700 font-medium text-xs mb-1 uppercase tracking-wide">RECOMMENDATION</div>
+          <div className="text-gray-800 text-xs leading-relaxed">{comparison.recommendation}</div>
+        </div>
+      );
+    }
+
+    // If we have bidirectional recommendations, show both
+    if (hasAdRec || hasLandingRec) {
+      return (
+        <div className="space-y-2">
+          {/* Ad Optimization Path */}
+          {hasAdRec && (
+            <div className="bg-blue-50 p-3 rounded-lg border border-blue-200 relative">
+              <div className="flex items-center gap-2 mb-1">
+                <Image className="h-3 w-3 text-blue-600" />
+                <div className="text-blue-700 font-medium text-xs uppercase tracking-wide">OPTIMIZE AD</div>
+                {comparison.aiPreferredPath === 'ad' && (
+                  <div className="flex items-center gap-1">
+                    <Sparkles className="h-3 w-3 text-blue-600" />
+                    <span className="text-xs text-blue-600">AdAlign Preferred</span>
+                  </div>
+                )}
+              </div>
+              <div className="text-gray-800 text-xs leading-relaxed">{comparison.adOptimizationRecommendation}</div>
+            </div>
+          )}
+          
+          {/* Landing Page Optimization Path */}
+          {hasLandingRec && (
+            <div className="bg-purple-50 p-3 rounded-lg border border-purple-200 relative">
+              <div className="flex items-center gap-2 mb-1">
+                <Settings className="h-3 w-3 text-purple-600" />
+                <div className="text-purple-700 font-medium text-xs uppercase tracking-wide">OPTIMIZE LANDING PAGE</div>
+                {comparison.aiPreferredPath === 'landing' && (
+                  <div className="flex items-center gap-1">
+                    <Sparkles className="h-3 w-3 text-purple-600" />
+                    <span className="text-xs text-purple-600">AdAlign Preferred</span>
+                  </div>
+                )}
+              </div>
+              <div className="text-gray-800 text-xs leading-relaxed">{comparison.landingPageOptimizationRecommendation}</div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // No action needed
+    return (
+      <div className="text-green-600 font-medium bg-green-50 p-3 rounded-lg text-xs">✅ No action needed</div>
+    );
+  };
+
   // Map categories to component scores
   const getCategoryScore = (category?: string) => {
     if (!componentScores) return null;
@@ -326,14 +391,7 @@ const ComparisonGrid: React.FC<ComparisonGridProps> = ({ comparisons, componentS
                   
                   {/* Recommendation */}
                   <div className="text-sm">
-                    {comparison.recommendation ? (
-                      <div className="bg-orange-50 p-3 rounded-lg border border-orange-200">
-                        <div className="text-orange-700 font-medium text-xs mb-1 uppercase tracking-wide">RECOMMENDATION</div>
-                        <div className="text-gray-800 text-xs leading-relaxed">{comparison.recommendation}</div>
-                      </div>
-                    ) : (
-                      <div className="text-green-600 font-medium bg-green-50 p-3 rounded-lg text-xs">✅ No action needed</div>
-                    )}
+                    {renderBidirectionalRecommendations(comparison)}
                   </div>
                 </div>
               );
@@ -397,12 +455,9 @@ const ComparisonGrid: React.FC<ComparisonGridProps> = ({ comparisons, componentS
                   </div>
                   
                   {/* Recommendation */}
-                  {comparison.recommendation && (
-                    <div className="bg-orange-50 p-3 rounded-lg border border-orange-200">
-                      <div className="text-orange-700 font-semibold text-sm mb-2 uppercase tracking-wide">RECOMMENDATION</div>
-                      <div className="text-gray-800 text-sm leading-relaxed">{comparison.recommendation}</div>
-                    </div>
-                  )}
+                  <div>
+                    {renderBidirectionalRecommendations(comparison)}
+                  </div>
                 </div>
               );
             })}

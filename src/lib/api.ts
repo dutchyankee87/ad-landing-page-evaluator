@@ -33,7 +33,10 @@ export interface ElementComparison {
   landingPageValue: string;
   status: 'match' | 'mismatch' | 'partial_match' | 'missing';
   severity: 'HIGH' | 'MEDIUM' | 'LOW';
-  recommendation?: string;
+  recommendation?: string; // Legacy support - general recommendation
+  adOptimizationRecommendation?: string; // Recommendation for optimizing the ad
+  landingPageOptimizationRecommendation?: string; // Recommendation for optimizing the landing page
+  aiPreferredPath?: 'ad' | 'landing'; // Which path AI recommends
   category?: 'content' | 'visual' | 'emotional' | 'trust' | 'mobile';
   colorAnalysis?: {
     adColors: string[];
@@ -54,6 +57,18 @@ export interface ElementComparison {
     adMobileFriendly: boolean;
     pageMobileFriendly: boolean;
     consistencyScore: number;
+  };
+  visualAnalysis?: {
+    adImageStyle: string;
+    pageImageStyle: string;
+    styleConsistency: number;
+    layoutSimilarity: number;
+    brandElementAlignment: number;
+  };
+  typographyAnalysis?: {
+    fontStyleMatch: number;
+    hierarchyAlignment: number;
+    visualWeightConsistency: number;
   };
 }
 

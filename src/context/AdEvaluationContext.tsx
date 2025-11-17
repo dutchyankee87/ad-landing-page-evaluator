@@ -300,10 +300,19 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
       const response = await apiEvaluateAd({
         adData: {
           ...adData,
+          platform: adData.platform || 'meta',
           mediaType: adData.mediaType || 'image'
         },
-        landingPageData,
-        audienceData,
+        landingPageData: {
+          ...landingPageData,
+          url: landingPageData.url || 'example.com'
+        },
+        audienceData: {
+          ...audienceData,
+          ageRange: audienceData.ageRange || '25-34',
+          gender: audienceData.gender || 'mixed',
+          interests: audienceData.interests || 'general'
+        },
         // TODO: Add user email when auth is implemented
         userEmail: undefined
       });
@@ -842,6 +851,7 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
       
       const adContent = getAdContent(platform);
       const lpContent = getLpContent(landingPageURL);
+
       
       return [
         {
@@ -850,8 +860,11 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
           landingPageValue: 'Standard web layout with generic hero image and corporate photography style',
           status: 'partial_match' as const,
           severity: 'HIGH' as const,
-          category: 'visual',
+          category: 'visual' as const,
           recommendation: `Update hero section imagery to match ${platform} ad style - use ${platform === 'tiktok' ? 'dynamic, video-style' : platform === 'linkedin' ? 'professional B2B' : 'lifestyle-focused'} visuals with similar composition and energy`,
+          adOptimizationRecommendation: `Adjust ad imagery to match landing page's professional style for better brand consistency`,
+          landingPageOptimizationRecommendation: `Update hero section to use ${platform === 'tiktok' ? 'dynamic, video-style' : platform === 'linkedin' ? 'professional B2B' : 'lifestyle-focused'} imagery matching the ad`,
+          aiPreferredPath: 'landing' as const,
           visualAnalysis: {
             adImageStyle: platform === 'tiktok' ? 'video/dynamic' : platform === 'linkedin' ? 'professional photography' : 'lifestyle photography',
             pageImageStyle: 'corporate photography',
@@ -866,8 +879,11 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
           landingPageValue: 'Standard web fonts with conservative hierarchy and formal styling',
           status: 'partial_match' as const,
           severity: 'MEDIUM' as const,
-          category: 'visual',
+          category: 'visual' as const,
           recommendation: `Adjust typography to match ${platform} ad style - use ${platform === 'tiktok' ? 'bolder, more casual' : platform === 'linkedin' ? 'professional but modern' : 'social media optimized'} fonts and hierarchy`,
+          adOptimizationRecommendation: `Use more conservative, web-friendly typography to match landing page hierarchy`,
+          landingPageOptimizationRecommendation: `Update fonts to ${platform === 'tiktok' ? 'bold, casual style' : platform === 'linkedin' ? 'modern professional style' : 'social media optimized style'} matching the ad`,
+          aiPreferredPath: 'landing' as const,
           typographyAnalysis: {
             fontStyleMatch: platform === 'linkedin' ? 7 : platform === 'tiktok' ? 4 : 5,
             hierarchyAlignment: 6,
@@ -880,8 +896,11 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
           landingPageValue: lpContent.headline,
           status: 'mismatch' as const,
           severity: 'HIGH' as const,
-          category: 'content',
-          recommendation: `Change H1 to match ad headline: "${adContent.headline}" for better message consistency`
+          category: 'content' as const,
+          recommendation: `Change H1 to match ad headline: "${adContent.headline}" for better message consistency`,
+          adOptimizationRecommendation: `Update ad headline to "${lpContent.headline}" for consistent messaging`,
+          landingPageOptimizationRecommendation: `Change H1 to match ad headline: "${adContent.headline}" for better message consistency`,
+          aiPreferredPath: 'landing' as const
         },
         {
           element: 'Primary CTA Button',
@@ -889,7 +908,10 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
           landingPageValue: lpContent.cta,
           status: adContent.cta.toLowerCase() === lpContent.cta.toLowerCase() ? 'match' as const : 'mismatch' as const,
           severity: 'HIGH' as const,
-          recommendation: adContent.cta.toLowerCase() === lpContent.cta.toLowerCase() ? undefined : `Update CTA button to match ad text: "${adContent.cta}"`
+          recommendation: adContent.cta.toLowerCase() === lpContent.cta.toLowerCase() ? undefined : `Update CTA button to match ad text: "${adContent.cta}"`,
+          adOptimizationRecommendation: adContent.cta.toLowerCase() === lpContent.cta.toLowerCase() ? undefined : `Change ad CTA to "${lpContent.cta}" to match landing page button`,
+          landingPageOptimizationRecommendation: adContent.cta.toLowerCase() === lpContent.cta.toLowerCase() ? undefined : `Update CTA button to match ad text: "${adContent.cta}"`,
+          aiPreferredPath: 'landing' as const
         },
         {
           element: 'Brand Color Scheme',
@@ -897,18 +919,15 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
           landingPageValue: '#005c6b (Different teal) + #0066CC (Blue accents)',
           status: 'partial_match' as const,
           severity: 'HIGH' as const,
-          category: 'visual',
+          category: 'visual' as const,
           recommendation: 'Update CSS: Primary #004c4c, CTA buttons #004c4c, urgency elements #FF6B35 for exact brand match',
+          adOptimizationRecommendation: 'Adjust ad colors to landing page scheme: Primary #005c6b, accents #0066CC for consistency',
+          landingPageOptimizationRecommendation: 'Update CSS: Primary #004c4c, CTA buttons #004c4c, urgency elements #FF6B35 for exact brand match',
+          aiPreferredPath: 'landing' as const,
           colorAnalysis: {
             adColors: ['#004c4c', '#FF6B35'],
             pageColors: ['#005c6b', '#0066CC'],
-            matchScore: 6,
-            colorSimilarity: {
-              identical: [],
-              similar: ['#004c4c/#005c6b'],
-              different: ['#FF6B35/#0066CC']
-            },
-            arrangementScore: 7
+            matchScore: 6
           }
         },
         {
@@ -917,7 +936,10 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
           landingPageValue: 'Generic financial imagery, no growth symbols',
           status: 'missing' as const,
           severity: 'MEDIUM' as const,
-          recommendation: 'Add 24px paper plane icon next to headline + progress arrows in hero section + upward trending graphics'
+          recommendation: 'Add 24px paper plane icon next to headline + progress arrows in hero section + upward trending graphics',
+          adOptimizationRecommendation: 'Simplify ad visuals to match landing page\'s clean, professional approach',
+          landingPageOptimizationRecommendation: 'Add paper plane icon (24px), progress arrows, and growth symbols to match ad theme',
+          aiPreferredPath: 'landing' as const
         },
         {
           element: 'Social Proof',
@@ -925,7 +947,10 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
           landingPageValue: 'No visible testimonials or trust indicators',
           status: 'missing' as const,
           severity: 'HIGH' as const,
-          recommendation: 'Add "★★★★★ 4.8/5 from 1,247+ customers" below headline + "2,847 started this month" counter above CTA'
+          recommendation: 'Add "★★★★★ 4.8/5 from 1,247+ customers" below headline + "2,847 started this month" counter above CTA',
+          adOptimizationRecommendation: 'Add customer count or rating badge to ad creative for stronger social proof',
+          landingPageOptimizationRecommendation: 'Add "★★★★★ 4.8/5 from 1,247+ customers" below headline + "2,847 started this month" counter above CTA',
+          aiPreferredPath: 'landing' as const
         },
         {
           element: 'Urgency/Scarcity',
@@ -933,7 +958,10 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
           landingPageValue: 'No time pressure or scarcity indicators',
           status: 'missing' as const,
           severity: 'MEDIUM' as const,
-          recommendation: 'Add countdown timer: "Bonus expires in 3 days, 14 hours" in orange #FF6B35 below CTA button'
+          recommendation: 'Add countdown timer: "Bonus expires in 3 days, 14 hours" in orange #FF6B35 below CTA button',
+          adOptimizationRecommendation: 'Add explicit deadline text: "Limited time offer - expires in 3 days" to ad copy',
+          landingPageOptimizationRecommendation: 'Add countdown timer: "Bonus expires in 3 days, 14 hours" in orange #FF6B35 below CTA button',
+          aiPreferredPath: 'landing' as const
         },
         {
           element: 'Value Proposition Focus',
@@ -941,7 +969,10 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
           landingPageValue: 'Single benefit: Plan your future (generic)',
           status: 'mismatch' as const,
           severity: 'HIGH' as const,
-          recommendation: 'Restructure hero copy to emphasize BOTH long-term pension building AND immediate €1,000 bonus with 50/50 visual weight'
+          recommendation: 'Restructure hero copy to emphasize BOTH long-term pension building AND immediate €1,000 bonus with 50/50 visual weight',
+          adOptimizationRecommendation: 'Simplify ad focus to single benefit: "Plan your secure future" matching landing page approach',
+          landingPageOptimizationRecommendation: 'Restructure hero to emphasize dual benefit: "Build pension + Get €1,000 bonus" matching ad messaging',
+          aiPreferredPath: 'ad' as const
         }
       ];
     };

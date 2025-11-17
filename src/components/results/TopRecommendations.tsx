@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { AlertTriangle, Target, Settings, CheckCircle, TrendingUp } from 'lucide-react';
+import OptimizationPathSelector, { OptimizationPath } from '../shared/OptimizationPathSelector';
 
 interface ElementComparison {
   element: string;
@@ -8,6 +9,9 @@ interface ElementComparison {
   status: 'match' | 'mismatch' | 'partial_match' | 'missing';
   severity: 'HIGH' | 'MEDIUM' | 'LOW';
   recommendation?: string;
+  adOptimizationRecommendation?: string;
+  landingPageOptimizationRecommendation?: string;
+  aiPreferredPath?: 'ad' | 'landing';
   category?: 'content' | 'visual' | 'emotional' | 'trust' | 'mobile';
 }
 
@@ -16,19 +20,43 @@ interface TopRecommendationsProps {
 }
 
 const TopRecommendations: React.FC<TopRecommendationsProps> = ({ comparisons }) => {
-  // Filter and prioritize recommendations based on severity and status
-  const getTopRecommendations = (comparisons: ElementComparison[]) => {
+  const [selectedPath, setSelectedPath] = useState<OptimizationPath>('ad');
+
+  // Filter and prioritize recommendations based on severity, status, and selected path
+  const getTopRecommendations = (comparisons: ElementComparison[], path: OptimizationPath) => {
     const severityScore = { HIGH: 3, MEDIUM: 2, LOW: 1 };
     const statusScore = { mismatch: 4, partial_match: 3, missing: 2, match: 0 };
     
     return comparisons
-      .filter(comp => comp.recommendation && comp.status !== 'match')
+      .filter(comp => {
+        // Check if we have a recommendation for the selected path
+        const hasRecommendation = path === 'ad' 
+          ? comp.adOptimizationRecommendation || comp.recommendation 
+          : comp.landingPageOptimizationRecommendation || comp.recommendation;
+        
+        return hasRecommendation && comp.status !== 'match';
+      })
       .map(comp => ({
         ...comp,
-        score: (severityScore[comp.severity] || 0) + (statusScore[comp.status] || 0)
+        score: (severityScore[comp.severity] || 0) + (statusScore[comp.status] || 0),
+        currentRecommendation: path === 'ad' 
+          ? comp.adOptimizationRecommendation || comp.recommendation
+          : comp.landingPageOptimizationRecommendation || comp.recommendation
       }))
       .sort((a, b) => b.score - a.score)
       .slice(0, 3);
+  };
+
+  // Get AI preferred path for the comparisons
+  const getAiPreferredPath = (comparisons: ElementComparison[]): OptimizationPath => {
+    const pathCounts = comparisons.reduce((acc, comp) => {
+      if (comp.aiPreferredPath) {
+        acc[comp.aiPreferredPath] = (acc[comp.aiPreferredPath] || 0) + 1;
+      }
+      return acc;
+    }, { ad: 0, landing: 0 });
+    
+    return pathCounts.landing > pathCounts.ad ? 'landing' : 'ad';
   };
 
   const getPriorityIcon = (severity: string) => {
@@ -90,7 +118,8 @@ const TopRecommendations: React.FC<TopRecommendationsProps> = ({ comparisons }) 
     return null;
   }
 
-  const topRecommendations = getTopRecommendations(comparisons);
+  const aiPreferredPath = getAiPreferredPath(comparisons);
+  const topRecommendations = getTopRecommendations(comparisons, selectedPath);
 
   if (topRecommendations.length === 0) {
     return (
@@ -124,18 +153,27 @@ const TopRecommendations: React.FC<TopRecommendationsProps> = ({ comparisons }) 
 
   return (
     <section className="mb-12">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="p-2 bg-orange-100 rounded-lg">
-          <TrendingUp className="h-5 w-5 text-orange-600" />
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-orange-100 rounded-lg">
+            <TrendingUp className="h-5 w-5 text-orange-600" />
+          </div>
+          <div>
+            <h2 className="text-xl font-semibold text-gray-800">
+              Top 3 Recommendations
+            </h2>
+            <p className="text-gray-600 text-sm mt-1">
+              Highest-impact optimizations for your selected optimization path
+            </p>
+          </div>
         </div>
-        <div>
-          <h2 className="text-xl font-semibold text-gray-800">
-            Top 3 Recommendations
-          </h2>
-          <p className="text-gray-600 text-sm mt-1">
-            Highest-impact optimizations based on your ad vs landing page analysis
-          </p>
-        </div>
+        
+        <OptimizationPathSelector
+          selectedPath={selectedPath}
+          onPathChange={setSelectedPath}
+          aiPreferredPath={aiPreferredPath}
+          className="flex-shrink-0"
+        />
       </div>
       
       <div className="space-y-4">
@@ -194,8 +232,13 @@ const TopRecommendations: React.FC<TopRecommendationsProps> = ({ comparisons }) 
                     </div>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-orange-800 text-sm mb-1">RECOMMENDED ACTION</h4>
-                    <p className="text-gray-800 text-sm leading-relaxed">{recommendation.recommendation}</p>
+                    <div className="flex items-center gap-2 mb-1">
+                      <h4 className="font-semibold text-orange-800 text-sm">RECOMMENDED ACTION</h4>
+                      {recommendation.aiPreferredPath === selectedPath && (
+                        <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">AdAlign Preferred</span>
+                      )}
+                    </div>
+                    <p className="text-gray-800 text-sm leading-relaxed">{recommendation.currentRecommendation}</p>
                   </div>
                 </div>
               </div>
