@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BarChart3, BookOpen, CreditCard, Menu, X, Zap, Users } from 'lucide-react';
+import { BarChart3, BookOpen, CreditCard, Menu, X, Zap } from 'lucide-react';
 
 const Header: React.FC = () => {
   const location = useLocation();
@@ -50,19 +50,6 @@ const Header: React.FC = () => {
               </Link>
             </motion.div>
             
-            <motion.div whileHover={{ scale: 1.02, y: -1 }} whileTap={{ scale: 0.98 }}>
-              <Link 
-                to="/partners" 
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 backdrop-blur-sm ${
-                  location.pathname === '/partners'
-                    ? 'bg-purple-100 text-purple-700 border border-purple-200'
-                    : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100/80'
-                }`}
-              >
-                <Users className="h-4 w-4" />
-                <span className="font-medium">Partners</span>
-              </Link>
-            </motion.div>
 
             <motion.div whileHover={{ scale: 1.02, y: -1 }} whileTap={{ scale: 0.98 }}>
               <Link 
@@ -158,24 +145,6 @@ const Header: React.FC = () => {
                   </Link>
                 </motion.div>
                 
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.2 }}
-                >
-                  <Link 
-                    to="/partners" 
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
-                      location.pathname === '/partners'
-                        ? 'bg-purple-100 text-purple-700'
-                        : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
-                    }`}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    <Users className="h-4 w-4" />
-                    <span>Partners</span>
-                  </Link>
-                </motion.div>
 
                 <motion.div
                   initial={{ opacity: 0, x: -20 }}
