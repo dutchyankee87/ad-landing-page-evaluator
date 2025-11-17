@@ -504,6 +504,9 @@ Target: ${audienceData.ageRange}, ${audienceData.gender}, ${audienceData.interes
 EXTRACT & ANALYZE:
 
 1. **Primary Colors** (3-5 dominant colors from each image as hex codes)
+   - IMPORTANT: Consider colors as matching if they are similar within 20 hex units (e.g., #FF5733 and #FF6B47 are matches)
+   - Account for different arrangements - same colors in different order should be considered partial matches
+   - Calculate color similarity using HSL distance, not just hex comparison
 2. **Text Elements** (exact transcription):
    - Headlines, CTAs, offers, product names
 3. **Visual Style** (design approach, layout, imagery)
@@ -511,10 +514,16 @@ EXTRACT & ANALYZE:
 5. **Mobile Elements** (responsive design, mobile-first layout)
 6. **Emotional Tone** (urgent, professional, playful, etc.)
 
-SCORING (1-10, be strict - most scores 1-4):
-- **Visual**: Color/design consistency
-- **Contextual**: Message/offer alignment  
-- **Tone**: Voice/personality match
+SCORING (1-10, calculate based on element matches):
+- **Visual**: Weight color matches heavily - identical=9-10, similar=7-8, different arrangement=6-7, different=1-4
+- **Contextual**: Message/offer alignment - exact=9-10, similar meaning=6-8, different=1-4
+- **Tone**: Voice/personality match - consistent=8-10, somewhat aligned=5-7, mismatched=1-4
+
+SCORING FORMULA:
+- Count perfect matches, partial matches, and mismatches from element comparisons
+- Perfect match = 2 points, Partial match = 1 point, Mismatch = 0 points  
+- Calculate category scores: (total_points / max_possible_points) * 10
+- Overall score should reflect the proportion of matches vs mismatches
 
 PRIORITIZE RECOMMENDATIONS:
 - Use HIGH severity for major mismatches that hurt conversions (headlines, CTAs, core colors)
@@ -546,7 +555,13 @@ Return JSON:
       "colorAnalysis": {
         "adColors": ["#hex1", "#hex2"],
         "pageColors": ["#hex3", "#hex4"],
-        "matchScore": [1-10]
+        "matchScore": [1-10],
+        "colorSimilarity": {
+          "identical": ["#hex_matches"],
+          "similar": ["#hex_similar"],
+          "different": ["#hex_different"]
+        },
+        "arrangementScore": [1-10]
       }
     },
     {

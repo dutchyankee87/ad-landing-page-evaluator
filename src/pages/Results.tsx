@@ -15,6 +15,7 @@ import { IndustryBenchmarks } from '../components/benchmarks/IndustryBenchmarks'
 import { DetailedScoring } from '../components/results/DetailedScoring';
 import { IndustryInsights } from '../components/insights/IndustryInsights';
 import { PersuasionAnalysis } from '../components/psychology/PersuasionAnalysis';
+import RunNewTestButton from '../components/results/RunNewTestButton';
 import SEOHead from '../components/SEOHead';
 
 const PLATFORM_NAMES = {
@@ -186,7 +187,10 @@ const Results: React.FC = () => {
                 {/* Ad vs Landing Page Comparison Grid */}
                 {results.elementComparisons && (
                   <div>
-                    <ComparisonGrid comparisons={results.elementComparisons} />
+                    <ComparisonGrid 
+                      comparisons={results.elementComparisons} 
+                      componentScores={results.componentScores}
+                    />
                   </div>
                 )}
                 
@@ -300,14 +304,17 @@ const Results: React.FC = () => {
               </div>
             </div>
             
-            <div className="text-center">
+            <div className="text-center space-y-4">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <RunNewTestButton />
                 <Link
                   to="/evaluate"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium border border-gray-300"
                 >
-                  Analyze Another Ad
+                  Analyze Different Ad
                   <ChevronRight className="h-4 w-4" />
                 </Link>
+              </div>
             </div>
           </div>
         </div>

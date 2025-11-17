@@ -33,9 +33,37 @@ interface ElementComparison {
 
 interface ComparisonGridProps {
   comparisons: ElementComparison[];
+  componentScores?: {
+    visualMatch?: number;
+    contextualMatch?: number;
+    toneAlignment?: number;
+  };
 }
 
-const ComparisonGrid: React.FC<ComparisonGridProps> = ({ comparisons }) => {
+const ComparisonGrid: React.FC<ComparisonGridProps> = ({ comparisons, componentScores }) => {
+  // Map categories to component scores
+  const getCategoryScore = (category?: string) => {
+    if (!componentScores) return null;
+    
+    switch (category) {
+      case 'visual':
+        return componentScores.visualMatch;
+      case 'content':
+      case 'contextual':
+        return componentScores.contextualMatch;
+      case 'emotional':
+        return componentScores.toneAlignment;
+      default:
+        return null;
+    }
+  };
+
+  const getScoreColor = (score: number): string => {
+    if (score >= 7.5) return 'text-green-600';
+    if (score >= 5) return 'text-amber-600';
+    return 'text-red-600';
+  };
+
   const getCategoryIcon = (category?: string) => {
     switch (category) {
       case 'visual':
@@ -205,10 +233,17 @@ const ComparisonGrid: React.FC<ComparisonGridProps> = ({ comparisons }) => {
                 >
                   {/* Element */}
                   <div className="font-medium text-gray-900 text-sm">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 mb-1">
                       {getCategoryIcon(comparison.category)}
                       {comparison.element}
                     </div>
+                    {getCategoryScore(comparison.category) && (
+                      <div className="text-xs text-gray-500">
+                        Component Score: <span className={`font-semibold ${getScoreColor(getCategoryScore(comparison.category)!)}`}>
+                          {getCategoryScore(comparison.category)}/10
+                        </span>
+                      </div>
+                    )}
                   </div>
                   
                   {/* Ad Value */}
@@ -270,10 +305,17 @@ const ComparisonGrid: React.FC<ComparisonGridProps> = ({ comparisons }) => {
                   {/* Element Header */}
                   <div className="flex items-center justify-between mb-4">
                     <div className="font-semibold text-gray-900 text-base">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 mb-1">
                         {getCategoryIcon(comparison.category)}
                         {comparison.element}
                       </div>
+                      {getCategoryScore(comparison.category) && (
+                        <div className="text-xs text-gray-500">
+                          Component Score: <span className={`font-semibold ${getScoreColor(getCategoryScore(comparison.category)!)}`}>
+                            {getCategoryScore(comparison.category)}/10
+                          </span>
+                        </div>
+                      )}
                     </div>
                     <div className="flex items-center gap-2">
                       {getStatusIcon(comparison.status)}

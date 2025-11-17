@@ -387,7 +387,7 @@ const AdAssetForm: React.FC = () => {
             <img
               src={adData.imageUrl}
               alt="Ad preview"
-              className="w-full h-64 object-cover"
+              className="w-full max-w-2xl mx-auto object-contain max-h-96"
             />
             <button
               type="button"
