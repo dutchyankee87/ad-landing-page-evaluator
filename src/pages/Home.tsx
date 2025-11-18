@@ -45,10 +45,10 @@ const Home: React.FC = () => {
         url="/"
       />
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50/30 to-blue-50/20">
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 pt-2 pb-4">
       {/* Hero Section */}
       <motion.section 
-        className="mb-16 py-12"
+        className="mb-12 py-6"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
@@ -127,8 +127,8 @@ const Home: React.FC = () => {
                     <TrendingUp className="h-5 w-5 text-green-600" />
                   </div>
                   <div>
-                    <div className="text-lg font-bold text-green-700">34%</div>
-                    <div className="text-sm text-gray-600">Cost reduction</div>
+                    <div className="text-lg font-bold text-green-700">-47%</div>
+                    <div className="text-sm text-gray-600">Bounce rate</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 bg-blue-50 p-4 rounded-xl border border-blue-200">
@@ -136,8 +136,8 @@ const Home: React.FC = () => {
                     <DollarSign className="h-5 w-5 text-blue-600" />
                   </div>
                   <div>
-                    <div className="text-lg font-bold text-blue-700">$2,400</div>
-                    <div className="text-sm text-gray-600">Monthly savings</div>
+                    <div className="text-lg font-bold text-blue-700">-34%</div>
+                    <div className="text-sm text-gray-600">Cost per engaged session</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 bg-purple-50 p-4 rounded-xl border border-purple-200">
