@@ -121,6 +121,17 @@ const Home: React.FC = () => {
               <span>Results in 60 seconds</span>
             </div>
           </motion.div>
+          
+          <motion.div 
+            variants={fadeInUpVariants}
+            className="mt-12 flex justify-center"
+          >
+            <img 
+              src="/hero-ocean.jpg" 
+              alt="Ad landing page alignment dashboard" 
+              className="max-w-4xl w-full rounded-2xl shadow-2xl border border-white/20"
+            />
+          </motion.div>
         </div>
       </motion.section>
 
