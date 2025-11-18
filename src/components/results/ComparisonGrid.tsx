@@ -58,19 +58,10 @@ interface ComparisonGridProps {
 const ComparisonGrid: React.FC<ComparisonGridProps> = ({ comparisons, componentScores }) => {
   // Render bidirectional recommendations
   const renderBidirectionalRecommendations = (comparison: ElementComparison) => {
-    const hasAdRec = comparison.adOptimizationRecommendation && comparison.adOptimizationRecommendation !== comparison.recommendation;
-    const hasLandingRec = comparison.landingPageOptimizationRecommendation && comparison.landingPageOptimizationRecommendation !== comparison.recommendation;
+    const hasAdRec = comparison.adOptimizationRecommendation;
+    const hasLandingRec = comparison.landingPageOptimizationRecommendation;
+    const hasGenericRec = comparison.recommendation && !hasAdRec && !hasLandingRec;
     
-    // If no specific bidirectional recommendations, show legacy recommendation
-    if (!hasAdRec && !hasLandingRec && comparison.recommendation) {
-      return (
-        <div className="bg-orange-50 p-3 rounded-lg border border-orange-200">
-          <div className="text-orange-700 font-medium text-xs mb-1 uppercase tracking-wide">RECOMMENDATION</div>
-          <div className="text-gray-800 text-xs leading-relaxed">{comparison.recommendation}</div>
-        </div>
-      );
-    }
-
     // If we have bidirectional recommendations, show both
     if (hasAdRec || hasLandingRec) {
       return (
@@ -108,6 +99,32 @@ const ComparisonGrid: React.FC<ComparisonGridProps> = ({ comparisons, componentS
               <div className="text-gray-800 text-xs leading-relaxed">{comparison.landingPageOptimizationRecommendation}</div>
             </div>
           )}
+        </div>
+      );
+    }
+
+    // If only generic recommendation, create specific ad vs landing page versions
+    if (hasGenericRec) {
+      return (
+        <div className="space-y-2">
+          <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+            <div className="flex items-center gap-2 mb-1">
+              <Image className="h-3 w-3 text-blue-600" />
+              <div className="text-blue-700 font-medium text-xs uppercase tracking-wide">OPTIMIZE AD</div>
+            </div>
+            <div className="text-gray-800 text-xs leading-relaxed">
+              Adjust your ad to: {comparison.recommendation.toLowerCase().replace(/^adjust|update|change/, '').trim()}
+            </div>
+          </div>
+          <div className="bg-purple-50 p-3 rounded-lg border border-purple-200">
+            <div className="flex items-center gap-2 mb-1">
+              <Settings className="h-3 w-3 text-purple-600" />
+              <div className="text-purple-700 font-medium text-xs uppercase tracking-wide">OPTIMIZE LANDING PAGE</div>
+            </div>
+            <div className="text-gray-800 text-xs leading-relaxed">
+              Update your landing page to: {comparison.recommendation.toLowerCase().replace(/^adjust|update|change/, '').trim()}
+            </div>
+          </div>
         </div>
       );
     }
@@ -364,12 +381,6 @@ const ComparisonGrid: React.FC<ComparisonGridProps> = ({ comparisons, componentS
                     <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
                       <div className="text-blue-700 font-medium text-xs mb-1 uppercase tracking-wide">AD</div>
                       <div className="text-gray-800 text-xs leading-relaxed">{comparison.adValue || '—'}</div>
-                      {renderColorAnalysis(comparison.colorAnalysis)}
-                      {renderVisualAnalysis(comparison.visualAnalysis)}
-                      {renderTypographyAnalysis(comparison.typographyAnalysis)}
-                      {renderEmotionalTone(comparison.emotionalTone)}
-                      {renderTrustSignals(comparison.trustSignals)}
-                      {renderMobileOptimization(comparison.mobileOptimization)}
                     </div>
                   </div>
                   
@@ -382,11 +393,22 @@ const ComparisonGrid: React.FC<ComparisonGridProps> = ({ comparisons, componentS
                   </div>
                   
                   {/* Status */}
-                  <div className="flex items-center gap-2">
-                    {getStatusIcon(comparison.status)}
-                    <span className={`px-2 py-1 rounded text-xs font-medium ${statusBadge.style}`}>
-                      {statusBadge.label}
-                    </span>
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      {getStatusIcon(comparison.status)}
+                      <span className={`px-2 py-1 rounded text-xs font-medium ${statusBadge.style}`}>
+                        {statusBadge.label}
+                      </span>
+                    </div>
+                    {/* Analysis details moved here */}
+                    <div className="space-y-1">
+                      {renderColorAnalysis(comparison.colorAnalysis)}
+                      {renderVisualAnalysis(comparison.visualAnalysis)}
+                      {renderTypographyAnalysis(comparison.typographyAnalysis)}
+                      {renderEmotionalTone(comparison.emotionalTone)}
+                      {renderTrustSignals(comparison.trustSignals)}
+                      {renderMobileOptimization(comparison.mobileOptimization)}
+                    </div>
                   </div>
                   
                   {/* Recommendation */}
@@ -411,25 +433,36 @@ const ComparisonGrid: React.FC<ComparisonGridProps> = ({ comparisons, componentS
                   className={`p-4 hover:bg-gray-50 transition-colors border-l-4 ${getSeverityColor(comparison.severity)}`}
                 >
                   {/* Element Header */}
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="font-semibold text-gray-900 text-base">
-                      <div className="flex items-center gap-2 mb-1">
-                        {getCategoryIcon(comparison.category)}
-                        {comparison.element}
-                      </div>
-                      {getCategoryScore(comparison.category) && (
-                        <div className="text-xs text-gray-500">
-                          Component Score: <span className={`font-semibold ${getScoreColor(getCategoryScore(comparison.category)!)}`}>
-                            {getCategoryScore(comparison.category)}/10
-                          </span>
+                  <div className="mb-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="font-semibold text-gray-900 text-base">
+                        <div className="flex items-center gap-2 mb-1">
+                          {getCategoryIcon(comparison.category)}
+                          {comparison.element}
                         </div>
-                      )}
+                        {getCategoryScore(comparison.category) && (
+                          <div className="text-xs text-gray-500">
+                            Component Score: <span className={`font-semibold ${getScoreColor(getCategoryScore(comparison.category)!)}`}>
+                              {getCategoryScore(comparison.category)}/10
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {getStatusIcon(comparison.status)}
+                        <span className={`px-2 py-1 rounded text-xs font-medium ${statusBadge.style}`}>
+                          {statusBadge.label}
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      {getStatusIcon(comparison.status)}
-                      <span className={`px-2 py-1 rounded text-xs font-medium ${statusBadge.style}`}>
-                        {statusBadge.label}
-                      </span>
+                    {/* Analysis details moved here for mobile */}
+                    <div className="space-y-1">
+                      {renderColorAnalysis(comparison.colorAnalysis)}
+                      {renderVisualAnalysis(comparison.visualAnalysis)}
+                      {renderTypographyAnalysis(comparison.typographyAnalysis)}
+                      {renderEmotionalTone(comparison.emotionalTone)}
+                      {renderTrustSignals(comparison.trustSignals)}
+                      {renderMobileOptimization(comparison.mobileOptimization)}
                     </div>
                   </div>
                   
@@ -439,12 +472,6 @@ const ComparisonGrid: React.FC<ComparisonGridProps> = ({ comparisons, componentS
                     <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
                       <div className="text-blue-700 font-semibold text-sm mb-2 uppercase tracking-wide">YOUR AD</div>
                       <div className="text-gray-800 text-sm leading-relaxed">{comparison.adValue || '—'}</div>
-                      {renderColorAnalysis(comparison.colorAnalysis)}
-                      {renderVisualAnalysis(comparison.visualAnalysis)}
-                      {renderTypographyAnalysis(comparison.typographyAnalysis)}
-                      {renderEmotionalTone(comparison.emotionalTone)}
-                      {renderTrustSignals(comparison.trustSignals)}
-                      {renderMobileOptimization(comparison.mobileOptimization)}
                     </div>
                     
                     {/* Landing Page Value */}

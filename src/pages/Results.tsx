@@ -155,7 +155,7 @@ const Results: React.FC = () => {
                   <div className="grid md:grid-cols-2 gap-8 items-center">
                     <div>
                       <h2 className="text-2xl font-semibold mb-4 text-gray-800">
-                        Congruence Score
+                        Alignment Score
                       </h2>
                       <p className="text-gray-600 mb-4 leading-relaxed">
                         This score reveals how well your ad and landing page work together to convert visitors.
@@ -178,6 +178,11 @@ const Results: React.FC = () => {
                     </div>
                   </div>
                 </section>
+
+                {/* Ad Summary - moved here for better context */}
+                <div>
+                  <AdSummary />
+                </div>
             
                 {/* Component Scores */}
                 <div>
@@ -267,10 +272,6 @@ const Results: React.FC = () => {
                   </motion.section>
                 )}
             
-                {/* Ad Summary */}
-                <div>
-                  <AdSummary />
-                </div>
                 
                 {/* Detailed Micro-Scoring Analysis */}
                 {results.detailedScoring && (
@@ -299,21 +300,22 @@ const Results: React.FC = () => {
                   </div>
                 )}
 
+                {/* Run New Test Section - moved above Partner Recommendations */}
+                <div className="text-center space-y-4 mb-12">
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <RunNewTestButton />
+                    <Link
+                      to="/evaluate"
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium border border-gray-300"
+                    >
+                      Analyze Different Ad
+                      <ChevronRight className="h-4 w-4" />
+                    </Link>
+                  </div>
+                </div>
+
                 {/* Partner Recommendations */}
                 <PartnerRecommendations overallScore={results.overallScore} />
-              </div>
-            </div>
-            
-            <div className="text-center space-y-4">
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <RunNewTestButton />
-                <Link
-                  to="/evaluate"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium border border-gray-300"
-                >
-                  Analyze Different Ad
-                  <ChevronRight className="h-4 w-4" />
-                </Link>
               </div>
             </div>
           </div>
@@ -335,11 +337,11 @@ const Results: React.FC = () => {
 
 // Helper function to get score description
 const getScoreDescription = (score: number): string => {
-  if (score >= 9) return '🔥 Conversion Machine';
-  if (score >= 7) return '✅ Strong Alignment';
-  if (score >= 5) return '⚠️ Room to Improve';
-  if (score >= 3) return '🚨 Losing Money';
-  return '💸 Conversion Killer';
+  if (score >= 9) return 'Excellent Alignment';
+  if (score >= 7) return 'Strong Alignment';
+  if (score >= 5) return 'Moderate Alignment';
+  if (score >= 3) return 'Weak Alignment';
+  return 'Poor Alignment';
 };
 
 export default Results;

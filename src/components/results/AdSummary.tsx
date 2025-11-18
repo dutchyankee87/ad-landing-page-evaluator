@@ -11,11 +11,20 @@ const PLATFORM_NAMES = {
 } as const;
 
 const AdSummary: React.FC = () => {
-  const { adData, landingPageData } = useAdEvaluation();
+  const { adData, landingPageData, results } = useAdEvaluation();
+  
+  // Extract real CTA data from analysis results instead of dummy data
+  const ctaComparison = results?.elementComparisons?.find(comp => 
+    comp.element === 'Primary CTA Button' || comp.element.includes('CTA')
+  );
+  const realCtaText = ctaComparison?.landingPageValue || landingPageData.ctaText;
   
   return (
     <section className="mb-10">
-      <h2 className="text-2xl font-bold mb-6">Ad Summary</h2>
+      <h2 className="text-2xl font-bold mb-2">What We Analyzed</h2>
+      <p className="text-gray-600 mb-6">
+        Here's a summary of your ad and landing page elements that were evaluated
+      </p>
       
       <div className="grid md:grid-cols-2 gap-6">
         {/* Ad Content */}
@@ -72,10 +81,15 @@ const AdSummary: React.FC = () => {
               </div>
             )}
             
-            {landingPageData.ctaText && (
+            {realCtaText && (
               <div>
                 <h4 className="text-sm font-medium text-gray-500">Main CTA</h4>
-                <p className="text-gray-800">{landingPageData.ctaText}</p>
+                <p className="text-gray-800">{realCtaText}</p>
+                {ctaComparison && ctaComparison.adValue !== ctaComparison.landingPageValue && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    Ad CTA: "{ctaComparison.adValue}"
+                  </p>
+                )}
               </div>
             )}
           </div>
