@@ -53,85 +53,117 @@ const Home: React.FC = () => {
         initial="hidden"
         animate="visible"
       >
-        <div className="max-w-5xl mx-auto text-center">
+        <div className="max-w-7xl mx-auto">
           <motion.div 
             variants={itemVariants}
-            className="inline-flex items-center gap-2 bg-red-50 text-red-700 px-4 py-2 rounded-full text-sm font-medium mb-6 border border-red-200"
+            className="flex justify-center mb-6"
           >
-            <AlertTriangle className="h-4 w-4" />
-            78% of paid ads fail because they don't match their landing pages
+            <div className="inline-flex items-center gap-2 bg-red-50 text-red-700 px-4 py-2 rounded-full text-sm font-medium border border-red-200">
+              <AlertTriangle className="h-4 w-4" />
+              78% of paid ads fail because they don't match their landing pages
+            </div>
           </motion.div>
           
-          <motion.h1 
-            variants={itemVariants}
-            className="text-4xl md:text-6xl font-bold mb-6 leading-tight"
-          >
-            Does Your Ad Match
-            <span className="block bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent">
-              Your Landing Page?
-            </span>
-          </motion.h1>
-          
-          <motion.p 
-            variants={itemVariants}
-            className="text-xl md:text-2xl text-gray-600 mb-8 leading-relaxed max-w-3xl mx-auto"
-          >
-            Find out if your ads and landing pages are working together or working against each other. Our AI compares your <Link to="/evaluate" className="text-orange-600 hover:text-orange-700 underline">Meta, TikTok, LinkedIn, Reddit & Google ads</Link> to your landing pages and shows you exactly where they don't align.
-          </motion.p>
-          
-          <motion.div 
-            variants={itemVariants}
-            className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8"
-          >
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <Link 
-                to="/evaluate" 
-                className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold px-8 py-4 rounded-xl transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-orange-300"
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Left Content */}
+            <div className="text-center lg:text-left">
+              <motion.h1 
+                variants={itemVariants}
+                className="text-4xl md:text-6xl font-bold mb-6 leading-tight"
               >
-                Check My Ad-Page Alignment - Free
-                <ArrowRight className="h-5 w-5" />
-              </Link>
-            </motion.div>
+                Does Your Ad Match
+                <span className="block bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent">
+                  Your Landing Page?
+                </span>
+              </motion.h1>
+              
+              <motion.p 
+                variants={itemVariants}
+                className="text-xl md:text-2xl text-gray-600 mb-8 leading-relaxed"
+              >
+                Find out if your ads and landing pages are working together or working against each other. Our AI compares your <Link to="/evaluate" className="text-orange-600 hover:text-orange-700 underline">Meta, TikTok, LinkedIn, Reddit & Google ads</Link> to your landing pages and shows you exactly where they don't align.
+              </motion.p>
+              
+              <motion.div 
+                variants={itemVariants}
+                className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start items-center lg:items-start mb-8"
+              >
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <Link 
+                    to="/evaluate" 
+                    className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold px-8 py-4 rounded-xl transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-orange-300 text-center"
+                  >
+                    <span className="flex flex-col">
+                      <span>Check My Ad-Page Alignment</span>
+                      <span className="text-sm font-normal opacity-90">Free Analysis</span>
+                    </span>
+                    <ArrowRight className="h-5 w-5 ml-2" />
+                  </Link>
+                </motion.div>
+                <motion.div 
+                  variants={itemVariants}
+                  className="flex flex-col gap-2 text-green-600 font-medium"
+                >
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="h-5 w-5" />
+                    <span>No signup required</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="h-5 w-5" />
+                    <span>Results in 60 seconds</span>
+                  </div>
+                </motion.div>
+              </motion.div>
+              
+              <motion.div 
+                variants={itemVariants}
+                className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6"
+              >
+                <div className="flex items-center gap-3 bg-green-50 p-4 rounded-xl border border-green-200">
+                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                    <TrendingUp className="h-5 w-5 text-green-600" />
+                  </div>
+                  <div>
+                    <div className="text-lg font-bold text-green-700">34%</div>
+                    <div className="text-sm text-gray-600">Cost reduction</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 bg-blue-50 p-4 rounded-xl border border-blue-200">
+                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                    <DollarSign className="h-5 w-5 text-blue-600" />
+                  </div>
+                  <div>
+                    <div className="text-lg font-bold text-blue-700">$2,400</div>
+                    <div className="text-sm text-gray-600">Monthly savings</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 bg-purple-50 p-4 rounded-xl border border-purple-200">
+                  <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                    <Clock className="h-5 w-5 text-purple-600" />
+                  </div>
+                  <div>
+                    <div className="text-lg font-bold text-purple-700">60 sec</div>
+                    <div className="text-sm text-gray-600">Analysis time</div>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+            
+            {/* Right Image */}
             <motion.div 
-              variants={itemVariants}
-              className="flex items-center gap-2 text-green-600 font-medium"
+              variants={fadeInUpVariants}
+              className="flex justify-center lg:justify-end"
             >
-              <CheckCircle className="h-5 w-5" />
-              No signup required • Results in 60 seconds
+              <img 
+                src="/hero-ocean.jpg" 
+                alt="Ad landing page alignment dashboard" 
+                className="max-w-full w-full h-[500px] object-cover object-center rounded-2xl shadow-2xl border border-white/20"
+              />
             </motion.div>
-          </motion.div>
-          
-          <motion.div 
-            variants={itemVariants}
-            className="flex flex-col sm:flex-row items-center justify-center gap-8 text-sm text-gray-600"
-          >
-            <div className="flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-green-500" />
-              <span>Average 34% reduction in cost per engaged session</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <DollarSign className="h-4 w-4 text-green-500" />
-              <span>Save $2,400/month in ad spend</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-blue-500" />
-              <span>Results in 60 seconds</span>
-            </div>
-          </motion.div>
-          
-          <motion.div 
-            variants={fadeInUpVariants}
-            className="mt-12 flex justify-center"
-          >
-            <img 
-              src="/hero-ocean.jpg" 
-              alt="Ad landing page alignment dashboard" 
-              className="max-w-4xl w-full rounded-2xl shadow-2xl border border-white/20"
-            />
-          </motion.div>
+          </div>
         </div>
       </motion.section>
 
