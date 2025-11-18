@@ -12,27 +12,27 @@ const Home: React.FC = () => {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1,
-        duration: 0.6
+        staggerChildren: 0.05,
+        duration: 0.4
       }
     }
   };
 
   const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
+    hidden: { y: 10, opacity: 0 },
     visible: {
       y: 0,
       opacity: 1,
-      transition: { duration: 0.6, ease: "easeOut" }
+      transition: { duration: 0.4, ease: "easeOut" }
     }
   };
 
   const fadeInUpVariants = {
-    hidden: { y: 60, opacity: 0 },
+    hidden: { y: 20, opacity: 0 },
     visible: {
       y: 0,
       opacity: 1,
-      transition: { duration: 0.8, ease: "easeOut" }
+      transition: { duration: 0.5, ease: "easeOut" }
     }
   };
 
@@ -84,8 +84,8 @@ const Home: React.FC = () => {
             className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8"
           >
             <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
               <Link 
                 to="/evaluate" 
@@ -127,9 +127,9 @@ const Home: React.FC = () => {
       {/* Problem/Solution */}
       <motion.section 
         className="mb-16"
-        initial={{ opacity: 0, y: 60 }}
+        initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
         viewport={{ once: true, margin: "-100px" }}
       >
         <div className="max-w-6xl mx-auto">
@@ -137,17 +137,17 @@ const Home: React.FC = () => {
             {/* Problem */}
             <motion.div 
               className="bg-gradient-to-br from-red-50 to-orange-50 p-8 rounded-2xl border border-red-200 shadow-lg hover:shadow-xl transition-all duration-300"
-              whileHover={{ y: -4 }}
-              initial={{ opacity: 0, x: -30 }}
+              whileHover={{ y: -2 }}
+              initial={{ opacity: 0, x: -15 }}
               whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
+              transition={{ duration: 0.4, delay: 0.1 }}
               viewport={{ once: true }}
             >
               <motion.div 
                 className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-6"
                 initial={{ scale: 0 }}
                 whileInView={{ scale: 1 }}
-                transition={{ delay: 0.4, type: "spring", stiffness: 400 }}
+                transition={{ delay: 0.1, type: "spring", stiffness: 150 }}
                 viewport={{ once: true }}
               >
                 <AlertTriangle className="h-8 w-8 text-red-600" />
@@ -165,7 +165,7 @@ const Home: React.FC = () => {
                     className="flex items-start gap-3"
                     initial={{ opacity: 0, x: -20 }}
                     whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.6 + index * 0.1 }}
+                    transition={{ delay: 0.3 + index * 0.05 }}
                     viewport={{ once: true }}
                   >
                     <span className="text-red-500 text-xl">×</span>
@@ -178,17 +178,17 @@ const Home: React.FC = () => {
             {/* Solution */}
             <motion.div 
               className="bg-gradient-to-br from-green-50 to-blue-50 p-8 rounded-2xl border border-green-200 shadow-lg hover:shadow-xl transition-all duration-300"
-              whileHover={{ y: -4 }}
-              initial={{ opacity: 0, x: 30 }}
+              whileHover={{ y: -2 }}
+              initial={{ opacity: 0, x: 15 }}
               whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
+              transition={{ duration: 0.4, delay: 0.2 }}
               viewport={{ once: true }}
             >
               <motion.div 
                 className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-6"
                 initial={{ scale: 0 }}
                 whileInView={{ scale: 1 }}
-                transition={{ delay: 0.6, type: "spring", stiffness: 400 }}
+                transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
                 viewport={{ once: true }}
               >
                 <CheckCircle className="h-8 w-8 text-green-600" />
@@ -206,7 +206,7 @@ const Home: React.FC = () => {
                     className="flex items-start gap-3"
                     initial={{ opacity: 0, x: -20 }}
                     whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.8 + index * 0.1 }}
+                    transition={{ delay: 0.4 + index * 0.05 }}
                     viewport={{ once: true }}
                   >
                     <span className="text-green-500 text-xl">✓</span>
@@ -274,17 +274,17 @@ const Home: React.FC = () => {
               <motion.div 
                 key={index}
                 className="text-center bg-white/80 backdrop-blur-sm p-6 rounded-2xl border border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300"
-                initial={{ opacity: 0, y: 30 }}
+                initial={{ opacity: 0, y: 15 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.2 }}
-                whileHover={{ y: -4 }}
+                transition={{ duration: 0.4, delay: index * 0.1 }}
+                whileHover={{ y: -2 }}
                 viewport={{ once: true }}
               >
                 <motion.div 
                   className={`w-16 h-16 ${item.color} text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4 shadow-lg`}
                   initial={{ scale: 0 }}
                   whileInView={{ scale: 1 }}
-                  transition={{ delay: 0.4 + index * 0.2, type: "spring", stiffness: 400 }}
+                  transition={{ delay: 0.2 + index * 0.1, type: "spring", stiffness: 200 }}
                   viewport={{ once: true }}
                 >
                   {item.step}
@@ -364,7 +364,7 @@ const Home: React.FC = () => {
                 <motion.div 
                   key={index}
                   className="text-center"
-                  initial={{ opacity: 0, y: 30 }}
+                  initial={{ opacity: 0, y: 15 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.6 + index * 0.1 }}
                   viewport={{ once: true }}
@@ -405,7 +405,7 @@ const Home: React.FC = () => {
                     key={index}
                     initial={{ opacity: 0, x: -20 }}
                     whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 1.4 + index * 0.1 }}
+                    transition={{ delay: 0.7 + index * 0.05 }}
                     viewport={{ once: true }}
                   >
                     • {fix}
@@ -469,17 +469,17 @@ const Home: React.FC = () => {
               <motion.div 
                 key={index}
                 className={`bg-gradient-to-br ${item.bgColor} backdrop-blur-sm p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border ${item.borderColor}`}
-                initial={{ opacity: 0, y: 30 }}
+                initial={{ opacity: 0, y: 15 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.2 }}
-                whileHover={{ y: -4, scale: 1.02 }}
+                transition={{ duration: 0.4, delay: index * 0.1 }}
+                whileHover={{ y: -2, scale: 1.01 }}
                 viewport={{ once: true }}
               >
                 <motion.div 
                   className={`text-4xl font-bold ${item.color} mb-2`}
                   initial={{ scale: 0 }}
                   whileInView={{ scale: 1 }}
-                  transition={{ delay: 0.4 + index * 0.2, type: "spring", stiffness: 400 }}
+                  transition={{ delay: 0.2 + index * 0.1, type: "spring", stiffness: 200 }}
                   viewport={{ once: true }}
                 >
                   {item.stat}
@@ -515,7 +515,7 @@ const Home: React.FC = () => {
             <motion.div
               initial={{ scale: 0 }}
               whileInView={{ scale: 1 }}
-              transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+              transition={{ delay: 0.1, type: "spring", stiffness: 150 }}
               viewport={{ once: true }}
               className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-full text-sm font-medium mb-6"
             >
@@ -668,10 +668,10 @@ const Home: React.FC = () => {
         <div className="max-w-5xl mx-auto">
           <motion.div 
             className="bg-gradient-to-br from-red-600 via-purple-600 to-blue-600 text-white p-12 rounded-3xl shadow-2xl text-center relative overflow-hidden"
-            initial={{ scale: 0.95, opacity: 0 }}
+            initial={{ scale: 0.98, opacity: 0 }}
             whileInView={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            whileHover={{ y: -4 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            whileHover={{ y: -2 }}
             viewport={{ once: true }}
           >
             <div className="absolute inset-0 bg-black/10"></div>
@@ -681,7 +681,7 @@ const Home: React.FC = () => {
                 backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"]
               }}
               transition={{ 
-                duration: 3,
+                duration: 6,
                 repeat: Infinity,
                 ease: "linear"
               }}
@@ -691,7 +691,7 @@ const Home: React.FC = () => {
                 className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm font-medium mb-6 border border-white/30"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
+                transition={{ delay: 0.2 }}
                 viewport={{ once: true }}
               >
                 <DollarSign className="h-4 w-4" />
@@ -702,7 +702,7 @@ const Home: React.FC = () => {
                 className="text-3xl md:text-5xl font-bold mb-6 leading-tight"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6 }}
+                transition={{ delay: 0.3 }}
                 viewport={{ once: true }}
               >
                 Your Competitors Are Already 
@@ -713,7 +713,7 @@ const Home: React.FC = () => {
                 className="text-xl md:text-2xl mb-8 opacity-90 max-w-3xl mx-auto"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.8 }}
+                transition={{ delay: 0.4 }}
                 viewport={{ once: true }}
               >
                 Don't let another day pass with ads and landing pages that don't match. Get your alignment score and fix the disconnect.
@@ -723,12 +723,12 @@ const Home: React.FC = () => {
                 className="flex flex-col sm:flex-row gap-4 justify-center items-center"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1 }}
+                transition={{ delay: 0.5 }}
                 viewport={{ once: true }}
               >
                 <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                 >
                   <Link 
                     to="/evaluate" 
@@ -744,7 +744,7 @@ const Home: React.FC = () => {
                 className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-6 text-sm opacity-80"
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 0.8 }}
-                transition={{ delay: 1.2 }}
+                transition={{ delay: 0.6 }}
                 viewport={{ once: true }}
               >
                 {[
@@ -757,7 +757,7 @@ const Home: React.FC = () => {
                     className="flex items-center gap-2"
                     initial={{ opacity: 0, x: -10 }}
                     whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 1.4 + index * 0.1 }}
+                    transition={{ delay: 0.7 + index * 0.05 }}
                     viewport={{ once: true }}
                   >
                     <CheckCircle className="h-4 w-4" />
