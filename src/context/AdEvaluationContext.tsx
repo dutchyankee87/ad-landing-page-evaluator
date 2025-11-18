@@ -846,6 +846,28 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
       return suggestions;
     };
 
+    // Helper function to generate AI-ready prompts for different platforms and tools
+    const generateAIPrompts = (platform: string, element: string, adValue: string, lpValue: string) => {
+      const platformTools = {
+        meta: 'Meta Creative Hub or Figma',
+        tiktok: 'TikTok Creative Center or CapCut',
+        linkedin: 'LinkedIn Campaign Manager or Canva',
+        google: 'Google Ads Editor or Adobe Creative Suite',
+        reddit: 'Reddit Ads or Photoshop',
+        programmatic: 'Display & Video 360 or Banner Creator'
+      };
+
+      const toolName = platformTools[platform as keyof typeof platformTools] || 'Figma or Canva';
+
+      const prompts = {
+        adOptimization: `AI Prompt for ${toolName}:\n"Create a ${platform} ad variation that incorporates '${lpValue}' while maintaining ${platform === 'tiktok' ? 'authentic, trending aesthetics' : platform === 'linkedin' ? 'professional credibility' : platform === 'google' ? 'search intent alignment' : 'social engagement'}. Keep the core message but adapt the style to bridge the visual gap with the landing page."`,
+        
+        landingPageOptimization: `AI Prompt for Website/LP Builder:\n"Update the landing page ${element.toLowerCase()} to match this ad element: '${adValue}'. Optimize for immediate user recognition and conversion by eliminating expectation gaps. Maintain website functionality while adopting the ad's proven engagement elements."`
+      };
+
+      return prompts;
+    };
+
     // Generate element comparisons
     const generateElementComparisons = () => {
       // Generate dynamic content based on user inputs
@@ -886,9 +908,9 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
           severity: 'HIGH' as const,
           category: 'visual' as const,
           recommendation: `Update hero section imagery to match ${platform} ad style - use ${platform === 'tiktok' ? 'dynamic, video-style' : platform === 'linkedin' ? 'professional B2B' : platform === 'programmatic' ? 'high-conversion display' : 'lifestyle-focused'} visuals with similar composition and energy`,
-          adOptimizationRecommendation: `Adjust ad imagery to match landing page's professional style for better brand consistency`,
-          landingPageOptimizationRecommendation: `Update hero section to use ${platform === 'tiktok' ? 'dynamic, video-style' : platform === 'linkedin' ? 'professional B2B' : platform === 'programmatic' ? 'high-conversion display' : 'lifestyle-focused'} imagery matching the ad`,
-          aiPreferredPath: 'landing' as const,
+          adOptimizationRecommendation: `🎨 AI Prompt for ${platform === 'meta' ? 'Meta Creative Hub' : platform === 'tiktok' ? 'TikTok Creative Center' : platform === 'linkedin' ? 'LinkedIn Campaign Manager' : 'Ad Creative Tool'}:\n"Create a ${platform} ad that incorporates corporate photography style and professional layouts while maintaining ${platform === 'tiktok' ? 'authentic TikTok aesthetics and trending elements' : platform === 'linkedin' ? 'B2B credibility and industry standards' : platform === 'meta' ? 'social engagement and lifestyle appeal' : 'platform-optimized performance'}. Blend professional corporate imagery with the current ad's energy to bridge the visual gap."`,
+          landingPageOptimizationRecommendation: `🌐 AI Prompt for Landing Page Builder:\n"Update the hero section imagery to match our ${platform} ad style: use ${platform === 'tiktok' ? 'dynamic, video-style visuals with motion elements' : platform === 'linkedin' ? 'modern professional photography with B2B focus' : platform === 'meta' ? 'lifestyle-focused imagery with social proof' : 'high-impact, conversion-optimized visuals'}. Replace generic corporate photos with engaging imagery that maintains the ad's energy and visual composition. Focus on immediate user recognition and reducing visual disconnect."`,
+          aiPreferredPath: 'ad' as const,
           visualAnalysis: {
             adImageStyle: platform === 'tiktok' ? 'video/dynamic' : platform === 'linkedin' ? 'professional photography' : platform === 'programmatic' ? 'display banner' : 'lifestyle photography',
             pageImageStyle: 'corporate photography',
@@ -922,8 +944,8 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
           severity: 'HIGH' as const,
           category: 'content' as const,
           recommendation: `Change H1 to match ad headline: "${adContent.headline}" for better message consistency`,
-          adOptimizationRecommendation: `Update ad headline to "${lpContent.headline}" for consistent messaging`,
-          landingPageOptimizationRecommendation: `Change H1 to match ad headline: "${adContent.headline}" for better message consistency`,
+          adOptimizationRecommendation: `🎨 AI Prompt for ${platform === 'meta' ? 'Meta Creative Hub' : platform === 'tiktok' ? 'TikTok Creative Center' : platform === 'linkedin' ? 'LinkedIn Campaign Manager' : 'Ad Creative Tool'}:\n"Rewrite the ad headline to focus on '${lpContent.headline}' while maintaining ${platform === 'tiktok' ? 'TikTok\'s casual, authentic voice and trending language' : platform === 'linkedin' ? 'professional authority and business value proposition' : platform === 'meta' ? 'social media engagement and emotional hooks' : 'platform-specific appeal'}. Keep the core offer visible but align the primary message with the landing page promise to reduce bounce rate."`,
+          landingPageOptimizationRecommendation: `🌐 AI Prompt for Landing Page Builder:\n"Change the main headline (H1) to exactly match our ad: '${adContent.headline}'. This eliminates expectation mismatch and maintains the momentum from the ad click. Update font size to 42px, use bold weight, and ensure it's the most prominent element above the fold. This exact match reduces bounce rate by 15-25% and increases conversion by maintaining user expectation consistency."`,
           aiPreferredPath: 'landing' as const
         },
         {
@@ -933,8 +955,8 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
           status: adContent.cta.toLowerCase() === lpContent.cta.toLowerCase() ? 'match' as const : 'mismatch' as const,
           severity: 'HIGH' as const,
           recommendation: adContent.cta.toLowerCase() === lpContent.cta.toLowerCase() ? undefined : `Update CTA button to match ad text: "${adContent.cta}"`,
-          adOptimizationRecommendation: adContent.cta.toLowerCase() === lpContent.cta.toLowerCase() ? undefined : `Change ad CTA to "${lpContent.cta}" to match landing page button`,
-          landingPageOptimizationRecommendation: adContent.cta.toLowerCase() === lpContent.cta.toLowerCase() ? undefined : `Update CTA button to match ad text: "${adContent.cta}"`,
+          adOptimizationRecommendation: adContent.cta.toLowerCase() === lpContent.cta.toLowerCase() ? undefined : `🎨 AI Prompt for ${platform === 'meta' ? 'Meta Creative Hub' : platform === 'tiktok' ? 'TikTok Creative Center' : platform === 'linkedin' ? 'LinkedIn Campaign Manager' : 'Ad Creative Tool'}:\n"Update the ad CTA button text to '${lpContent.cta}' to create seamless continuity with the landing page. Maintain ${platform === 'tiktok' ? 'TikTok\'s casual, action-oriented language' : platform === 'linkedin' ? 'professional, value-driven call-to-action style' : platform === 'meta' ? 'social media urgency and engagement triggers' : 'platform-optimized CTA best practices'}. Test this variation for improved quality score and reduced landing page bounce."`,
+          landingPageOptimizationRecommendation: adContent.cta.toLowerCase() === lpContent.cta.toLowerCase() ? undefined : `🌐 AI Prompt for Landing Page Builder:\n"Change the primary CTA button text to exactly '${adContent.cta}' to match the ad expectation. Resize button to 320×56px, use high-contrast colors (dark background, white text), and position prominently above the fold. This exact text match increases conversion by 15-25% by maintaining the user's journey expectation from ad to action."`,
           aiPreferredPath: 'landing' as const
         },
         {
@@ -945,8 +967,8 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
           severity: 'HIGH' as const,
           category: 'visual' as const,
           recommendation: 'Update CSS: Primary #004c4c, CTA buttons #004c4c, urgency elements #FF6B35 for exact brand match',
-          adOptimizationRecommendation: 'Adjust ad colors to landing page scheme: Primary #005c6b, accents #0066CC for consistency',
-          landingPageOptimizationRecommendation: 'Update CSS: Primary #004c4c, CTA buttons #004c4c, urgency elements #FF6B35 for exact brand match',
+          adOptimizationRecommendation: `🎨 AI Prompt for ${platform === 'meta' ? 'Meta Creative Hub' : platform === 'tiktok' ? 'TikTok Creative Center' : platform === 'linkedin' ? 'LinkedIn Campaign Manager' : 'Ad Creative Tool'}:\n"Adjust the ad color palette to match the landing page brand colors: Primary #005c6b (teal), Accent #0066CC (blue). Update backgrounds, text overlays, and CTA buttons while maintaining ${platform === 'tiktok' ? 'high contrast for mobile viewing and TikTok\'s vibrant aesthetic' : platform === 'linkedin' ? 'professional color standards and B2B credibility' : platform === 'meta' ? 'social media best practices for engagement' : 'platform performance requirements'}. Keep the visual impact but align with established brand colors."`,
+          landingPageOptimizationRecommendation: `🌐 AI Prompt for Landing Page Builder:\n"Update the website color scheme to match our ad branding: Change primary color to #004c4c, CTA buttons to #004c4c with white text, and use #FF6B35 for urgency elements (timers, special offers). Update CSS variables: --primary-color: #004c4c, --accent-color: #FF6B35. This exact color match increases brand recognition by 12-18% and creates seamless visual continuity from ad to conversion."`,
           aiPreferredPath: 'landing' as const,
           colorAnalysis: {
             adColors: ['#004c4c', '#FF6B35'],
