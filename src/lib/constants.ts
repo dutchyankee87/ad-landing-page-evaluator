@@ -35,7 +35,7 @@ export type SubscriptionStatus =
   | 'unpaid';
 
 // Platform constants
-export const PLATFORMS = ['meta', 'tiktok', 'linkedin', 'google', 'reddit'] as const;
+export const PLATFORMS = ['meta', 'tiktok', 'linkedin', 'google', 'reddit', 'programmatic'] as const;
 export type Platform = typeof PLATFORMS[number];
 
 // Industry constants  

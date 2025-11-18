@@ -385,6 +385,12 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
             cta: "Check it out",
             offer: "Redditor exclusive: 40% off lifetime deal",
             visuals: "Casual screenshot-style with authentic user interface"
+          },
+          programmatic: {
+            headline: "Boost Performance by 50% - Limited Time",
+            cta: "Start Free Trial",
+            offer: "Free 14-day trial + setup assistance",
+            visuals: "Professional display banner with clear value proposition and branding"
           }
         };
         return adTemplates[platform as keyof typeof adTemplates] || adTemplates.meta;
@@ -612,6 +618,23 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
           "Maintain authentic, helpful tone that respects Reddit culture",
           "Focus on contributing value rather than extracting it"
         ]
+      },
+      programmatic: {
+        visual: [
+          "Ensure high contrast and clear readability across different device sizes",
+          "Use compelling visuals that capture attention in crowded ad environments",
+          "Maintain consistent brand colors and visual identity with landing page"
+        ],
+        contextual: [
+          "Create clear value propositions that work across various website contexts",
+          "Ensure messaging relevance regardless of placement environment",
+          "Focus on universal appeal while maintaining brand consistency"
+        ],
+        tone: [
+          "Use direct, benefit-focused language that communicates value quickly",
+          "Maintain professional yet engaging tone suitable for diverse audiences",
+          "Create urgency and clear calls-to-action that drive immediate action"
+        ]
       }
     };
 
@@ -836,7 +859,8 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
           tiktok: { headline: "This productivity hack will change your life! 📈", cta: "Try for Free" },
           linkedin: { headline: "Boost Enterprise Productivity by 40%", cta: "Download Whitepaper" },
           google: { headline: "Business Software | 5-Star Rated | Free Trial", cta: "Start Free Trial" },
-          reddit: { headline: "Finally found software that actually works", cta: "Check it out" }
+          reddit: { headline: "Finally found software that actually works", cta: "Check it out" },
+          programmatic: { headline: "Boost Performance by 50% - Limited Time", cta: "Start Free Trial" }
         };
         return templates[platform as keyof typeof templates] || templates.meta;
       };
@@ -856,38 +880,38 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
       return [
         {
           element: 'Visual Imagery & Graphics',
-          adValue: `${platform === 'tiktok' ? 'Dynamic video-style' : platform === 'linkedin' ? 'Professional photography' : 'Social media optimized'} imagery with ${platform === 'meta' ? 'lifestyle focus' : 'product-centric'} composition`,
+          adValue: `${platform === 'tiktok' ? 'Dynamic video-style' : platform === 'linkedin' ? 'Professional photography' : platform === 'programmatic' ? 'Display banner optimized' : 'Social media optimized'} imagery with ${platform === 'meta' ? 'lifestyle focus' : platform === 'programmatic' ? 'conversion-focused' : 'product-centric'} composition`,
           landingPageValue: 'Standard web layout with generic hero image and corporate photography style',
           status: 'partial_match' as const,
           severity: 'HIGH' as const,
           category: 'visual' as const,
-          recommendation: `Update hero section imagery to match ${platform} ad style - use ${platform === 'tiktok' ? 'dynamic, video-style' : platform === 'linkedin' ? 'professional B2B' : 'lifestyle-focused'} visuals with similar composition and energy`,
+          recommendation: `Update hero section imagery to match ${platform} ad style - use ${platform === 'tiktok' ? 'dynamic, video-style' : platform === 'linkedin' ? 'professional B2B' : platform === 'programmatic' ? 'high-conversion display' : 'lifestyle-focused'} visuals with similar composition and energy`,
           adOptimizationRecommendation: `Adjust ad imagery to match landing page's professional style for better brand consistency`,
-          landingPageOptimizationRecommendation: `Update hero section to use ${platform === 'tiktok' ? 'dynamic, video-style' : platform === 'linkedin' ? 'professional B2B' : 'lifestyle-focused'} imagery matching the ad`,
+          landingPageOptimizationRecommendation: `Update hero section to use ${platform === 'tiktok' ? 'dynamic, video-style' : platform === 'linkedin' ? 'professional B2B' : platform === 'programmatic' ? 'high-conversion display' : 'lifestyle-focused'} imagery matching the ad`,
           aiPreferredPath: 'landing' as const,
           visualAnalysis: {
-            adImageStyle: platform === 'tiktok' ? 'video/dynamic' : platform === 'linkedin' ? 'professional photography' : 'lifestyle photography',
+            adImageStyle: platform === 'tiktok' ? 'video/dynamic' : platform === 'linkedin' ? 'professional photography' : platform === 'programmatic' ? 'display banner' : 'lifestyle photography',
             pageImageStyle: 'corporate photography',
-            styleConsistency: platform === 'meta' ? 6 : platform === 'tiktok' ? 4 : 5,
+            styleConsistency: platform === 'meta' ? 6 : platform === 'tiktok' ? 4 : platform === 'programmatic' ? 7 : 5,
             layoutSimilarity: 5,
-            brandElementAlignment: platform === 'linkedin' ? 7 : 6
+            brandElementAlignment: platform === 'linkedin' ? 7 : platform === 'programmatic' ? 6 : 6
           }
         },
         {
           element: 'Typography & Visual Hierarchy',
-          adValue: `${platform === 'tiktok' ? 'Bold, casual' : platform === 'linkedin' ? 'Professional, clean' : 'Engaging, modern'} typography with ${platform}-optimized sizing`,
+          adValue: `${platform === 'tiktok' ? 'Bold, casual' : platform === 'linkedin' ? 'Professional, clean' : platform === 'programmatic' ? 'High-impact, readable' : 'Engaging, modern'} typography with ${platform}-optimized sizing`,
           landingPageValue: 'Standard web fonts with conservative hierarchy and formal styling',
           status: 'partial_match' as const,
           severity: 'MEDIUM' as const,
           category: 'visual' as const,
-          recommendation: `Adjust typography to match ${platform} ad style - use ${platform === 'tiktok' ? 'bolder, more casual' : platform === 'linkedin' ? 'professional but modern' : 'social media optimized'} fonts and hierarchy`,
+          recommendation: `Adjust typography to match ${platform} ad style - use ${platform === 'tiktok' ? 'bolder, more casual' : platform === 'linkedin' ? 'professional but modern' : platform === 'programmatic' ? 'high-impact, conversion-focused' : 'social media optimized'} fonts and hierarchy`,
           adOptimizationRecommendation: `Use more conservative, web-friendly typography to match landing page hierarchy`,
-          landingPageOptimizationRecommendation: `Update fonts to ${platform === 'tiktok' ? 'bold, casual style' : platform === 'linkedin' ? 'modern professional style' : 'social media optimized style'} matching the ad`,
+          landingPageOptimizationRecommendation: `Update fonts to ${platform === 'tiktok' ? 'bold, casual style' : platform === 'linkedin' ? 'modern professional style' : platform === 'programmatic' ? 'high-impact, conversion-focused style' : 'social media optimized style'} matching the ad`,
           aiPreferredPath: 'landing' as const,
           typographyAnalysis: {
-            fontStyleMatch: platform === 'linkedin' ? 7 : platform === 'tiktok' ? 4 : 5,
+            fontStyleMatch: platform === 'linkedin' ? 7 : platform === 'tiktok' ? 4 : platform === 'programmatic' ? 6 : 5,
             hierarchyAlignment: 6,
-            visualWeightConsistency: platform === 'meta' ? 6 : 5
+            visualWeightConsistency: platform === 'meta' ? 6 : platform === 'programmatic' ? 7 : 5
           }
         },
         {

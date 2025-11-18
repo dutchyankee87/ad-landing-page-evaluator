@@ -119,6 +119,18 @@ export const PLATFORM_CONFIGS: PlatformConfig[] = [
     screenshotTips: 'We\'ll capture the promoted post format and community context.',
     supportsVideo: true,
     videoGuidance: 'Reddit video content will be analyzed for community authenticity and engagement potential.'
+  },
+  {
+    id: 'programmatic',
+    name: 'Programmatic/Display',
+    patterns: [
+      // No specific URL patterns - programmatic ads are typically uploaded as images
+    ],
+    videoPatterns: [],
+    guidance: 'Upload a screenshot or creative file of your display banner or programmatic ad',
+    screenshotTips: 'Programmatic ads will be analyzed for visual appeal, messaging clarity, and conversion potential.',
+    supportsVideo: true,
+    videoGuidance: 'Video display ads will be analyzed for visual consistency and engagement optimization.'
   }
 ];
 

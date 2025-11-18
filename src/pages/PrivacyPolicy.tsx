@@ -100,7 +100,8 @@ const PrivacyPolicy: React.FC = () => {
                   <p>We use the information we collect to:</p>
                   <ul className="list-disc pl-6 space-y-2">
                     <li>Provide AI-powered ad analysis and generate evaluation reports</li>
-                    <li>Improve our analysis algorithms and service quality</li>
+                    <li>Build anonymized industry benchmarks and performance insights to improve recommendations</li>
+                    <li>Improve our analysis algorithms and service quality through aggregated data analysis</li>
                     <li>Monitor and analyze usage patterns to enhance user experience</li>
                     <li>Ensure security and prevent fraudulent use of our service</li>
                     <li>Communicate with you about your account and service updates</li>
@@ -119,10 +120,32 @@ const PrivacyPolicy: React.FC = () => {
                   </p>
                   <ul className="list-disc pl-6 space-y-2">
                     <li><strong>Encryption:</strong> All data is transmitted using SSL/TLS encryption</li>
-                    <li><strong>Limited Storage:</strong> Ad content and landing page data are processed temporarily and not stored permanently</li>
+                    <li><strong>Secure Storage:</strong> Ad content and landing page data are securely stored and anonymized for building industry benchmarks</li>
                     <li><strong>Access Controls:</strong> Strict access controls limit who can view your data</li>
-                    <li><strong>Data Retention:</strong> Analysis results may be stored for up to 30 days for service improvement purposes</li>
+                    <li><strong>Data Retention:</strong> Analysis results and anonymized data may be stored to improve service quality and build industry insights</li>
+                    <li><strong>Anonymization:</strong> All stored data is anonymized and aggregated to protect your business privacy while enabling industry benchmarks</li>
                   </ul>
+                </div>
+              </section>
+
+              <section>
+                <div className="flex items-center gap-3 mb-4">
+                  <Database className="h-6 w-6 text-blue-600" />
+                  <h2 className="text-2xl font-bold text-gray-900">Industry Benchmarks & Data Usage</h2>
+                </div>
+                <div className="space-y-4 text-gray-700">
+                  <p>
+                    We use your ad content and landing page data to create valuable industry insights:
+                  </p>
+                  <ul className="list-disc pl-6 space-y-2">
+                    <li><strong>Anonymized Benchmarks:</strong> Your data is anonymized and aggregated to build performance benchmarks across industries</li>
+                    <li><strong>Trend Analysis:</strong> We identify what works best across different sectors (e-commerce, SaaS, healthcare, etc.)</li>
+                    <li><strong>AI Improvement:</strong> Aggregated data helps train and improve our AI models for better recommendations</li>
+                    <li><strong>Privacy Protection:</strong> All data is stripped of identifying information before being used for benchmarks</li>
+                  </ul>
+                  <p>
+                    This approach allows us to provide increasingly accurate recommendations while maintaining your business privacy.
+                  </p>
                 </div>
               </section>
 

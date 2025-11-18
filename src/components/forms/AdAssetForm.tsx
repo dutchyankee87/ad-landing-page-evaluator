@@ -11,7 +11,8 @@ const SUPPORTED_PLATFORMS = [
   { id: 'tiktok', name: 'TikTok', guidance: 'Capture your ad preview from TikTok Ads Manager. For video ads, take a screenshot of a representative frame.' },
   { id: 'linkedin', name: 'LinkedIn', guidance: 'Screenshot from LinkedIn Campaign Manager. Include the full sponsored content or ad format.' },
   { id: 'google', name: 'Google Ads', guidance: 'Capture from Google Ads interface. Include display ads, search ads, or YouTube ad thumbnails.' },
-  { id: 'reddit', name: 'Reddit', guidance: 'Screenshot your promoted post or ad from Reddit Ads. Include the full post format and any media.' }
+  { id: 'reddit', name: 'Reddit', guidance: 'Screenshot your promoted post or ad from Reddit Ads. Include the full post format and any media.' },
+  { id: 'programmatic', name: 'Programmatic/Display', guidance: 'Screenshot your display banner, native ad, or programmatic creative from your DSP, ad server, or creative management platform. Include the full banner with all visual elements.' }
 ];
 
 type InputMode = 'upload' | 'url';

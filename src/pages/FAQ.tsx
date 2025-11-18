@@ -30,11 +30,15 @@ const FAQ: React.FC = () => {
       questions: [
         {
           question: "Is my ad data secure and private?",
-          answer: "Yes, absolutely. We process your ads temporarily for analysis only. No data is stored permanently, and we never share your ad content or landing page information with third parties. See our <a href='/privacy-policy' class='text-orange-600 hover:text-orange-700 underline'>Privacy Policy</a> for full details."
+          answer: "Yes, absolutely. We securely store your ad content and landing page data to build industry benchmarks and improve our AI analysis accuracy. This anonymized data helps us provide better insights across different industries and platforms. We never share your specific ad content or landing page information with third parties. See our <a href='/privacy-policy' class='text-orange-600 hover:text-orange-700 underline'>Privacy Policy</a> for full details."
         },
         {
           question: "What happens to my uploaded images?",
-          answer: "Ad images are processed in real-time for analysis and immediately deleted from our servers. We don't store any of your creative assets. The analysis results are kept temporarily to show you the recommendations."
+          answer: "Ad images are securely stored and used to build industry benchmarks that help improve our AI analysis for all users. Your creative assets are anonymized and aggregated with data from other campaigns to identify trends and best practices across different industries and platforms. This helps us provide more accurate recommendations and insights."
+        },
+        {
+          question: "How do you use my data for industry benchmarks?",
+          answer: "We anonymize and aggregate your ad content and landing page data to create industry-wide benchmarks and performance insights. This helps us identify what works best across different sectors (e-commerce, SaaS, healthcare, etc.) and improve our AI recommendations. Your specific business information remains confidential and is never shared in identifiable form."
         },
         {
           question: "Do you share data with third parties?",
