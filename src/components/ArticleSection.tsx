@@ -85,12 +85,6 @@ const ArticleSection: React.FC = () => {
           ))}
         </div>
         
-        <div className="text-center mt-12">
-          <div className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium cursor-pointer group">
-            View All Articles
-            <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-          </div>
-        </div>
       </div>
     </section>
   );

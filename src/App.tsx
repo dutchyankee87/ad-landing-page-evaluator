@@ -13,8 +13,6 @@ import { AdEvaluationProvider } from './context/AdEvaluationContext';
 const EvaluationForm = React.lazy(() => import('./pages/EvaluationForm'));
 const Results = React.lazy(() => import('./pages/Results'));
 const Article = React.lazy(() => import('./pages/Article'));
-const Blog = React.lazy(() => import('./pages/Blog'));
-const BlogPost = React.lazy(() => import('./pages/BlogPost'));
 const FAQ = React.lazy(() => import('./pages/FAQ'));
 const EcommerceLanding = React.lazy(() => import('./pages/EcommerceLanding'));
 const Pricing = React.lazy(() => import('./pages/Pricing'));
@@ -51,8 +49,6 @@ function App() {
                   <Route path="/" element={<Home />} />
                   <Route path="/evaluate" element={<EvaluationForm />} />
                   <Route path="/results" element={<Results />} />
-                  <Route path="/blog" element={<Blog />} />
-                  <Route path="/blog/:slug" element={<BlogPost />} />
                   <Route path="/faq" element={<FAQ />} />
                   <Route path="/ecommerce" element={<EcommerceLanding />} />
                   <Route path="/pricing" element={<Pricing />} />
