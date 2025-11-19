@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, TrendingUp, AlertTriangle, CheckCircle, DollarSign, Zap, Target, Clock, BarChart3, Users } from 'lucide-react';
 import SEOHead from '../components/SEOHead';
-import ArticleSection from '../components/ArticleSection';
 import PartnerSection from '../components/partners/PartnerSection';
 
 const Home: React.FC = () => {
@@ -536,8 +535,6 @@ const Home: React.FC = () => {
         </div>
       </motion.section>
 
-      {/* Articles Section */}
-      <ArticleSection />
 
       {/* Partners Trust Section */}
       <motion.section 

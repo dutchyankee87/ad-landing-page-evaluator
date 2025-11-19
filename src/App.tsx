@@ -13,6 +13,7 @@ import { AdEvaluationProvider } from './context/AdEvaluationContext';
 const EvaluationForm = React.lazy(() => import('./pages/EvaluationForm'));
 const Results = React.lazy(() => import('./pages/Results'));
 const Article = React.lazy(() => import('./pages/Article'));
+const Articles = React.lazy(() => import('./pages/Articles'));
 const FAQ = React.lazy(() => import('./pages/FAQ'));
 const EcommerceLanding = React.lazy(() => import('./pages/EcommerceLanding'));
 const Pricing = React.lazy(() => import('./pages/Pricing'));
@@ -59,6 +60,7 @@ function App() {
                   <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                   <Route path="/terms-of-service" element={<TermsOfService />} />
                   <Route path="/disclaimer" element={<Disclaimer />} />
+                  <Route path="/articles" element={<Articles />} />
                   <Route path="/articles/:slug" element={<Article />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>

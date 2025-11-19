@@ -38,9 +38,9 @@ const Header: React.FC = () => {
           <nav className="hidden md:flex items-center gap-2">
             <motion.div whileHover={{ scale: 1.02, y: -1 }} whileTap={{ scale: 0.98 }}>
               <Link 
-                to="/#articles" 
+                to="/articles" 
                 className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 backdrop-blur-sm ${
-                  location.pathname === '/' && location.hash === '#articles'
+                  location.pathname === '/articles' || location.pathname.startsWith('/articles/')
                     ? 'bg-green-100 text-green-700 border border-green-200'
                     : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100/80'
                 }`}
@@ -132,9 +132,9 @@ const Header: React.FC = () => {
                   transition={{ delay: 0.1 }}
                 >
                   <Link 
-                    to="/#articles" 
+                    to="/articles" 
                     className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
-                      location.pathname === '/' && location.hash === '#articles'
+                      location.pathname === '/articles' || location.pathname.startsWith('/articles/')
                         ? 'bg-green-100 text-green-700'
                         : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
                     }`}
