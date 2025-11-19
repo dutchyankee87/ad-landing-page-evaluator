@@ -22,7 +22,8 @@ const evaluations = pgTable('evaluations', {
   id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
   userId: uuid('user_id'),
   title: text('title').notNull(),
-  adScreenshotUrl: text('ad_screenshot_url').notNull(),
+  // Fixed field name to match database schema
+  adImageUrl: text('ad_image_url').notNull(),
   landingPageUrl: text('landing_page_url').notNull(),
   landingPageTitle: text('landing_page_title'),
   landingPageContent: text('landing_page_content'),
@@ -48,15 +49,24 @@ const evaluations = pgTable('evaluations', {
   screenshotFileSize: integer('screenshot_file_size'),
   screenshotCapturedAt: timestamp('screenshot_captured_at', { withTimezone: true }),
   screenshotIsPlaceholder: boolean('screenshot_is_placeholder'),
-  contextualScore: decimal('contextual_score'),
-  toneScore: decimal('tone_score'),
   adImageFileSize: integer('ad_image_file_size'),
-  visualScore: decimal('visual_score'),
   adUrl: text('ad_url'),
   adSourceType: text('ad_source_type'), // 'upload', 'url', 'video'
   mediaType: text('media_type'), // 'image', 'video', 'unknown'
   videoFrameCount: integer('video_frame_count'),
   videoProcessingMethod: text('video_processing_method'),
+  // Add new enhanced analysis columns
+  comparisonType: text('comparison_type').default('single'),
+  comparisonGroupId: uuid('comparison_group_id'),
+  elementComparisons: jsonb('element_comparisons'),
+  strategicRecommendations: jsonb('strategic_recommendations'),
+  riskFactors: jsonb('risk_factors'),
+  missedOpportunities: jsonb('missed_opportunities'),
+  heatmapZones: jsonb('heatmap_zones'),
+  insights: jsonb('insights'),
+  brandCoherenceScore: decimal('brand_coherence_score'),
+  userJourneyAlignmentScore: decimal('user_journey_alignment_score'),
+  conversionOptimizationScore: decimal('conversion_optimization_score'),
 });
 
 // IP rate limiting table
@@ -765,7 +775,7 @@ Return JSON:
           userId: userId, // Will be null for unauthenticated users
           title: `${adData.platform || 'Meta'} Ad Evaluation - ${new Date().toISOString().split('T')[0]}`,
           platform: adData.platform,
-          adScreenshotUrl: adImageUrl,
+          adImageUrl: adImageUrl, // Fixed: was adScreenshotUrl
           adUrl: adData.adUrl || null,
           adSourceType: adSourceType,
           mediaType: adData.mediaType || (adSourceType === 'video' ? 'video' : 'image'),
@@ -780,14 +790,31 @@ Return JSON:
           targetLocation: audienceData.location || null,
           targetInterests: audienceData.interests || null,
           overallScore: overallScore,
-          visualMatchScore: analysis.scores.visualMatch,
-          contextualMatchScore: analysis.scores.contextualMatch,
-          toneAlignmentScore: analysis.scores.toneAlignment,
+          visualMatchScore: analysis.scores.visualMatch, // Fixed: was visualMatchScore
+          contextualMatchScore: analysis.scores.contextualMatch, // Fixed: was contextualMatchScore  
+          toneAlignmentScore: analysis.scores.toneAlignment, // Fixed: was toneAlignmentScore
           visualSuggestions: analysis.suggestions.visual,
           contextualSuggestions: analysis.suggestions.contextual,
           toneSuggestions: analysis.suggestions.tone,
           analysisModel: 'gpt-4o-vision',
           adImageFileSize: adData.imageFileSize || null,
+          // Add new enhanced analysis data
+          elementComparisons: analysis.elementComparisons || null,
+          strategicRecommendations: analysis.strategicRecommendations || null,
+          riskFactors: analysis.riskFactors || null,
+          missedOpportunities: analysis.missedOpportunities || null,
+          heatmapZones: analysis.heatmapZones || null,
+          insights: analysis.insights || null,
+          // Add component scores if available
+          brandCoherenceScore: analysis.componentScores?.brandCoherence || null,
+          userJourneyAlignmentScore: analysis.componentScores?.userJourneyAlignment || null,
+          conversionOptimizationScore: analysis.componentScores?.conversionOptimization || null,
+          // Add landing page screenshot data if available
+          landingPageScreenshotUrl: landingPageScreenshot || null,
+          screenshotCapturedAt: landingPageScreenshot ? new Date() : null,
+          screenshotIsPlaceholder: !landingPageScreenshot,
+          // Default comparison type
+          comparisonType: 'single',
           createdAt: new Date(),
           updatedAt: new Date()
         });
