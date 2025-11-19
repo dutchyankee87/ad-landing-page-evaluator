@@ -75,17 +75,24 @@ const Article: React.FC = () => {
                 </div>
               </div>
 
-              {/* Featured Image for the first article */}
+              {/* Featured Images for articles */}
               {article.id === '1' && (
                 <div className="mb-8">
-                  <div className="w-full h-64 md:h-96 bg-gradient-to-br from-blue-100 via-purple-100 to-orange-100 rounded-2xl shadow-lg flex items-center justify-center">
-                    <div className="text-center p-8">
-                      <div className="text-4xl md:text-6xl mb-4">📊📈🎯</div>
-                      <p className="text-lg font-medium text-gray-700 max-w-md">
-                        Digital marketing dashboard showing the convergence of SEO and paid advertising analytics, featuring charts and graphs that illustrate how AdAlign bridges the gap between online advertising and search engine optimization
-                      </p>
-                    </div>
-                  </div>
+                  <img 
+                    src="/future-advertising-seo-convergence.jpg" 
+                    alt="Digital marketing dashboard showing the convergence of SEO and paid advertising analytics, illustrating how AdAlign bridges the gap between online advertising and search engine optimization"
+                    className="w-full h-64 md:h-96 object-cover rounded-2xl shadow-lg"
+                  />
+                </div>
+              )}
+              
+              {article.id === '3' && (
+                <div className="mb-8">
+                  <img 
+                    src="/meta-google-tiktok-platform-strategies.jpg" 
+                    alt="Comparison dashboard showing Meta, Google, and TikTok advertising platforms with different strategic approaches for optimal ad-to-page alignment"
+                    className="w-full h-64 md:h-96 object-cover rounded-2xl shadow-lg"
+                  />
                 </div>
               )}
             </header>
