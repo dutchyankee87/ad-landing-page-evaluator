@@ -405,8 +405,16 @@ export default async function handler(req, res) {
       logger.log('⚠️ No database connection - proceeding without user tracking');
     }
 
-    // Check IP-based rate limiting for unauthenticated users
-    if (!userEmail) {
+    // Check for dev bypass header
+    const devBypass = req.headers['x-dev-bypass'];
+    const isDevBypass = devBypass === 'unlimited-dev-2024';
+    
+    if (isDevBypass) {
+      logger.log('🔓 Dev bypass detected - skipping rate limits');
+    }
+    
+    // Check IP-based rate limiting for unauthenticated users (unless dev bypass)
+    if (!userEmail && !isDevBypass) {
       const ipCheck = await checkIpRateLimit(db, clientIp);
       
       if (!ipCheck.allowed) {
@@ -429,8 +437,8 @@ export default async function handler(req, res) {
 
     let userId = null;
 
-    // Check user usage limits if email provided and database available
-    if (userEmail && db) {
+    // Check user usage limits if email provided and database available (unless dev bypass)
+    if (userEmail && db && !isDevBypass) {
       try {
         const userResult = await db.select().from(users).where(eq(users.email, userEmail)).limit(1);
         const user = userResult[0];
@@ -450,6 +458,17 @@ export default async function handler(req, res) {
       } catch (dbError) {
         logger.warn('⚠️ Database query failed:', dbError);
         // Continue without user tracking
+      }
+    } else if (userEmail && isDevBypass) {
+      // For dev bypass with email, still get userId but skip limits
+      try {
+        const userResult = await db.select().from(users).where(eq(users.email, userEmail)).limit(1);
+        const user = userResult[0];
+        if (user) {
+          userId = user.id;
+        }
+      } catch (dbError) {
+        logger.warn('⚠️ Database query failed:', dbError);
       }
     }
 
@@ -819,8 +838,8 @@ Return JSON:
           updatedAt: new Date()
         });
 
-        // Increment user usage only for authenticated users
-        if (userId) {
+        // Increment user usage only for authenticated users (unless dev bypass)
+        if (userId && !isDevBypass) {
           await db
             .update(users)
             .set({ 
@@ -828,9 +847,11 @@ Return JSON:
               updatedAt: new Date()
             })
             .where(eq(users.id, userId));
-        } else {
+        } else if (!isDevBypass) {
           // Record IP evaluation for unauthenticated users
           await recordIpEvaluation(db, clientIp);
+        } else {
+          logger.log('🔓 Dev bypass - skipping usage tracking');
         }
 
         logger.log('✅ Evaluation stored in database');
