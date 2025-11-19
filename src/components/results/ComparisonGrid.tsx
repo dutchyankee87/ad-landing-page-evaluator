@@ -56,74 +56,43 @@ interface ComparisonGridProps {
 }
 
 const ComparisonGrid: React.FC<ComparisonGridProps> = ({ comparisons, componentScores }) => {
-  // Render bidirectional recommendations
-  const renderBidirectionalRecommendations = (comparison: ElementComparison) => {
+  // Render generic optimization recommendations
+  const renderOptimizationRecommendations = (comparison: ElementComparison) => {
     const hasAdRec = comparison.adOptimizationRecommendation;
     const hasLandingRec = comparison.landingPageOptimizationRecommendation;
     const hasGenericRec = comparison.recommendation && !hasAdRec && !hasLandingRec;
     
-    // If we have bidirectional recommendations, show both
-    if (hasAdRec || hasLandingRec) {
-      return (
-        <div className="space-y-2">
-          {/* Ad Optimization Path */}
-          {hasAdRec && (
-            <div className="bg-blue-50 p-3 rounded-lg border border-blue-200 relative">
-              <div className="flex items-center gap-2 mb-1">
-                <Image className="h-3 w-3 text-blue-600" />
-                <div className="text-blue-700 font-medium text-xs uppercase tracking-wide">OPTIMIZE AD</div>
-                {comparison.aiPreferredPath === 'ad' && (
-                  <div className="flex items-center gap-1">
-                    <Sparkles className="h-3 w-3 text-blue-600" />
-                    <span className="text-xs text-blue-600">AdAlign Preferred</span>
-                  </div>
-                )}
-              </div>
-              <div className="text-gray-800 text-xs leading-relaxed">{comparison.adOptimizationRecommendation}</div>
-            </div>
-          )}
-          
-          {/* Landing Page Optimization Path */}
-          {hasLandingRec && (
-            <div className="bg-purple-50 p-3 rounded-lg border border-purple-200 relative">
-              <div className="flex items-center gap-2 mb-1">
-                <Settings className="h-3 w-3 text-purple-600" />
-                <div className="text-purple-700 font-medium text-xs uppercase tracking-wide">OPTIMIZE LANDING PAGE</div>
-                {comparison.aiPreferredPath === 'landing' && (
-                  <div className="flex items-center gap-1">
-                    <Sparkles className="h-3 w-3 text-purple-600" />
-                    <span className="text-xs text-purple-600">AdAlign Preferred</span>
-                  </div>
-                )}
-              </div>
-              <div className="text-gray-800 text-xs leading-relaxed">{comparison.landingPageOptimizationRecommendation}</div>
-            </div>
-          )}
-        </div>
-      );
+    // Create a unified recommendation from available sources
+    let optimizationText = '';
+    let preferredPath = '';
+    
+    if (hasAdRec && hasLandingRec) {
+      // Combine both recommendations into a generic suggestion
+      optimizationText = `${comparison.adOptimizationRecommendation} OR ${comparison.landingPageOptimizationRecommendation}`;
+      preferredPath = comparison.aiPreferredPath ? ` (${comparison.aiPreferredPath === 'ad' ? 'Ad optimization' : 'Landing page optimization'} recommended)` : '';
+    } else if (hasAdRec) {
+      optimizationText = comparison.adOptimizationRecommendation;
+    } else if (hasLandingRec) {
+      optimizationText = comparison.landingPageOptimizationRecommendation;
+    } else if (hasGenericRec) {
+      optimizationText = comparison.recommendation;
     }
 
-    // If only generic recommendation, create specific ad vs landing page versions
-    if (hasGenericRec) {
+    if (optimizationText) {
       return (
-        <div className="space-y-2">
-          <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
-            <div className="flex items-center gap-2 mb-1">
-              <Image className="h-3 w-3 text-blue-600" />
-              <div className="text-blue-700 font-medium text-xs uppercase tracking-wide">OPTIMIZE AD</div>
-            </div>
-            <div className="text-gray-800 text-xs leading-relaxed">
-              Adjust your ad to: {comparison.recommendation.toLowerCase().replace(/^adjust|update|change/, '').trim()}
-            </div>
+        <div className="bg-orange-50 p-3 rounded-lg border border-orange-200">
+          <div className="flex items-center gap-2 mb-1">
+            <Target className="h-3 w-3 text-orange-600" />
+            <div className="text-orange-700 font-medium text-xs uppercase tracking-wide">OPTIMIZATION SUGGESTION</div>
+            {comparison.aiPreferredPath && (
+              <div className="flex items-center gap-1">
+                <Sparkles className="h-3 w-3 text-orange-600" />
+                <span className="text-xs text-orange-600">AI Recommended</span>
+              </div>
+            )}
           </div>
-          <div className="bg-purple-50 p-3 rounded-lg border border-purple-200">
-            <div className="flex items-center gap-2 mb-1">
-              <Settings className="h-3 w-3 text-purple-600" />
-              <div className="text-purple-700 font-medium text-xs uppercase tracking-wide">OPTIMIZE LANDING PAGE</div>
-            </div>
-            <div className="text-gray-800 text-xs leading-relaxed">
-              Update your landing page to: {comparison.recommendation.toLowerCase().replace(/^adjust|update|change/, '').trim()}
-            </div>
+          <div className="text-gray-800 text-xs leading-relaxed">
+            {optimizationText}{preferredPath}
           </div>
         </div>
       );
@@ -413,7 +382,7 @@ const ComparisonGrid: React.FC<ComparisonGridProps> = ({ comparisons, componentS
                   
                   {/* Recommendation */}
                   <div className="text-sm">
-                    {renderBidirectionalRecommendations(comparison)}
+                    {renderOptimizationRecommendations(comparison)}
                   </div>
                 </div>
               );
@@ -483,7 +452,7 @@ const ComparisonGrid: React.FC<ComparisonGridProps> = ({ comparisons, componentS
                   
                   {/* Recommendation */}
                   <div>
-                    {renderBidirectionalRecommendations(comparison)}
+                    {renderOptimizationRecommendations(comparison)}
                   </div>
                 </div>
               );

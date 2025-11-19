@@ -159,15 +159,10 @@ showFeedbackModal,
                         This score reveals how well your ad and landing page work together to convert visitors.
                         Higher scores = higher conversion rates.
                       </p>
-                      <div className="flex items-center gap-4">
-                        <div className="text-4xl font-bold text-blue-600">
-                          {results.overallScore}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          <div className="font-medium">out of 10</div>
-                          <div className="font-semibold text-gray-700">
-                            {getScoreDescription(results.overallScore)}
-                          </div>
+                      <div className="text-sm text-gray-500">
+                        <div className="font-medium">out of 10</div>
+                        <div className="font-semibold text-gray-700">
+                          {getScoreDescription(results.overallScore)}
                         </div>
                       </div>
                     </div>
@@ -208,25 +203,6 @@ showFeedbackModal,
                 )}
                 
             
-                {/* Industry Benchmarks */}
-                <motion.section 
-                  className="mb-16"
-                  variants={itemVariants}
-                >
-                  <motion.h2 
-                    className="text-3xl font-bold mb-8 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent"
-                    variants={itemVariants}
-                  >
-                    📊 How You Stack Up
-                  </motion.h2>
-                  <IndustryBenchmarks
-                    score={results.overallScore}
-                    platform={adData.platform || 'meta'}
-                    industry={results.industry || 'other'}
-                    benchmarkData={results.benchmarkData}
-                    userPercentile={results.benchmarkData?.userPercentile}
-                  />
-                </motion.section>
 
                 {/* Psychological Persuasion Analysis */}
                 {results.persuasionPrinciples && (
@@ -297,6 +273,26 @@ showFeedbackModal,
                     <TopRecommendations comparisons={results.elementComparisons} />
                   </div>
                 )}
+
+                {/* Industry Benchmarks - moved below recommendations */}
+                <motion.section 
+                  className="mb-16"
+                  variants={itemVariants}
+                >
+                  <motion.h2 
+                    className="text-3xl font-bold mb-8 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent"
+                    variants={itemVariants}
+                  >
+                    📊 How You Stack Up <span className="text-sm text-orange-600 bg-orange-100 px-2 py-1 rounded-full ml-2">Coming Soon</span>
+                  </motion.h2>
+                  <IndustryBenchmarks
+                    score={results.overallScore}
+                    platform={adData.platform || 'meta'}
+                    industry={results.industry || 'other'}
+                    benchmarkData={results.benchmarkData}
+                    userPercentile={results.benchmarkData?.userPercentile}
+                  />
+                </motion.section>
 
                 {/* Run New Test Section - moved above Partner Recommendations */}
                 <div className="text-center space-y-4 mb-12">

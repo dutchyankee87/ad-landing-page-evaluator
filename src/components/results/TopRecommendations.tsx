@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { AlertTriangle, Target, Settings, CheckCircle, TrendingUp } from 'lucide-react';
-import OptimizationPathSelector, { OptimizationPath } from '../shared/OptimizationPathSelector';
 
 interface ElementComparison {
   element: string;
@@ -20,7 +19,7 @@ interface TopRecommendationsProps {
 }
 
 const TopRecommendations: React.FC<TopRecommendationsProps> = ({ comparisons }) => {
-  const [selectedPath, setSelectedPath] = useState<OptimizationPath>('ad');
+  const selectedPath = 'ad'; // Fixed to ad path only
 
   // Filter and prioritize recommendations based on severity, status, and selected path
   const getTopRecommendations = (comparisons: ElementComparison[], path: OptimizationPath) => {
@@ -92,7 +91,7 @@ const TopRecommendations: React.FC<TopRecommendationsProps> = ({ comparisons }) 
     const impacts = {
       HIGH: {
         'Primary Headline': '+15-25% conversion rate',
-        'Call-to-Action': '+12-20% click-through rate',
+        'Call-to-Action': '12-20% lower cost per conversion',
         'Primary Colors': '+8-15% brand recognition',
         'Trust Signals': '+10-18% conversion rate',
         default: '+10-20% performance improvement'
@@ -153,27 +152,18 @@ const TopRecommendations: React.FC<TopRecommendationsProps> = ({ comparisons }) 
 
   return (
     <section className="mb-12">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-orange-100 rounded-lg">
-            <TrendingUp className="h-5 w-5 text-orange-600" />
-          </div>
-          <div>
-            <h2 className="text-xl font-semibold text-gray-800">
-              Top 3 Recommendations
-            </h2>
-            <p className="text-gray-600 text-sm mt-1">
-              Highest-impact optimizations for your selected optimization path
-            </p>
-          </div>
+      <div className="flex items-center gap-3 mb-6">
+        <div className="p-2 bg-orange-100 rounded-lg">
+          <TrendingUp className="h-5 w-5 text-orange-600" />
         </div>
-        
-        <OptimizationPathSelector
-          selectedPath={selectedPath}
-          onPathChange={setSelectedPath}
-          aiPreferredPath={aiPreferredPath}
-          className="flex-shrink-0"
-        />
+        <div>
+          <h2 className="text-xl font-semibold text-gray-800">
+            Top 3 Recommendations
+          </h2>
+          <p className="text-gray-600 text-sm mt-1">
+            Highest-impact optimizations to improve your ad performance
+          </p>
+        </div>
       </div>
       
       <div className="space-y-4">
