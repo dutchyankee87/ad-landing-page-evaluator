@@ -23,7 +23,7 @@ const evaluations = pgTable('evaluations', {
   userId: uuid('user_id'),
   title: text('title').notNull(),
   // Fixed field name to match database schema
-  adImageUrl: text('ad_image_url').notNull(),
+  adScreenshotUrl: text('ad_screenshot_url').notNull(),
   landingPageUrl: text('landing_page_url').notNull(),
   landingPageTitle: text('landing_page_title'),
   landingPageContent: text('landing_page_content'),
@@ -794,7 +794,7 @@ Return JSON:
           userId: userId, // Will be null for unauthenticated users
           title: `${adData.platform || 'Meta'} Ad Evaluation - ${new Date().toISOString().split('T')[0]}`,
           platform: adData.platform,
-          adImageUrl: adImageUrl, // Fixed: was adScreenshotUrl
+          adScreenshotUrl: adImageUrl, // Fixed: was adScreenshotUrl
           adUrl: adData.adUrl || null,
           adSourceType: adSourceType,
           mediaType: adData.mediaType || (adSourceType === 'video' ? 'video' : 'image'),

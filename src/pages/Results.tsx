@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Download, ChevronRight, MessageCircle } from 'lucide-react';
+import { ArrowLeft, Download, RefreshCw } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAdEvaluation } from '../context/AdEvaluationContext';
 import ScoreGauge from '../components/results/ScoreGauge';
@@ -15,7 +15,6 @@ import { IndustryBenchmarks } from '../components/benchmarks/IndustryBenchmarks'
 import { DetailedScoring } from '../components/results/DetailedScoring';
 import { IndustryInsights } from '../components/insights/IndustryInsights';
 import { PersuasionAnalysis } from '../components/psychology/PersuasionAnalysis';
-import RunNewTestButton from '../components/results/RunNewTestButton';
 import SEOHead from '../components/SEOHead';
 
 const PLATFORM_NAMES = {
@@ -31,8 +30,7 @@ const Results: React.FC = () => {
     results, 
     hasEvaluated, 
     adData, 
-    showFeedbackModal, 
-    openFeedbackModal, 
+showFeedbackModal, 
     closeFeedbackModal, 
     submitFeedback 
   } = useAdEvaluation();
@@ -122,11 +120,11 @@ const Results: React.FC = () => {
               
               <div className="flex gap-2">
                 <button
-                  className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium"
-                  onClick={openFeedbackModal}
+                  className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-md hover:from-orange-600 hover:to-red-600 transition-colors text-sm font-medium"
+                  onClick={() => navigate('/evaluate')}
                 >
-                  <MessageCircle className="h-4 w-4" />
-                  <span>Feedback</span>
+                  <RefreshCw className="h-4 w-4" />
+                  <span>Analyze Again</span>
                 </button>
                 
                 <button 
@@ -302,14 +300,13 @@ const Results: React.FC = () => {
 
                 {/* Run New Test Section - moved above Partner Recommendations */}
                 <div className="text-center space-y-4 mb-12">
-                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <RunNewTestButton />
+                  <div className="flex justify-center">
                     <Link
                       to="/evaluate"
-                      className="inline-flex items-center gap-2 px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium border border-gray-300"
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg hover:from-orange-600 hover:to-red-600 transition-colors font-medium"
                     >
-                      Analyze Different Ad
-                      <ChevronRight className="h-4 w-4" />
+                      <RefreshCw className="h-4 w-4" />
+                      Analyze Again
                     </Link>
                   </div>
                 </div>
