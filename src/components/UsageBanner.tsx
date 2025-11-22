@@ -36,9 +36,18 @@ const UsageBanner: React.FC<UsageBannerProps> = () => {
   // Use real usage data for evaluation capability if available
   const canActuallyEvaluate = realUsage ? realUsage.canEvaluate : canPerformEvaluation;
   const actualRemainingEvaluations = realUsage ? realUsage.remaining : remainingEvaluations;
+  
+  // Debug logging
+  console.log('UsageBanner Debug:', {
+    realUsage,
+    canPerformEvaluation,
+    canActuallyEvaluate,
+    actualRemainingEvaluations,
+    currentUsage
+  });
 
   const isNearLimit = currentUsage.used >= currentUsage.limit * 0.67; // Show warning at 2/3 used
-  const isOverLimit = !canActuallyEvaluate;
+  const isOverLimit = !canActuallyEvaluate || currentUsage.used >= currentUsage.limit;
 
   // For anonymous users who haven't used their free check, show different messaging
   if (!isSignedIn && !hasUsedAnonymousCheck()) {
