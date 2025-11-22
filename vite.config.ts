@@ -7,6 +7,7 @@ export default defineConfig({
   define: {
     global: 'globalThis',
   },
+  envPrefix: ['VITE_', 'NEXT_PUBLIC_'], // Include NEXT_PUBLIC_ variables in build
   build: {
     rollupOptions: {
       external: (id) => {
