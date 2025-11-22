@@ -5,6 +5,7 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import Breadcrumbs from './components/Breadcrumbs';
 import ProductHuntBanner from './components/ProductHuntBanner';
+import WhatsAppWidget from './components/WhatsAppWidget';
 import Home from './pages/Home';
 import UsageLimitModal from './components/UsageLimitModal';
 import { AdEvaluationProvider } from './context/AdEvaluationContext';
@@ -69,6 +70,7 @@ function App() {
             <Footer />
             
             <UsageLimitModal />
+            <WhatsAppWidget />
           </div>
         </AdEvaluationProvider>
       </Router>
