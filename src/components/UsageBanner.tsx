@@ -46,8 +46,16 @@ const UsageBanner: React.FC<UsageBannerProps> = () => {
     currentUsage
   });
 
-  const isNearLimit = currentUsage.used >= currentUsage.limit * 0.67; // Show warning at 2/3 used
-  const isOverLimit = !canActuallyEvaluate || currentUsage.used >= currentUsage.limit;
+  // Simplified logic: if we can't evaluate OR used >= limit, we're over the limit
+  const isOverLimit = !canActuallyEvaluate;
+  const isNearLimit = !isOverLimit && currentUsage.used >= currentUsage.limit * 0.67;
+  
+  console.log('UsageBanner Boolean Logic:', {
+    isOverLimit,
+    isNearLimit,
+    canActuallyEvaluate,
+    calculation: `!${canActuallyEvaluate} = ${isOverLimit}`
+  });
 
   // For anonymous users who haven't used their free check, show different messaging
   if (!isSignedIn && !hasUsedAnonymousCheck()) {
