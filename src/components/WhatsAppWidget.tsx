@@ -37,11 +37,11 @@ export default function WhatsAppWidget() {
   return (
     <>
       {/* Mobile layout */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-[9999] bg-white/95 backdrop-blur-md border-t border-gray-200/60 px-4 py-2 shadow-lg">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-[9999] bg-gray-900/95 backdrop-blur-md border-t border-gray-700/60 px-4 py-2 shadow-lg">
         <div className="flex items-center justify-between">
           <div className="flex-1 mr-3">
-            <p className="text-sm font-medium text-gray-900">Share ADalign.io</p>
-            <p className="text-xs text-gray-600">Help others optimize campaigns</p>
+            <p className="text-sm font-medium text-white">Share ADalign.io</p>
+            <p className="text-xs text-gray-300">Help others optimize campaigns</p>
           </div>
           <div className="flex items-center space-x-2">
             <button
@@ -53,7 +53,7 @@ export default function WhatsAppWidget() {
             </button>
             <button
               onClick={handleDismiss}
-              className="p-1.5 text-gray-400 hover:text-gray-600 transition-colors duration-200 touch-manipulation"
+              className="p-1.5 text-gray-400 hover:text-white transition-colors duration-200 touch-manipulation"
               aria-label="Dismiss"
             >
               <X className="w-4 h-4" />
@@ -65,11 +65,11 @@ export default function WhatsAppWidget() {
       {/* Desktop layout */}
       <div className="hidden md:block fixed bottom-24 left-1/2 transform -translate-x-1/2 z-[9999]">
         <div className="relative max-w-sm mx-auto">
-          <div className="bg-white/95 backdrop-blur-md rounded-xl shadow-lg border border-gray-200/60 p-3 transition-all duration-300 hover:scale-105 hover:shadow-xl">
+          <div className="bg-gray-900/95 backdrop-blur-md rounded-xl shadow-lg border border-gray-700/60 p-3 transition-all duration-300 hover:scale-105 hover:shadow-xl">
             <div className="flex items-center justify-between">
               <div className="flex-1 mr-3">
-                <p className="text-gray-900 font-medium text-sm">Share ADalign.io</p>
-                <p className="text-gray-600 text-xs mt-0.5">Help marketers optimize campaigns</p>
+                <p className="text-white font-medium text-sm">Share ADalign.io</p>
+                <p className="text-gray-300 text-xs mt-0.5">Help marketers optimize campaigns</p>
               </div>
               <div className="flex items-center space-x-2">
                 <button
@@ -81,7 +81,7 @@ export default function WhatsAppWidget() {
                 </button>
                 <button
                   onClick={handleDismiss}
-                  className="p-1.5 text-gray-400 hover:text-gray-600 transition-colors duration-200 hover:bg-gray-100 rounded-lg"
+                  className="p-1.5 text-gray-400 hover:text-white transition-colors duration-200 hover:bg-gray-700 rounded-lg"
                   aria-label="Dismiss"
                 >
                   <X className="w-4 h-4" />
