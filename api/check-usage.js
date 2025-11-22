@@ -39,31 +39,44 @@ const getCurrentMonth = () => {
   return `${year}-${month}`;
 };
 
+// Clerk users table
+const clerkUsers = pgTable('clerk_users', {
+  id: text('id').primaryKey(),
+  email: text('email').unique().notNull(),
+  tier: text('tier').default('free').notNull(),
+  monthlyEvaluations: integer('monthly_evaluations').default(0).notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull(),
+});
+
+const TIER_LIMITS = { free: 3, pro: 50, enterprise: 1000 };
+
 export default async function handler(req, res) {
   // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
 
-  if (req.method !== 'GET') {
+  if (req.method !== 'GET' && req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
-    // Get client IP address
+    // Get client IP address and user email (if provided)
     const clientIp = getClientIp(req);
+    const userEmail = req.method === 'POST' ? req.body?.userEmail : req.query?.userEmail;
     
     // Initialize database connection
     if (!process.env.DATABASE_URL) {
       // If no database, return default values
       return res.status(200).json({
         used: 0,
-        limit: IP_MONTHLY_LIMIT,
-        remaining: IP_MONTHLY_LIMIT,
+        limit: userEmail ? TIER_LIMITS.free : IP_MONTHLY_LIMIT,
+        remaining: userEmail ? TIER_LIMITS.free : IP_MONTHLY_LIMIT,
         canEvaluate: true,
         nextReset: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1).toISOString()
       });
@@ -74,38 +87,74 @@ export default async function handler(req, res) {
 
     const currentMonth = getCurrentMonth();
     
-    // Check current IP usage for this month
-    const ipUsageResult = await db
-      .select()
-      .from(ipRateLimit)
-      .where(eq(ipRateLimit.ipAddress, clientIp))
-      .limit(1);
-    
-    const ipUsage = ipUsageResult[0];
-    
-    let monthlyEvaluations = 0;
-    
-    if (ipUsage) {
-      // If it's a new month, reset to 0
-      if (ipUsage.currentMonth !== currentMonth) {
-        monthlyEvaluations = 0;
-      } else {
-        monthlyEvaluations = ipUsage.monthlyEvaluations;
+    if (userEmail) {
+      // Check user-based usage for authenticated users
+      const userResult = await db
+        .select()
+        .from(clerkUsers)
+        .where(eq(clerkUsers.email, userEmail))
+        .limit(1);
+      
+      if (userResult.length === 0) {
+        return res.status(404).json({
+          error: 'User not found',
+          used: 0,
+          limit: TIER_LIMITS.free,
+          remaining: 0,
+          canEvaluate: false,
+          nextReset: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1).toISOString()
+        });
       }
+      
+      const user = userResult[0];
+      const limit = TIER_LIMITS[user.tier] || TIER_LIMITS.free;
+      const remaining = Math.max(0, limit - user.monthlyEvaluations);
+      const canEvaluate = user.monthlyEvaluations < limit;
+      
+      return res.status(200).json({
+        used: user.monthlyEvaluations,
+        limit,
+        remaining,
+        canEvaluate,
+        nextReset: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1).toISOString(),
+        tier: user.tier,
+        userEmail: user.email
+      });
+      
+    } else {
+      // Check IP-based usage for unauthenticated users
+      const ipUsageResult = await db
+        .select()
+        .from(ipRateLimit)
+        .where(eq(ipRateLimit.ipAddress, clientIp))
+        .limit(1);
+      
+      const ipUsage = ipUsageResult[0];
+      
+      let monthlyEvaluations = 0;
+      
+      if (ipUsage) {
+        // If it's a new month, reset to 0
+        if (ipUsage.currentMonth !== currentMonth) {
+          monthlyEvaluations = 0;
+        } else {
+          monthlyEvaluations = ipUsage.monthlyEvaluations;
+        }
+      }
+      
+      const remaining = Math.max(0, IP_MONTHLY_LIMIT - monthlyEvaluations);
+      const canEvaluate = monthlyEvaluations < IP_MONTHLY_LIMIT;
+      const nextReset = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1).toISOString();
+      
+      return res.status(200).json({
+        used: monthlyEvaluations,
+        limit: IP_MONTHLY_LIMIT,
+        remaining,
+        canEvaluate,
+        nextReset,
+        ipAddress: clientIp.slice(0, 8) + '***' // Partially hide IP for privacy
+      });
     }
-    
-    const remaining = Math.max(0, IP_MONTHLY_LIMIT - monthlyEvaluations);
-    const canEvaluate = monthlyEvaluations < IP_MONTHLY_LIMIT;
-    const nextReset = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1).toISOString();
-    
-    return res.status(200).json({
-      used: monthlyEvaluations,
-      limit: IP_MONTHLY_LIMIT,
-      remaining,
-      canEvaluate,
-      nextReset,
-      ipAddress: clientIp.slice(0, 8) + '***' // Partially hide IP for privacy
-    });
 
   } catch (error) {
     console.error('Usage check failed:', error);

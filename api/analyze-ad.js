@@ -85,7 +85,17 @@ const ipRateLimit = pgTable('ip_rate_limit', {
   };
 });
 
-const TIER_LIMITS = { free: 1, pro: 50, enterprise: 1000 };
+// Clerk users table for authentication-based rate limiting
+const clerkUsers = pgTable('clerk_users', {
+  id: text('id').primaryKey(),
+  email: text('email').unique().notNull(),
+  tier: text('tier').default('free').notNull(),
+  monthlyEvaluations: integer('monthly_evaluations').default(0).notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).default(sql`NOW()`).notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).default(sql`NOW()`).notNull(),
+});
+
+const TIER_LIMITS = { free: 3, pro: 50, enterprise: 1000 }; // Updated free tier to 3
 const IP_MONTHLY_LIMIT = 5; // 5 evaluations per month for non-authenticated users
 
 // Helper function to get client IP address
@@ -173,6 +183,63 @@ const recordIpEvaluation = async (db, ipAddress) => {
       .where(eq(ipRateLimit.ipAddress, ipAddress));
   } catch (error) {
     logger.warn('⚠️ Failed to record evaluation:', error);
+  }
+};
+
+// Check user-based rate limiting for authenticated users
+const checkUserRateLimit = async (db, userEmail) => {
+  if (!db || !userEmail) return { allowed: false, remaining: 0, tier: 'free' };
+
+  try {
+    const currentMonth = getCurrentMonth();
+    
+    // Get user from clerk_users table
+    const userResult = await db
+      .select()
+      .from(clerkUsers)
+      .where(eq(clerkUsers.email, userEmail))
+      .limit(1);
+    
+    if (userResult.length === 0) {
+      logger.warn(`❌ User not found: ${userEmail}`);
+      return { allowed: false, remaining: 0, tier: 'free' };
+    }
+
+    const user = userResult[0];
+    const limit = TIER_LIMITS[user.tier] || TIER_LIMITS.free;
+    const remaining = limit - user.monthlyEvaluations;
+    const allowed = user.monthlyEvaluations < limit;
+    
+    logger.log(`👤 User rate limit check: ${user.email} (${user.tier}) - ${user.monthlyEvaluations}/${limit} used`);
+    
+    return { 
+      allowed, 
+      remaining: Math.max(0, remaining), 
+      tier: user.tier,
+      user 
+    };
+  } catch (error) {
+    logger.warn('⚠️ User rate limit check failed:', error);
+    return { allowed: false, remaining: 0, tier: 'free' };
+  }
+};
+
+// Record user evaluation
+const recordUserEvaluation = async (db, userEmail) => {
+  if (!db || !userEmail) return;
+
+  try {
+    await db
+      .update(clerkUsers)
+      .set({
+        monthlyEvaluations: sql`monthly_evaluations + 1`,
+        updatedAt: new Date()
+      })
+      .where(eq(clerkUsers.email, userEmail));
+      
+    logger.log(`✅ Recorded evaluation for user: ${userEmail}`);
+  } catch (error) {
+    logger.warn('⚠️ Failed to record user evaluation:', error);
   }
 };
 
@@ -413,12 +480,33 @@ export default async function handler(req, res) {
       logger.log('🔓 Dev bypass detected - skipping rate limits');
     }
     
-    // Check IP-based rate limiting for unauthenticated users (unless dev bypass)
-    if (!userEmail && !isDevBypass) {
+    // Rate limiting logic
+    let rateLimitResult = null;
+    
+    if (userEmail && !isDevBypass) {
+      // Check user-based rate limiting for authenticated users
+      rateLimitResult = await checkUserRateLimit(db, userEmail);
+      
+      if (!rateLimitResult.allowed) {
+        logger.log(`🚫 User rate limit exceeded: ${userEmail} (${rateLimitResult.tier})`);
+        const limit = TIER_LIMITS[rateLimitResult.tier] || TIER_LIMITS.free;
+        return res.status(429).json({
+          error: `Monthly limit reached (${rateLimitResult.user?.monthlyEvaluations || 0}/${limit}). Please upgrade your plan for more evaluations.`,
+          errorCode: 'USER_RATE_LIMIT_EXCEEDED',
+          remainingEvaluations: rateLimitResult.remaining,
+          tier: rateLimitResult.tier,
+          nextReset: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1).toISOString()
+        });
+      }
+      
+      logger.log(`✅ User rate limit check passed: ${userEmail} (${rateLimitResult.tier}) - ${rateLimitResult.remaining} remaining`);
+      
+    } else if (!userEmail && !isDevBypass) {
+      // Check IP-based rate limiting for unauthenticated users
       const ipCheck = await checkIpRateLimit(db, clientIp);
       
       if (!ipCheck.allowed) {
-        logger.log('🚫 Rate limit exceeded');
+        logger.log('🚫 IP rate limit exceeded');
         return res.status(429).json({
           error: `Monthly limit reached (5/5). Please wait for next month or create an account.`,
           errorCode: 'IP_RATE_LIMIT_EXCEEDED',
@@ -427,7 +515,7 @@ export default async function handler(req, res) {
         });
       }
       
-      logger.log('✅ Rate limit check passed. Remaining:', ipCheck.remaining);
+      logger.log('✅ IP rate limit check passed. Remaining:', ipCheck.remaining);
     }
 
     // Initialize OpenAI
@@ -437,38 +525,19 @@ export default async function handler(req, res) {
 
     let userId = null;
 
-    // Check user usage limits if email provided and database available (unless dev bypass)
+    // Note: User rate limiting is now handled above via checkUserRateLimit()
+    // This section is kept for legacy users table compatibility if needed
     if (userEmail && db && !isDevBypass) {
       try {
-        const userResult = await db.select().from(users).where(eq(users.email, userEmail)).limit(1);
-        const user = userResult[0];
-
-        if (user) {
-          const limit = TIER_LIMITS[user.tier];
-          
-          if (user.monthlyEvaluations >= limit) {
-            return res.status(429).json({
-              error: `Monthly limit reached (${user.monthlyEvaluations}/${limit}). Limit resets next month.`,
-              errorCode: 'USAGE_LIMIT_EXCEEDED'
-            });
-          }
-          
-          userId = user.id;
-        }
-      } catch (dbError) {
-        logger.warn('⚠️ Database query failed:', dbError);
-        // Continue without user tracking
-      }
-    } else if (userEmail && isDevBypass) {
-      // For dev bypass with email, still get userId but skip limits
-      try {
+        // Try to get userId from legacy users table for evaluation storage
         const userResult = await db.select().from(users).where(eq(users.email, userEmail)).limit(1);
         const user = userResult[0];
         if (user) {
           userId = user.id;
         }
       } catch (dbError) {
-        logger.warn('⚠️ Database query failed:', dbError);
+        logger.warn('⚠️ Legacy users table query failed:', dbError);
+        // Continue without legacy userId
       }
     }
 
@@ -838,16 +907,27 @@ Return JSON:
           updatedAt: new Date()
         });
 
-        // Increment user usage only for authenticated users (unless dev bypass)
-        if (userId && !isDevBypass) {
-          await db
-            .update(users)
-            .set({ 
-              monthlyEvaluations: sql`monthly_evaluations + 1`,
-              updatedAt: new Date()
-            })
-            .where(eq(users.id, userId));
-        } else if (!isDevBypass) {
+        // Record usage tracking (unless dev bypass)
+        if (userEmail && !isDevBypass) {
+          // Record user evaluation for authenticated users using clerk_users table
+          await recordUserEvaluation(db, userEmail);
+          
+          // Also update legacy users table if userId exists
+          if (userId) {
+            try {
+              await db
+                .update(users)
+                .set({ 
+                  monthlyEvaluations: sql`monthly_evaluations + 1`,
+                  updatedAt: new Date()
+                })
+                .where(eq(users.id, userId));
+              logger.log('✅ Updated legacy users table');
+            } catch (legacyError) {
+              logger.warn('⚠️ Legacy users table update failed:', legacyError);
+            }
+          }
+        } else if (!userEmail && !isDevBypass) {
           // Record IP evaluation for unauthenticated users
           await recordIpEvaluation(db, clientIp);
         } else {
