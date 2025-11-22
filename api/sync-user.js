@@ -3,9 +3,9 @@ import postgres from 'postgres';
 import { pgTable, uuid, text, integer, timestamp } from 'drizzle-orm/pg-core';
 import { eq } from 'drizzle-orm';
 
-// Database schema - use text for Clerk user IDs (they're not UUIDs)
-const users = pgTable('users', {
-  id: text('id').primaryKey(), // Changed from uuid to text for Clerk IDs
+// Database schema for Clerk users (separate table to avoid migration issues)
+const clerkUsers = pgTable('clerk_users', {
+  id: text('id').primaryKey(),
   email: text('email').unique().notNull(),
   tier: text('tier').default('free').notNull(),
   monthlyEvaluations: integer('monthly_evaluations').default(0).notNull(),
@@ -53,8 +53,8 @@ export default async function handler(req, res) {
     // Check if user already exists
     const existingUser = await db
       .select()
-      .from(users)
-      .where(eq(users.id, userId))
+      .from(clerkUsers)
+      .where(eq(clerkUsers.id, userId))
       .limit(1);
 
     console.log('🔍 Existing user query result:', existingUser);
@@ -70,7 +70,7 @@ export default async function handler(req, res) {
 
     // Create new user
     const newUser = await db
-      .insert(users)
+      .insert(clerkUsers)
       .values({
         id: userId,
         email: email,
