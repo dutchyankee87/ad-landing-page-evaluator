@@ -44,7 +44,7 @@ const Home: React.FC = () => {
         url="/"
       />
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50/30 to-blue-50/20">
-      <div className="container mx-auto px-4 pt-2 pb-4">
+      <div className="w-full max-w-none lg:w-[90%] mx-auto px-4 pt-2 pb-4">
       {/* Hero Section */}
       <motion.section 
         className="mb-12 py-6"
@@ -52,7 +52,7 @@ const Home: React.FC = () => {
         initial="hidden"
         animate="visible"
       >
-        <div className="max-w-7xl mx-auto">
+        <div className="w-full mx-auto">
           <motion.div 
             variants={itemVariants}
             className="flex justify-center mb-6"
@@ -176,7 +176,7 @@ const Home: React.FC = () => {
         transition={{ duration: 0.5, ease: "easeOut" }}
         viewport={{ once: true, margin: "-100px" }}
       >
-        <div className="max-w-6xl mx-auto">
+        <div className="w-full mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Problem */}
             <motion.div 
@@ -271,7 +271,7 @@ const Home: React.FC = () => {
         transition={{ duration: 0.8 }}
         viewport={{ once: true, margin: "-100px" }}
       >
-        <div className="max-w-5xl mx-auto">
+        <div className="w-full mx-auto">
           <motion.h2 
             className="text-3xl md:text-4xl font-bold text-center mb-4"
             initial={{ opacity: 0, y: 20 }}
@@ -349,7 +349,7 @@ const Home: React.FC = () => {
         transition={{ duration: 0.8 }}
         viewport={{ once: true, margin: "-100px" }}
       >
-        <div className="max-w-6xl mx-auto">
+        <div className="w-full mx-auto">
           <motion.h2 
             className="text-3xl md:text-4xl font-bold text-center mb-4"
             initial={{ opacity: 0, y: 20 }}
@@ -546,7 +546,7 @@ const Home: React.FC = () => {
         transition={{ duration: 0.8 }}
         viewport={{ once: true, margin: "-100px" }}
       >
-        <div className="max-w-5xl mx-auto">
+        <div className="w-full mx-auto">
           <motion.div 
             className="text-center mb-12"
             initial={{ opacity: 0, y: 20 }}
@@ -589,7 +589,7 @@ const Home: React.FC = () => {
           <PartnerSection
             showHeader={false}
             compact={true}
-            className="max-w-4xl mx-auto"
+            className="w-full mx-auto"
           />
           
           <motion.div 
@@ -619,7 +619,7 @@ const Home: React.FC = () => {
         transition={{ duration: 0.8 }}
         viewport={{ once: true, margin: "-100px" }}
       >
-        <div className="max-w-4xl mx-auto">
+        <div className="w-full mx-auto">
           <motion.div 
             className="text-center mb-12"
             initial={{ opacity: 0, y: 20 }}
@@ -707,7 +707,7 @@ const Home: React.FC = () => {
         transition={{ duration: 0.8 }}
         viewport={{ once: true, margin: "-100px" }}
       >
-        <div className="max-w-5xl mx-auto">
+        <div className="w-full mx-auto">
           <motion.div 
             className="bg-gradient-to-br from-red-600 via-purple-600 to-blue-600 text-white p-12 rounded-3xl shadow-2xl text-center relative overflow-hidden"
             initial={{ scale: 0.98, opacity: 0 }}
