@@ -244,7 +244,8 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
   // Function to refresh real usage data from backend
   const refreshUsage = async () => {
     try {
-      const usage = await getRealUsage();
+      const userEmail = user?.emailAddresses?.[0]?.emailAddress;
+      const usage = await getRealUsage(userEmail);
       setRealUsage(usage);
       
       // Update local states based on real usage

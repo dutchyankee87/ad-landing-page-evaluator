@@ -165,16 +165,30 @@ export async function evaluateAd(request: EvaluationRequest): Promise<Evaluation
 }
 
 // Get real usage information from backend
-export async function getRealUsage(): Promise<UsageInfo> {
+export async function getRealUsage(userEmail?: string): Promise<UsageInfo> {
   try {
-    logger.log('🔍 Checking real usage from backend...');
+    logger.log('🔍 Checking real usage from backend...', { userEmail });
     
-    const response = await fetch('/api/check-usage', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      }
-    });
+    let response;
+    
+    if (userEmail) {
+      // For authenticated users, use POST with email
+      response = await fetch('/api/check-usage', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userEmail })
+      });
+    } else {
+      // For unauthenticated users, use GET for IP-based limiting
+      response = await fetch('/api/check-usage', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+    }
 
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}`);
@@ -202,7 +216,7 @@ export async function getRealUsage(): Promise<UsageInfo> {
 
 // Legacy function - kept for compatibility
 export async function getUserUsage(userEmail?: string): Promise<UsageInfo> {
-  return getRealUsage();
+  return getRealUsage(userEmail);
 }
 
 // Generate mock evaluation for fallback
