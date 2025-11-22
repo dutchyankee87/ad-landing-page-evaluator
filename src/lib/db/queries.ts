@@ -5,11 +5,14 @@ import {
   evaluations, 
   performanceFeedback,
   industryBenchmarks,
+  sharedReports,
   TIER_LIMITS, 
   type User, 
   type NewUser, 
   type NewEvaluation,
   type NewPerformanceFeedback,
+  type NewSharedReport,
+  type SharedReport,
   type Industry,
   type AudienceType
 } from './schema';
@@ -309,19 +312,104 @@ export async function getEvaluationPercentile(
   return 95;
 }
 
+// Shared Reports Operations
+export async function createSharedReport(shareData: NewSharedReport): Promise<SharedReport> {
+  const result = await db.insert(sharedReports).values(shareData).returning();
+  return result[0];
+}
+
+export async function getSharedReport(shareToken: string): Promise<SharedReport | null> {
+  const result = await db
+    .select()
+    .from(sharedReports)
+    .where(eq(sharedReports.shareToken, shareToken))
+    .limit(1);
+  
+  return result[0] || null;
+}
+
+export async function getSharedReportWithEvaluation(shareToken: string) {
+  const result = await db
+    .select({
+      sharedReport: sharedReports,
+      evaluation: evaluations
+    })
+    .from(sharedReports)
+    .innerJoin(evaluations, eq(sharedReports.evaluationId, evaluations.id))
+    .where(eq(sharedReports.shareToken, shareToken))
+    .limit(1);
+  
+  return result[0] || null;
+}
+
+export async function incrementShareView(shareToken: string): Promise<void> {
+  await db
+    .update(sharedReports)
+    .set({ 
+      viewCount: sql`view_count + 1`,
+      lastViewedAt: new Date()
+    })
+    .where(eq(sharedReports.shareToken, shareToken));
+}
+
+export async function getActiveSharedReports(evaluationId: string) {
+  return await db
+    .select()
+    .from(sharedReports)
+    .where(
+      and(
+        eq(sharedReports.evaluationId, evaluationId),
+        gte(sharedReports.expiresAt, new Date())
+      )
+    )
+    .orderBy(desc(sharedReports.createdAt));
+}
+
+export async function deleteExpiredShares(): Promise<number> {
+  const result = await db
+    .delete(sharedReports)
+    .where(
+      lte(sharedReports.expiresAt, new Date())
+    );
+  
+  // Return approximate count (PostgreSQL doesn't return exact count for delete)
+  return 0; // Would need to count first if exact number needed
+}
+
+export async function getUserSharedReports(userId: string, limit = 10) {
+  return await db
+    .select({
+      sharedReport: sharedReports,
+      evaluation: {
+        id: evaluations.id,
+        platform: evaluations.platform,
+        overallScore: evaluations.overallScore,
+        createdAt: evaluations.createdAt
+      }
+    })
+    .from(sharedReports)
+    .innerJoin(evaluations, eq(sharedReports.evaluationId, evaluations.id))
+    .where(eq(evaluations.userId, userId))
+    .orderBy(desc(sharedReports.createdAt))
+    .limit(limit);
+}
+
 // Data Flywheel Analytics - SIMPLIFIED until all tables are implemented
 export async function getDataFlywheelMetrics() {
   const [
     totalEvaluations,
-    totalFeedback
+    totalFeedback,
+    totalSharedReports
   ] = await Promise.all([
     db.select({ count: count() }).from(evaluations),
-    db.select({ count: count() }).from(performanceFeedback)
+    db.select({ count: count() }).from(performanceFeedback),
+    db.select({ count: count() }).from(sharedReports)
   ]);
 
   return {
     totalEvaluations: totalEvaluations[0].count,
     totalFeedback: totalFeedback[0].count,
+    totalSharedReports: totalSharedReports[0].count,
     totalMetrics: 0, // Will be implemented later
     implementationRate: 0 // Will be implemented later
   };

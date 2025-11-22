@@ -136,6 +136,25 @@ export const ipRateLimit = pgTable('ip_rate_limit', {
   };
 });
 
+// Shared reports for public sharing
+export const sharedReports = pgTable('shared_reports', {
+  id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
+  shareToken: text('share_token').unique().notNull(),
+  evaluationId: uuid('evaluation_id').references(() => evaluations.id).notNull(),
+  title: text('title').notNull(),
+  sanitizedData: jsonb('sanitized_data').notNull(), // Cleaned evaluation data
+  expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+  viewCount: integer('view_count').default(0).notNull(),
+  lastViewedAt: timestamp('last_viewed_at', { withTimezone: true }),
+  createdAt: timestamp('created_at', { withTimezone: true }).default(sql`NOW()`).notNull(),
+}, (table) => {
+  return {
+    shareTokenIdx: index('idx_shared_reports_token').on(table.shareToken),
+    evaluationIdIdx: index('idx_shared_reports_evaluation').on(table.evaluationId),
+    expiresAtIdx: index('idx_shared_reports_expires').on(table.expiresAt),
+  };
+});
+
 // Zod schemas for validation
 export const insertEvaluationSchema = createInsertSchema(evaluations);
 export const selectEvaluationSchema = createSelectSchema(evaluations);
@@ -143,6 +162,8 @@ export const insertUserSchema = createInsertSchema(users);
 export const selectUserSchema = createSelectSchema(users);
 export const insertPerformanceFeedbackSchema = createInsertSchema(performanceFeedback);
 export const selectPerformanceFeedbackSchema = createSelectSchema(performanceFeedback);
+export const insertSharedReportSchema = createInsertSchema(sharedReports);
+export const selectSharedReportSchema = createSelectSchema(sharedReports);
 
 // TypeScript types
 export type Evaluation = typeof evaluations.$inferSelect;
@@ -151,6 +172,8 @@ export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type PerformanceFeedback = typeof performanceFeedback.$inferSelect;
 export type NewPerformanceFeedback = typeof performanceFeedback.$inferInsert;
+export type SharedReport = typeof sharedReports.$inferSelect;
+export type NewSharedReport = typeof sharedReports.$inferInsert;
 
 // Re-export business logic constants from shared constants file
 export {

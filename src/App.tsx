@@ -13,6 +13,7 @@ import { AdEvaluationProvider } from './context/AdEvaluationContext';
 // Lazy load heavy components for better performance
 const EvaluationForm = React.lazy(() => import('./pages/EvaluationForm'));
 const Results = React.lazy(() => import('./pages/Results'));
+const SharedReport = React.lazy(() => import('./pages/SharedReport'));
 const Article = React.lazy(() => import('./pages/Article'));
 const Articles = React.lazy(() => import('./pages/Articles'));
 const FAQ = React.lazy(() => import('./pages/FAQ'));
@@ -51,6 +52,7 @@ function App() {
                   <Route path="/" element={<Home />} />
                   <Route path="/evaluate" element={<EvaluationForm />} />
                   <Route path="/results" element={<Results />} />
+                  <Route path="/shared/:shareToken" element={<SharedReport />} />
                   <Route path="/faq" element={<FAQ />} />
                   <Route path="/ecommerce" element={<EcommerceLanding />} />
                   <Route path="/pricing" element={<Pricing />} />

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Download, RefreshCw } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -10,6 +10,7 @@ import ComparisonGrid from '../components/results/ComparisonGrid';
 import LanguageAnalysis from '../components/results/LanguageAnalysis';
 import AdSummary from '../components/results/AdSummary';
 import PartnerRecommendations from '../components/results/PartnerRecommendations';
+import ShareButton from '../components/results/ShareButton';
 import { PerformanceFeedbackModal } from '../components/feedback/PerformanceFeedbackModal';
 import { IndustryBenchmarks } from '../components/benchmarks/IndustryBenchmarks';
 import { DetailedScoring } from '../components/results/DetailedScoring';
@@ -35,6 +36,21 @@ showFeedbackModal,
     submitFeedback 
   } = useAdEvaluation();
   const navigate = useNavigate();
+  const [shareMessage, setShareMessage] = useState<string | null>(null);
+  const [shareError, setShareError] = useState<string | null>(null);
+
+  // Handle share success/error messages
+  const handleShareSuccess = (shareUrl: string) => {
+    setShareMessage('Share link created successfully!');
+    setShareError(null);
+    setTimeout(() => setShareMessage(null), 3000);
+  };
+
+  const handleShareError = (error: string) => {
+    setShareError(error);
+    setShareMessage(null);
+    setTimeout(() => setShareError(null), 5000);
+  };
 
   // Redirect if results aren't available
   useEffect(() => {
@@ -127,6 +143,17 @@ showFeedbackModal,
                   <span>Analyze Again</span>
                 </button>
                 
+                <ShareButton
+                  evaluation={{
+                    id: results?.evaluationId || 'mock-evaluation',
+                    ...results,
+                    ...adData,
+                    platform: adData.platform
+                  }}
+                  onShare={handleShareSuccess}
+                  onError={handleShareError}
+                />
+                
                 <button 
                   className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors text-sm font-medium"
                   onClick={() => window.print()}
@@ -136,6 +163,29 @@ showFeedbackModal,
                 </button>
               </div>
             </div>
+
+            {/* Share Success/Error Messages */}
+            {shareMessage && (
+              <motion.div
+                className="mb-4 p-3 bg-green-50 border border-green-200 rounded-md"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+              >
+                <p className="text-green-700 text-sm font-medium">{shareMessage}</p>
+              </motion.div>
+            )}
+            
+            {shareError && (
+              <motion.div
+                className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+              >
+                <p className="text-red-700 text-sm font-medium">{shareError}</p>
+              </motion.div>
+            )}
         
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
               <div className="px-6 py-4 border-b border-gray-100">

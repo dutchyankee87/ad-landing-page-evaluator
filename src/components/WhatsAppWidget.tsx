@@ -1,15 +1,31 @@
-'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { X, ArrowRight } from 'lucide-react'
 
 export default function WhatsAppWidget() {
   const [isVisible, setIsVisible] = useState(true)
 
+  useEffect(() => {
+    // Debug: Log when widget mounts
+    console.log('WhatsAppWidget mounted, visible:', isVisible)
+  }, [isVisible])
+
   // WhatsApp share handler
   const handleWhatsAppShare = () => {
-    const message = encodeURIComponent('Check out this amazing ad optimization tool that helps improve your marketing campaigns! 🚀 AdAlign.io - Optimize your ad-to-landing page congruence')
-    const whatsappUrl = `https://wa.me/?text=${message}`
-    window.open(whatsappUrl, '_blank')
+    const message = 'Check out this amazing ad optimization tool that helps improve your marketing campaigns! 🚀 AdAlign.io - Optimize your ad-to-landing page congruence'
+    const encodedMessage = encodeURIComponent(message)
+    const whatsappUrl = `https://wa.me/?text=${encodedMessage}`
+    
+    // Verify the URL is properly formatted
+    console.log('WhatsApp URL:', whatsappUrl)
+    
+    // Open WhatsApp with error handling
+    try {
+      window.open(whatsappUrl, '_blank', 'noopener,noreferrer')
+    } catch (error) {
+      console.error('Error opening WhatsApp:', error)
+      // Fallback: try to open WhatsApp Web directly
+      window.open(`https://web.whatsapp.com/send?text=${encodedMessage}`, '_blank', 'noopener,noreferrer')
+    }
   }
 
   const handleDismiss = () => {
@@ -21,7 +37,7 @@ export default function WhatsAppWidget() {
   return (
     <>
       {/* Mobile layout */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 px-4 py-3">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-[9999] bg-white border-t border-gray-200 px-4 py-3 shadow-lg">
         <div className="flex items-center justify-between">
           <div className="flex-1 mr-4">
             <p className="text-sm font-medium text-gray-900">Share AdAlign with colleagues</p>
@@ -47,7 +63,7 @@ export default function WhatsAppWidget() {
       </div>
 
       {/* Desktop layout */}
-      <div className="hidden md:block fixed bottom-24 left-1/2 transform -translate-x-1/2 z-50">
+      <div className="hidden md:block fixed bottom-24 left-1/2 transform -translate-x-1/2 z-[9999]">
         <div className="relative max-w-md mx-auto">
           <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-2xl shadow-lg backdrop-blur-sm p-4 transition-all duration-300 hover:scale-105 hover:shadow-xl">
             <div className="flex items-center justify-between">
