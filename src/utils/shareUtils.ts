@@ -143,13 +143,20 @@ export function isExpired(expiresAt: Date): boolean {
  * Formats share data for clipboard copying
  */
 export function formatShareText(shareUrl: string, title: string, score: number): string {
-  return `Check out this ad analysis report: "${title}"
+  const scoreEmoji = score >= 7 ? '🚀' : score >= 4 ? '📊' : '⚠️';
+  const scoreDescription = score >= 7 ? 'Great alignment!' : score >= 4 ? 'Room for improvement' : 'Needs attention';
   
-Overall Alignment Score: ${score}/10
+  return `${scoreEmoji} Ad Performance Analysis
 
-View the full report: ${shareUrl}
+🎯 ${title}
+ℹ️ Overall Score: ${score}/10 - ${scoreDescription}
 
-Analyzed with adalign.io - AI-powered ad optimization`;
+🔍 View detailed analysis:
+${shareUrl}
+
+🚀 Powered by adalign.io - AI-driven ad optimization
+
+#AdOptimization #MarketingAnalytics #ConversionOptimization`;
 }
 
 /**
@@ -195,14 +202,28 @@ export function isValidShareToken(token: string): boolean {
  * Creates a title for shared reports
  */
 export function createShareTitle(evaluation: any): string {
+  const platformNames: Record<string, string> = {
+    meta: 'Meta (FB/IG)',
+    google: 'Google Ads',
+    tiktok: 'TikTok',
+    linkedin: 'LinkedIn',
+    reddit: 'Reddit'
+  };
+  
   const platform = evaluation.platform ? 
-    evaluation.platform.charAt(0).toUpperCase() + evaluation.platform.slice(1) : 
-    'Platform';
+    platformNames[evaluation.platform] || evaluation.platform.charAt(0).toUpperCase() + evaluation.platform.slice(1) : 
+    'Ad Platform';
   
   const score = Math.round(evaluation.overallScore || 0);
-  const date = new Date().toLocaleDateString();
+  const date = new Date().toLocaleDateString('en-US', { 
+    month: 'short', 
+    day: 'numeric', 
+    year: 'numeric' 
+  });
   
-  return `${platform} Ad Analysis - ${score}/10 Score (${date})`;
+  const performance = score >= 7 ? 'High Performance' : score >= 4 ? 'Moderate Performance' : 'Optimization Needed';
+  
+  return `${platform} Analysis - ${score}/10 (${performance}) - ${date}`;
 }
 
 /**
