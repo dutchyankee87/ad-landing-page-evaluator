@@ -43,123 +43,43 @@ const SharedReport: React.FC = () => {
 
   const fetchSharedReport = async (token: string) => {
     try {
-      // In a real implementation, this would fetch from /api/shared-report/:token
-      // For now, we'll simulate with mock data
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
+      // Fetch from actual API endpoint
+      const response = await fetch(`/api/shared-report?shareToken=${token}`);
+      const result = await response.json();
       
-      // Mock shared report data
-      const mockData: SharedReportData = {
-        shareToken: token,
-        title: 'Meta Ad Analysis - 7/10 Score (11/22/2025)',
-        sanitizedData: {
-          overallScore: 7.2,
-          visualScore: 6.8,
-          contextualScore: 7.5,
-          toneScore: 7.3,
-          platform: 'meta',
-          componentScores: {
-            visual: 6.8,
-            contextual: 7.5,
-            tone: 7.3
-          },
-          visualSuggestions: [
-            'Consider using more consistent brand colors across ad and landing page',
-            'Align image styles to create better visual continuity'
-          ],
-          contextualSuggestions: [
-            'Ensure headline messaging is consistent between ad and page',
-            'Optimize value proposition alignment'
-          ],
-          toneSuggestions: [
-            'Maintain consistent voice and urgency level',
-            'Align emotional appeal across touchpoints'
-          ],
-          elementComparisons: [
-            {
-              element: 'Headlines',
-              category: 'Contextual',
-              status: 'match',
-              severity: 'low',
-              analysis: 'Headlines show strong thematic alignment with consistent value proposition',
-              recommendation: 'Consider testing slight variations in urgency level',
-              score: 8.2
-            },
-            {
-              element: 'Color Scheme',
-              category: 'Visual', 
-              status: 'partial_match',
-              severity: 'medium',
-              analysis: 'Primary colors align well, but accent colors differ slightly',
-              recommendation: 'Harmonize accent color usage across ad and page',
-              score: 6.8
-            },
-            {
-              element: 'Call-to-Action',
-              category: 'Contextual',
-              status: 'match',
-              severity: 'low', 
-              analysis: 'CTA messaging is consistent and compelling',
-              recommendation: 'Strong alignment - consider A/B testing button colors',
-              score: 9.1
-            },
-            {
-              element: 'Typography',
-              category: 'Visual',
-              status: 'mismatch',
-              severity: 'medium',
-              analysis: 'Font families differ between ad and landing page',
-              recommendation: 'Use consistent typography for better brand coherence',
-              score: 4.5
-            },
-            {
-              element: 'Tone of Voice',
-              category: 'Tone',
-              status: 'partial_match',
-              severity: 'low',
-              analysis: 'Generally consistent professional tone with minor variations',
-              recommendation: 'Align formality level across all copy elements', 
-              score: 7.3
-            },
-            {
-              element: 'Value Proposition',
-              category: 'Contextual',
-              status: 'match',
-              severity: 'low',
-              analysis: 'Core value proposition clearly communicated in both contexts',
-              recommendation: 'Excellent alignment - maintain consistency',
-              score: 8.9
-            }
-          ],
-          createdAt: new Date().toISOString(),
-          // Target age removed for privacy
-          targetGender: 'All',
-          targetLocation: 'United States',
-          analysisModel: 'GPT-4'
-        },
-        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // 24 hours from now
-        viewCount: 12,
-        lastViewedAt: null,
-        createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString() // 2 hours ago
-      };
-
-      // Check if expired
-      const expirationDate = new Date(mockData.expiresAt);
-      if (isExpired(expirationDate)) {
-        setExpired(true);
-        setError('This shared report has expired');
+      if (!response.ok) {
+        if (response.status === 404) {
+          setError('Shared report not found');
+        } else if (response.status === 410) {
+          setExpired(true);
+          setError('This shared report has expired');
+        } else {
+          setError(result.error || 'Failed to load shared report');
+        }
         setLoading(false);
         return;
       }
 
-      setReportData(mockData);
-      setLoading(false);
+      if (result.success && result.data) {
+        // Check if expired on client side as well
+        const expirationDate = new Date(result.data.expiresAt);
+        if (isExpired(expirationDate)) {
+          setExpired(true);
+          setError('This shared report has expired');
+          setLoading(false);
+          return;
+        }
 
-      // Track view (in real implementation)
-      // await fetch(`/api/shared-report/${token}/view`, { method: 'POST' });
+        setReportData(result.data);
+        setLoading(false);
+        return;
+      }
+
+      throw new Error('Invalid response format');
 
     } catch (err) {
       console.error('Error fetching shared report:', err);
-      setError('Failed to load shared report');
+      setError('Failed to load shared report. The service may be temporarily unavailable.');
       setLoading(false);
     }
   };

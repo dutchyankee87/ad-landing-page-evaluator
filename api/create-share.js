@@ -60,16 +60,10 @@ export default async function handler(req, res) {
         expiresAt: sharedReport.expiresAt
       });
     } catch (dbError) {
-      console.warn('Database creation failed, returning mock response:', dbError.message);
-      
-      // Fallback: return successful response even if DB fails
-      return res.status(200).json({
-        success: true,
-        shareToken,
-        shareUrl: `${req.headers.origin || 'https://adalign.io'}/shared/${shareToken}`,
-        title,
-        expiresAt,
-        mock: true
+      console.error('Database creation failed:', dbError.message);
+      return res.status(503).json({ 
+        error: 'Service temporarily unavailable. Please try again later.',
+        details: process.env.NODE_ENV === 'development' ? dbError.message : undefined
       });
     }
 
