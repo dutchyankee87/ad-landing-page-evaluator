@@ -254,6 +254,35 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
     }
   };
 
+  // Sync user to database when they sign up
+  const syncUser = async () => {
+    if (!user?.id || !user?.emailAddresses?.[0]?.emailAddress) {
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/sync-user', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          email: user.emailAddresses[0].emailAddress
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        logger.log('✅ User synced to database:', data);
+      } else {
+        logger.warn('❌ User sync failed:', await response.text());
+      }
+    } catch (error) {
+      logger.error('❌ User sync error:', error);
+    }
+  };
+
   // Update usage stats when component mounts or usage changes
   useEffect(() => {
     const updateUsageStats = () => {
@@ -266,6 +295,12 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
     };
 
     updateUsageStats();
+    
+    // Sync user to database if logged in
+    if (user?.id) {
+      syncUser();
+    }
+    
     // Also refresh real usage from backend
     refreshUsage();
     
@@ -275,7 +310,7 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
       refreshUsage(); // Also refresh from backend periodically
     }, 60000);
     return () => clearInterval(interval);
-  }, [userId]); // Update when userId changes
+  }, [userId, user]); // Update when userId or user changes
   
   const updateAdData = (data: Partial<AdData>) => {
     setAdData(prev => ({ ...prev, ...data }));
@@ -353,8 +388,7 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
           gender: audienceData.gender || 'mixed',
           interests: audienceData.interests || 'general'
         },
-        // TODO: Add user email when auth is implemented
-        userEmail: undefined
+        userEmail: user?.emailAddresses?.[0]?.emailAddress
       });
 
       // For API responses, generate enhanced data on the frontend
