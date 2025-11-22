@@ -526,8 +526,14 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
       setHasEvaluated(true);
       
     } catch (error) {
+      // Check if this is a rate limit error - re-throw it to let the UI handle it
+      if (error instanceof Error && error.message.includes('429')) {
+        logger.error('🚫 Rate limit exceeded in context');
+        throw error; // Re-throw rate limit errors
+      }
+      
       logger.warn('Evaluation failed, using fallback:', error);
-      // Fallback to mock evaluation
+      // Fallback to mock evaluation for non-rate-limit errors
       await mockEvaluateAd();
     }
   };

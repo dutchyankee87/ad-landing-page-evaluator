@@ -147,9 +147,15 @@ export async function evaluateAd(request: EvaluationRequest): Promise<Evaluation
     return data;
     
   } catch (error) {
+    // Check if this is a rate limit error - don't fallback, throw it
+    if (error instanceof Error && error.message.includes('429')) {
+      logger.error('🚫 Rate limit exceeded');
+      throw error; // Re-throw rate limit errors so UI can handle them
+    }
+    
     logger.warn('🔄 API call failed, using fallback:', error);
     
-    // Fallback to mock evaluation for demo/development
+    // Fallback to mock evaluation for demo/development (non-rate-limit errors only)
     return generateFallbackEvaluation(request.adData.platform);
   }
 }

@@ -1,8 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
 import { logger } from './logger';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+// Support both VITE_ (development) and NEXT_PUBLIC_ (Vercel) environment variables
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || import.meta.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || import.meta.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase environment variables');
@@ -12,7 +13,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // Image compression utility
 export const compressImage = (file: File, maxWidth = 1920, quality = 0.8): Promise<Blob> => {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d')!;
     const img = new Image();
@@ -25,7 +26,13 @@ export const compressImage = (file: File, maxWidth = 1920, quality = 0.8): Promi
       
       // Draw and compress
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      canvas.toBlob(resolve, 'image/jpeg', quality);
+      canvas.toBlob((blob) => {
+        if (blob) {
+          resolve(blob);
+        } else {
+          reject(new Error('Failed to compress image'));
+        }
+      }, 'image/jpeg', quality);
     };
     
     img.src = URL.createObjectURL(file);
@@ -100,7 +107,7 @@ export const uploadAdImage = async (
 
 // Generate thumbnail
 export const generateThumbnail = (file: File, size = 300): Promise<Blob> => {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d')!;
     const img = new Image();
@@ -120,7 +127,13 @@ export const generateThumbnail = (file: File, size = 300): Promise<Blob> => {
         0, 0, size, size
       );
       
-      canvas.toBlob(resolve, 'image/jpeg', 0.8);
+      canvas.toBlob((blob) => {
+        if (blob) {
+          resolve(blob);
+        } else {
+          reject(new Error('Failed to create thumbnail'));
+        }
+      }, 'image/jpeg', 0.8);
     };
     
     img.src = URL.createObjectURL(file);

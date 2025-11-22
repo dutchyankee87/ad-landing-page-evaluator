@@ -12,8 +12,9 @@ async function getSupabaseClient() {
   try {
     const { createClient } = await import('@supabase/supabase-js');
     
-    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-    const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+    // Support both VITE_ (development) and NEXT_PUBLIC_ (Vercel) environment variables
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || import.meta.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || import.meta.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
     
     // Check if environment variables are properly configured (not placeholder values)
     if (!supabaseUrl || 

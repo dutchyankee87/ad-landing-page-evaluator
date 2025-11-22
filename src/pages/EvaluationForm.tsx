@@ -60,7 +60,12 @@ const EvaluationForm: React.FC = () => {
       await evaluateAd();
       navigate('/results');
     } catch (err) {
-      setError('An error occurred during evaluation. Please try again.');
+      // Handle rate limit errors specifically
+      if (err instanceof Error && err.message.includes('429')) {
+        setError('Monthly evaluation limit reached (5/5). Your limit will reset on December 1st. Please create an account for higher limits.');
+      } else {
+        setError('An error occurred during evaluation. Please try again.');
+      }
       logger.error(err);
     } finally {
       setIsSubmitting(false);
