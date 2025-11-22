@@ -3,9 +3,9 @@ import postgres from 'postgres';
 import { pgTable, uuid, text, integer, timestamp } from 'drizzle-orm/pg-core';
 import { eq } from 'drizzle-orm';
 
-// Database schema (copied from analyze-ad.js)
+// Database schema - use text for Clerk user IDs (they're not UUIDs)
 const users = pgTable('users', {
-  id: uuid('id').primaryKey(),
+  id: text('id').primaryKey(), // Changed from uuid to text for Clerk IDs
   email: text('email').unique().notNull(),
   tier: text('tier').default('free').notNull(),
   monthlyEvaluations: integer('monthly_evaluations').default(0).notNull(),
