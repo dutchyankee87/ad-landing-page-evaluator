@@ -37,8 +37,11 @@ export default function WhatsAppWidget() {
   return (
     <>
       {/* Mobile layout */}
-      <div className="md:hidden fixed bottom-4 left-4 right-4 z-[9999] bg-gray-900/95 backdrop-blur-md border border-gray-700/60 px-4 py-2 shadow-lg rounded-xl">
-        <div className="flex items-center justify-center">
+      <div className="md:hidden fixed bottom-4 left-4 right-4 z-[9999] bg-gradient-to-r from-white via-white to-white shadow-2xl border border-gray-200/50 rounded-2xl px-6 py-3 max-w-lg backdrop-blur-sm bg-white/95 hover:shadow-3xl transition-all duration-300 hover:scale-105">
+        <div className="flex items-center justify-between">
+          <div className="flex-1 mr-3">
+            <p className="text-sm font-medium text-gray-900">Help others align their ads and landing pages</p>
+          </div>
           <div className="flex items-center space-x-2">
             <button
               onClick={handleWhatsAppShare}
@@ -47,22 +50,25 @@ export default function WhatsAppWidget() {
               <span>Share</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
-            <button
-              onClick={handleDismiss}
-              className="p-1.5 text-gray-400 hover:text-white transition-colors duration-200 touch-manipulation"
-              aria-label="Dismiss"
-            >
-              <X className="w-4 h-4" />
-            </button>
           </div>
         </div>
+        <button
+          onClick={handleDismiss}
+          className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition-colors opacity-70 hover:opacity-100"
+          aria-label="Dismiss"
+        >
+          <X className="w-4 h-4" />
+        </button>
       </div>
 
       {/* Desktop layout */}
       <div className="hidden md:block fixed bottom-6 left-1/2 transform -translate-x-1/2 z-[9999]">
-        <div className="relative max-w-sm mx-auto">
-          <div className="bg-gray-900/95 backdrop-blur-md rounded-xl shadow-lg border border-gray-700/60 p-3 transition-all duration-300 hover:scale-105 hover:shadow-xl">
-            <div className="flex items-center justify-center">
+        <div className="relative max-w-lg mx-auto">
+          <div className="bg-gradient-to-r from-white via-white to-white shadow-2xl border border-gray-200/50 rounded-2xl px-8 py-3 backdrop-blur-sm bg-white/95 hover:shadow-3xl transition-all duration-300 hover:scale-105">
+            <div className="flex items-center justify-between">
+              <div className="flex-1 mr-4">
+                <p className="text-sm font-medium text-gray-900">Help others align their ads and landing pages</p>
+              </div>
               <div className="flex items-center space-x-2">
                 <button
                   onClick={handleWhatsAppShare}
@@ -71,15 +77,15 @@ export default function WhatsAppWidget() {
                   <span>Share</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
-                <button
-                  onClick={handleDismiss}
-                  className="p-1.5 text-gray-400 hover:text-white transition-colors duration-200 hover:bg-gray-700 rounded-lg"
-                  aria-label="Dismiss"
-                >
-                  <X className="w-4 h-4" />
-                </button>
               </div>
             </div>
+            <button
+              onClick={handleDismiss}
+              className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition-colors opacity-70 hover:opacity-100"
+              aria-label="Dismiss"
+            >
+              <X className="w-4 h-4" />
+            </button>
           </div>
         </div>
       </div>
