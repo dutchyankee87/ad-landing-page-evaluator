@@ -44,7 +44,7 @@ const Home: React.FC = () => {
         url="/"
       />
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50/30 to-blue-50/20">
-      <div className="w-full max-w-none lg:w-[90%] mx-auto px-4 pt-2 pb-4">
+      <div className="w-full max-w-none lg:w-[80%] mx-auto px-4 pt-2 pb-4">
       {/* Hero Section */}
       <motion.section 
         className="mb-12 py-6"
