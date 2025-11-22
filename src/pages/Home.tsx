@@ -70,7 +70,9 @@ const Home: React.FC = () => {
                 variants={itemVariants}
                 className="text-4xl md:text-6xl font-bold mb-6 leading-tight"
               >
-                Does Your Ad Match
+                <span className="bg-gradient-to-r from-gray-800 to-gray-900 bg-clip-text text-transparent">
+                  Does Your Ad Match
+                </span>
                 <span className="block bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent">
                   Your Landing Page?
                 </span>

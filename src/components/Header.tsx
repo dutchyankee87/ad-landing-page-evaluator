@@ -113,7 +113,7 @@ const Header: React.FC = () => {
                 className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-300 shadow-lg ${
                   location.pathname === '/evaluate' 
                     ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-orange-500/30 border border-orange-300' 
-                    : 'bg-gradient-to-r from-gray-900 to-gray-800 text-white hover:from-gray-800 hover:to-gray-700 shadow-gray-900/20 hover:shadow-xl'
+                    : 'bg-gradient-to-r from-orange-600 to-red-600 text-white hover:from-orange-700 hover:to-red-700 shadow-orange-600/20 hover:shadow-xl'
                 }`}
               >
                 <Zap className="h-4 w-4" />
@@ -258,7 +258,7 @@ const Header: React.FC = () => {
                     className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 ${
                       location.pathname === '/evaluate' 
                         ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg' 
-                        : 'bg-gradient-to-r from-gray-900 to-gray-800 text-white hover:from-gray-800 hover:to-gray-700 shadow-md'
+                        : 'bg-gradient-to-r from-orange-600 to-red-600 text-white hover:from-orange-700 hover:to-red-700 shadow-md'
                     }`}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
