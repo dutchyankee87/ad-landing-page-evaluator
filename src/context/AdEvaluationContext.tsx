@@ -201,8 +201,18 @@ const AdEvaluationContext = createContext<AdEvaluationContextType | undefined>(u
 
 // Provider component
 export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const { user } = useUser();
+  const { user, isLoaded } = useUser();
   const userId = user?.id;
+  
+  // Debug Clerk user object
+  console.log('🔍 Clerk User Debug:', {
+    isLoaded,
+    hasUser: !!user,
+    userId: user?.id,
+    email: user?.emailAddresses?.[0]?.emailAddress,
+    firstName: user?.firstName,
+    fullUserObject: user
+  });
   
   const [adData, setAdData] = useState<AdData>({
     imageUrl: null,
@@ -256,9 +266,25 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
 
   // Sync user to database when they sign up
   const syncUser = async () => {
-    if (!user?.id || !user?.emailAddresses?.[0]?.emailAddress) {
+    if (!isLoaded) {
+      console.log('⏳ Clerk user not loaded yet, skipping sync');
       return;
     }
+
+    if (!user?.id || !user?.emailAddresses?.[0]?.emailAddress) {
+      logger.warn('❌ Missing user data for sync:', { 
+        isLoaded,
+        userId: user?.id, 
+        email: user?.emailAddresses?.[0]?.emailAddress 
+      });
+      return;
+    }
+
+    console.log('🔄 Attempting to sync user:', {
+      userId: user.id,
+      email: user.emailAddresses[0].emailAddress,
+      userObject: user
+    });
 
     try {
       const response = await fetch('/api/sync-user', {
@@ -296,8 +322,8 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
 
     updateUsageStats();
     
-    // Sync user to database if logged in
-    if (user?.id) {
+    // Sync user to database if logged in and loaded
+    if (isLoaded && user?.id) {
       syncUser();
     }
     
@@ -310,7 +336,7 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
       refreshUsage(); // Also refresh from backend periodically
     }, 60000);
     return () => clearInterval(interval);
-  }, [userId, user]); // Update when userId or user changes
+  }, [userId, user, isLoaded]); // Update when userId, user, or load state changes
   
   const updateAdData = (data: Partial<AdData>) => {
     setAdData(prev => ({ ...prev, ...data }));
