@@ -28,19 +28,27 @@ export default async function handler(req, res) {
   }
 
   try {
+    console.log('🔄 Sync user request received:', { body: req.body, headers: req.headers });
+    
     const { userId, email } = req.body;
 
     if (!userId || !email) {
+      console.log('❌ Missing required fields:', { userId, email });
       return res.status(400).json({ error: 'Missing userId or email' });
     }
 
+    console.log('✅ Valid sync request:', { userId, email });
+
     // Initialize database connection
     if (!process.env.DATABASE_URL) {
+      console.log('❌ Database URL not configured');
       return res.status(500).json({ error: 'Database not configured' });
     }
 
     const client = postgres(process.env.DATABASE_URL, { prepare: false });
     const db = drizzle(client);
+
+    console.log('🔍 Checking for existing user with ID:', userId);
 
     // Check if user already exists
     const existingUser = await db
@@ -49,7 +57,10 @@ export default async function handler(req, res) {
       .where(eq(users.id, userId))
       .limit(1);
 
+    console.log('🔍 Existing user query result:', existingUser);
+
     if (existingUser.length > 0) {
+      console.log('✅ User already exists:', existingUser[0]);
       return res.status(200).json({
         success: true,
         message: 'User already exists',
