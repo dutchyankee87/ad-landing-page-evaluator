@@ -1,5 +1,4 @@
 import { nanoid } from 'nanoid';
-import type { Evaluation } from '../lib/db/schema';
 
 // Duration constants
 export const SHARE_DURATION_HOURS = 72; // 3 days
@@ -16,7 +15,7 @@ export function generateShareToken(): string {
  * Sanitizes evaluation data for safe public sharing
  * Removes sensitive information while preserving insights
  */
-export function sanitizeEvaluationData(evaluation: Evaluation): Record<string, any> {
+export function sanitizeEvaluationData(evaluation: any): Record<string, any> {
   return {
     // Core scores (safe to share)
     overallScore: evaluation.overallScore,
@@ -33,11 +32,11 @@ export function sanitizeEvaluationData(evaluation: Evaluation): Record<string, a
     contextualSuggestions: sanitizeRecommendations(evaluation.contextualSuggestions),
     toneSuggestions: sanitizeRecommendations(evaluation.toneSuggestions),
     
-    // Generic landing page info (no personal data)
+    // Element comparisons (sanitized)
+    elementComparisons: sanitizeElementComparisons(evaluation.elementComparisons),
+    
+    // Generic landing page info (no personal data - target age removed for privacy)
     landingPageTitle: evaluation.landingPageTitle,
-    targetAgeRange: evaluation.targetAgeRange,
-    targetGender: evaluation.targetGender,
-    targetLocation: evaluation.targetLocation,
     
     // Analysis metadata
     analysisModel: evaluation.analysisModel,
@@ -49,6 +48,33 @@ export function sanitizeEvaluationData(evaluation: Evaluation): Record<string, a
       tone: evaluation.toneScore
     }
   };
+}
+
+/**
+ * Sanitizes element comparisons to remove sensitive data while preserving insights
+ */
+function sanitizeElementComparisons(comparisons: any): any {
+  if (!comparisons || !Array.isArray(comparisons)) return comparisons;
+  
+  return comparisons.map((comparison: any) => {
+    if (typeof comparison !== 'object' || comparison === null) return comparison;
+    
+    return {
+      ...comparison,
+      // Keep analysis structure but sanitize content
+      adContent: comparison.adContent ? '[Ad Content]' : undefined,
+      pageContent: comparison.pageContent ? '[Page Content]' : undefined,
+      analysis: sanitizeText(comparison.analysis || ''),
+      recommendation: sanitizeText(comparison.recommendation || ''),
+      // Keep scores and status for insights
+      status: comparison.status,
+      severity: comparison.severity,
+      category: comparison.category,
+      element: comparison.element,
+      score: comparison.score,
+      colorAnalysis: comparison.colorAnalysis
+    };
+  });
 }
 
 /**
@@ -147,7 +173,7 @@ export function formatPdfData(evaluation: any) {
     metadata: {
       platform: evaluation.platform,
       targetAudience: {
-        age: evaluation.targetAgeRange,
+        // Age removed for privacy
         gender: evaluation.targetGender,
         location: evaluation.targetLocation
       },

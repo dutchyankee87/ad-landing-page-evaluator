@@ -4,6 +4,7 @@ import { ArrowLeft, Clock, Eye, AlertTriangle, ExternalLink } from 'lucide-react
 import { motion } from 'framer-motion';
 import ScoreGauge from '../components/results/ScoreGauge';
 import ComponentScores from '../components/results/ComponentScores';
+import ComparisonGrid from '../components/results/ComparisonGrid';
 import SEOHead from '../components/SEOHead';
 import { isValidShareToken, isExpired, SHARE_DURATION_HOURS } from '../utils/shareUtils';
 
@@ -73,8 +74,64 @@ const SharedReport: React.FC = () => {
             'Maintain consistent voice and urgency level',
             'Align emotional appeal across touchpoints'
           ],
+          elementComparisons: [
+            {
+              element: 'Headlines',
+              category: 'Contextual',
+              status: 'match',
+              severity: 'low',
+              analysis: 'Headlines show strong thematic alignment with consistent value proposition',
+              recommendation: 'Consider testing slight variations in urgency level',
+              score: 8.2
+            },
+            {
+              element: 'Color Scheme',
+              category: 'Visual', 
+              status: 'partial_match',
+              severity: 'medium',
+              analysis: 'Primary colors align well, but accent colors differ slightly',
+              recommendation: 'Harmonize accent color usage across ad and page',
+              score: 6.8
+            },
+            {
+              element: 'Call-to-Action',
+              category: 'Contextual',
+              status: 'match',
+              severity: 'low', 
+              analysis: 'CTA messaging is consistent and compelling',
+              recommendation: 'Strong alignment - consider A/B testing button colors',
+              score: 9.1
+            },
+            {
+              element: 'Typography',
+              category: 'Visual',
+              status: 'mismatch',
+              severity: 'medium',
+              analysis: 'Font families differ between ad and landing page',
+              recommendation: 'Use consistent typography for better brand coherence',
+              score: 4.5
+            },
+            {
+              element: 'Tone of Voice',
+              category: 'Tone',
+              status: 'partial_match',
+              severity: 'low',
+              analysis: 'Generally consistent professional tone with minor variations',
+              recommendation: 'Align formality level across all copy elements', 
+              score: 7.3
+            },
+            {
+              element: 'Value Proposition',
+              category: 'Contextual',
+              status: 'match',
+              severity: 'low',
+              analysis: 'Core value proposition clearly communicated in both contexts',
+              recommendation: 'Excellent alignment - maintain consistency',
+              score: 8.9
+            }
+          ],
           createdAt: new Date().toISOString(),
-          targetAgeRange: '25-44',
+          // Target age removed for privacy
           targetGender: 'All',
           targetLocation: 'United States',
           analysisModel: 'GPT-4'
@@ -251,6 +308,21 @@ const SharedReport: React.FC = () => {
                   <ComponentScores componentScores={sanitizedData.componentScores} />
                 </motion.div>
 
+                {/* Comparison Table */}
+                {sanitizedData.elementComparisons && (
+                  <motion.section
+                    className="mt-12"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.25 }}
+                  >
+                    <ComparisonGrid 
+                      comparisons={sanitizedData.elementComparisons}
+                      componentScores={sanitizedData.componentScores}
+                    />
+                  </motion.section>
+                )}
+
                 {/* Recommendations */}
                 <motion.section 
                   className="mt-12"
@@ -308,14 +380,10 @@ const SharedReport: React.FC = () => {
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.4 }}
                 >
-                  <div className="grid md:grid-cols-4 gap-4 text-sm text-gray-600">
+                  <div className="grid md:grid-cols-3 gap-4 text-sm text-gray-600">
                     <div>
                       <div className="font-medium text-gray-700">Platform</div>
                       <div className="capitalize">{sanitizedData.platform}</div>
-                    </div>
-                    <div>
-                      <div className="font-medium text-gray-700">Target Age</div>
-                      <div>{sanitizedData.targetAgeRange || 'Not specified'}</div>
                     </div>
                     <div>
                       <div className="font-medium text-gray-700">Analysis Model</div>

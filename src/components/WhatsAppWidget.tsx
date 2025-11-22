@@ -37,12 +37,8 @@ export default function WhatsAppWidget() {
   return (
     <>
       {/* Mobile layout */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-[9999] bg-gray-900/95 backdrop-blur-md border-t border-gray-700/60 px-4 py-2 shadow-lg">
-        <div className="flex items-center justify-between">
-          <div className="flex-1 mr-3">
-            <p className="text-sm font-medium text-white">Share ADalign.io</p>
-            <p className="text-xs text-gray-300">Help others optimize campaigns</p>
-          </div>
+      <div className="md:hidden fixed bottom-4 left-4 right-4 z-[9999] bg-gray-900/95 backdrop-blur-md border border-gray-700/60 px-4 py-2 shadow-lg rounded-xl">
+        <div className="flex items-center justify-center">
           <div className="flex items-center space-x-2">
             <button
               onClick={handleWhatsAppShare}
@@ -63,14 +59,10 @@ export default function WhatsAppWidget() {
       </div>
 
       {/* Desktop layout */}
-      <div className="hidden md:block fixed bottom-24 left-1/2 transform -translate-x-1/2 z-[9999]">
+      <div className="hidden md:block fixed bottom-6 left-1/2 transform -translate-x-1/2 z-[9999]">
         <div className="relative max-w-sm mx-auto">
           <div className="bg-gray-900/95 backdrop-blur-md rounded-xl shadow-lg border border-gray-700/60 p-3 transition-all duration-300 hover:scale-105 hover:shadow-xl">
-            <div className="flex items-center justify-between">
-              <div className="flex-1 mr-3">
-                <p className="text-white font-medium text-sm">Share ADalign.io</p>
-                <p className="text-gray-300 text-xs mt-0.5">Help marketers optimize campaigns</p>
-              </div>
+            <div className="flex items-center justify-center">
               <div className="flex items-center space-x-2">
                 <button
                   onClick={handleWhatsAppShare}
