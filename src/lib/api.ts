@@ -118,8 +118,12 @@ export interface EvaluationResponse {
 export interface UsageInfo {
   used: number;
   limit: number;
-  tier: 'free' | 'pro' | 'enterprise';
+  remaining: number;
   canEvaluate: boolean;
+  nextReset: string;
+  tier?: 'free' | 'pro' | 'enterprise';
+  ipAddress?: string;
+  error?: string;
 }
 
 // Evaluate ad using Vercel Function
@@ -160,35 +164,45 @@ export async function evaluateAd(request: EvaluationRequest): Promise<Evaluation
   }
 }
 
-// Get user usage information
-export async function getUserUsage(userEmail?: string): Promise<UsageInfo> {
-  if (!userEmail) {
-    return {
-      used: 0,
-      limit: 1,
-      tier: 'free',
-      canEvaluate: true
-    };
-  }
-
+// Get real usage information from backend
+export async function getRealUsage(): Promise<UsageInfo> {
   try {
-    // In production, this would query the database through an API endpoint
-    // For now, return mock data
-    return {
-      used: 0,
-      limit: 1,
-      tier: 'free',
-      canEvaluate: true
-    };
+    logger.log('🔍 Checking real usage from backend...');
+    
+    const response = await fetch('/api/check-usage', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const data = await response.json();
+    logger.log('✅ Real usage data received:', data);
+    return data;
+    
   } catch (error) {
-    logger.warn('Usage check failed:', error);
+    logger.warn('❌ Usage check failed, using fallback:', error);
+    
+    // Fallback to conservative defaults
     return {
-      used: 0,
-      limit: 1,
+      used: 5, // Assume limit reached if we can't check
+      limit: 5,
+      remaining: 0,
+      canEvaluate: false,
+      nextReset: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1).toISOString(),
       tier: 'free',
-      canEvaluate: true
+      error: 'Unable to check usage'
     };
   }
+}
+
+// Legacy function - kept for compatibility
+export async function getUserUsage(userEmail?: string): Promise<UsageInfo> {
+  return getRealUsage();
 }
 
 // Generate mock evaluation for fallback

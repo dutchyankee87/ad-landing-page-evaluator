@@ -15,22 +15,30 @@ interface UsageBannerProps {
 }
 
 const UsageBanner: React.FC<UsageBannerProps> = () => {
-  const { usageData, remainingEvaluations, daysUntilReset, canPerformEvaluation } = useAdEvaluation();
+  const { usageData, realUsage, remainingEvaluations, daysUntilReset, canPerformEvaluation } = useAdEvaluation();
   const { isSignedIn } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
 
   // Check for admin mode
   const isAdminMode = remainingEvaluations === 999;
   
-  // Use real usage data from context
-  const currentUsage = {
+  // Prefer real usage data from backend, fallback to localStorage
+  const currentUsage = realUsage ? {
+    used: realUsage.used,
+    limit: realUsage.limit,
+    tier: 'free' as const
+  } : {
     used: usageData.evaluationsUsed,
     limit: usageData.monthlyLimit,
     tier: 'free' as const
   };
+  
+  // Use real usage data for evaluation capability if available
+  const canActuallyEvaluate = realUsage ? realUsage.canEvaluate : canPerformEvaluation;
+  const actualRemainingEvaluations = realUsage ? realUsage.remaining : remainingEvaluations;
 
   const isNearLimit = currentUsage.used >= currentUsage.limit * 0.67; // Show warning at 2/3 used
-  const isOverLimit = !canPerformEvaluation;
+  const isOverLimit = !canActuallyEvaluate;
 
   // For anonymous users who haven't used their free check, show different messaging
   if (!isSignedIn && !hasUsedAnonymousCheck()) {
@@ -124,7 +132,7 @@ const UsageBanner: React.FC<UsageBannerProps> = () => {
           }`}>
             {isOverLimit
               ? `Resets in ${daysUntilReset} day${daysUntilReset !== 1 ? 's' : ''}.`
-              : `${remainingEvaluations} evaluation${remainingEvaluations !== 1 ? 's' : ''} remaining. Resets in ${daysUntilReset} day${daysUntilReset !== 1 ? 's' : ''}.`
+              : `${actualRemainingEvaluations} evaluation${actualRemainingEvaluations !== 1 ? 's' : ''} remaining. Resets in ${daysUntilReset} day${daysUntilReset !== 1 ? 's' : ''}.`
             }
           </p>
           {(isOverLimit || isNearLimit) && (

@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
-import { ElementComparison } from '../lib/api';
+import { ElementComparison, getRealUsage, type UsageInfo } from '../lib/api';
 import { logger } from '../lib/logger';
 import { 
   canEvaluate, 
@@ -179,6 +179,7 @@ interface AdEvaluationContextType {
   hasEvaluated: boolean;
   showFeedbackModal: boolean;
   usageData: UsageData;
+  realUsage: UsageInfo | null; // Real usage data from backend
   canPerformEvaluation: boolean;
   remainingEvaluations: number;
   daysUntilReset: number;
@@ -192,6 +193,7 @@ interface AdEvaluationContextType {
   closeFeedbackModal: () => void;
   submitFeedback: (feedback: any) => Promise<void>;
   closeLimitModal: () => void;
+  refreshUsage: () => Promise<void>; // Function to refresh usage data
 }
 
 // Create context
@@ -224,24 +226,54 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [showLimitModal, setShowLimitModal] = useState(false);
   const [usageData, setUsageData] = useState<UsageData>(() => getUsageData(userId));
+  const [realUsage, setRealUsage] = useState<UsageInfo | null>(null);
   const [canPerformEvaluation, setCanPerformEvaluation] = useState(() => canEvaluate(userId));
   const [remainingEvaluations, setRemainingEvaluations] = useState(() => getRemainingEvaluations(userId));
   const [daysUntilReset, setDaysUntilReset] = useState(() => getDaysUntilReset());
+
+  // Function to refresh real usage data from backend
+  const refreshUsage = async () => {
+    try {
+      const usage = await getRealUsage();
+      setRealUsage(usage);
+      
+      // Update local states based on real usage
+      setCanPerformEvaluation(usage.canEvaluate);
+      setRemainingEvaluations(usage.remaining);
+      
+      // Calculate days until reset from nextReset date
+      const resetDate = new Date(usage.nextReset);
+      const today = new Date();
+      const diffTime = resetDate.getTime() - today.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      setDaysUntilReset(Math.max(0, diffDays));
+      
+      logger.log('✅ Usage refreshed from backend');
+    } catch (error) {
+      logger.error('❌ Failed to refresh usage:', error);
+    }
+  };
 
   // Update usage stats when component mounts or usage changes
   useEffect(() => {
     const updateUsageStats = () => {
       const usage = getUsageData(userId);
       setUsageData(usage);
+      // Keep localStorage backup in case API fails
       setCanPerformEvaluation(canEvaluate(userId));
       setRemainingEvaluations(getRemainingEvaluations(userId));
       setDaysUntilReset(getDaysUntilReset());
     };
 
     updateUsageStats();
+    // Also refresh real usage from backend
+    refreshUsage();
     
     // Update stats periodically (every minute) to handle month transitions
-    const interval = setInterval(updateUsageStats, 60000);
+    const interval = setInterval(() => {
+      updateUsageStats();
+      refreshUsage(); // Also refresh from backend periodically
+    }, 60000);
     return () => clearInterval(interval);
   }, [userId]); // Update when userId changes
   
@@ -258,10 +290,18 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
   };
   
   const evaluateAd = async () => {
+    // First check real usage from backend to prevent rate limit errors
+    await refreshUsage();
+    
+    // If real usage indicates we can't evaluate, block it early
+    if (realUsage && !realUsage.canEvaluate) {
+      throw new Error(`HTTP 429: Rate limit exceeded (${realUsage.used}/${realUsage.limit})`);
+    }
+    
     // Determine evaluation type based on ad data
     const evaluationType: EvaluationType = adData.mediaType === 'video' ? 'video' : 'image';
     
-    // Get fresh usage data to ensure accuracy
+    // Get fresh usage data to ensure accuracy (localStorage backup)
     const usage = getUsageData(userId);
     
     // Check if this evaluation type is allowed for user's tier
@@ -1204,6 +1244,7 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
         hasEvaluated,
         showFeedbackModal,
         usageData,
+        realUsage,
         canPerformEvaluation,
         remainingEvaluations,
         daysUntilReset,
@@ -1216,7 +1257,8 @@ export const AdEvaluationProvider: React.FC<{ children: ReactNode }> = ({ childr
         openFeedbackModal,
         closeFeedbackModal,
         submitFeedback,
-        closeLimitModal
+        closeLimitModal,
+        refreshUsage
       }}
     >
       {children}
